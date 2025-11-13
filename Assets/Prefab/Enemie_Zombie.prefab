@@ -49,12 +49,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieAI
   target: {fileID: 0}
-  attackRange: 1.5
-  moveSpeed: 3
+  attackRange: 2
+  moveSpeed: 2
   rotationSpeed: 5
-  circleDistance: 2.5
-  circleSpeed: 2
-  attackCooldown: 1.5
+  circleDistance: 3
+  circleSpeed: 1
+  attackCooldown: 2
+  attackDamage: 25
 --- !u!136 &1545083021011329708
 CapsuleCollider:
   m_ObjectHideFlags: 0

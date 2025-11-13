@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 
+[RequireComponent(typeof(NavMeshAgent))]
 public class ZombieAI : MonoBehaviour
 {
     [Header("References")]
@@ -13,6 +14,7 @@ public class ZombieAI : MonoBehaviour
     public float circleDistance = 2.5f;
     public float circleSpeed = 2f;
     public float attackCooldown = 1.5f;
+    public float attackDamage = 10f; // added from EnemyAttack
 
     private NavMeshAgent agent;
     private float lastAttackTime;
@@ -64,7 +66,21 @@ public class ZombieAI : MonoBehaviour
             return;
 
         lastAttackTime = Time.time;
-        // Simple placeholder for attack
-        Debug.Log($"{name} attacks the player!");
+
+        // Apply real damage
+        if (target.TryGetComponent(out PlayerHealth playerHealth))
+        {
+            playerHealth.TakeDamage(attackDamage);
+            Debug.Log($"{name} attacks the player for {attackDamage} damage!");
+        }
+
+        // Optionally stop moving briefly to sell the hit
+        agent.SetDestination(transform.position);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }
