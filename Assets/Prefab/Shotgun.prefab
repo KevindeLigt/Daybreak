@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4922189394745127459}
   - component: {fileID: 4965538892756486854}
   m_Layer: 0
-  m_Name: Barrel1_Mesh
+  m_Name: BarrelRight_Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 2017836983676809778}
   - component: {fileID: 1199334847686277914}
   m_Layer: 0
-  m_Name: Barrel2_Mesh
+  m_Name: BarrelLeft_Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -188,7 +188,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7613455906160886340}
   m_Layer: 0
-  m_Name: BarrelPoint1
+  m_Name: BarrelLeftPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -203,7 +203,7 @@ Transform:
   m_GameObject: {fileID: 2979878977590647391}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalPosition: {x: -0.298, y: 0, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -257,19 +257,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb37891f62ccde8408b5b97e0c216b2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShotgunController
-  pelletCount: 10
+  pelletsPerShot: 12
   spreadAngle: 12
   range: 40
   damagePerPellet: 10
   forcePerPellet: 50
-  fireCooldown: 1
-  reloadTime: 3
+  openTime: 0.4
+  loadShellTime: 0.6
+  closeTime: 0.4
   fpsCamera: {fileID: 0}
-  muzzlePoint: {fileID: 7613455906160886340}
+  leftBarrel: {fileID: 7613455906160886340}
+  rightBarrel: {fileID: 840933890702551096}
   tracerPrefab: {fileID: 7523358957666567661, guid: cb7a724a36c4cde4b9db3e00fd6680a0, type: 3}
   hitMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 192
 --- !u!1 &8337939801068494617
 GameObject:
   m_ObjectHideFlags: 0
@@ -280,7 +282,7 @@ GameObject:
   m_Component:
   - component: {fileID: 840933890702551096}
   m_Layer: 0
-  m_Name: BarrelPoint2
+  m_Name: BarrelRightPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

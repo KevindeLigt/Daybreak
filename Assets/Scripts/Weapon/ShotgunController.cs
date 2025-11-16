@@ -1,100 +1,136 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using System.Collections;
 
-public class ShotgunController : MonoBehaviour
+public class DoubleBarrelShotgunController : MonoBehaviour
 {
     [Header("Shotgun Settings")]
-    public int pelletCount = 10;
-    public float spreadAngle = 12f;
+    public int pelletsPerShot = 12;
+    public float spreadAngle = 6f;
     public float range = 40f;
     public float damagePerPellet = 10f;
-    public float forcePerPellet = 2f; // Lower now because warp pushes more strongly
-    public float fireCooldown = 1.0f;
-    public float reloadTime = 1.6f;
+    public float forcePerPellet = 3f;
+
+    [Header("Reloading")]
+    public float openTime = 0.4f;
+    public float loadShellTime = 0.6f;
+    public float closeTime = 0.4f;
 
     [Header("References")]
     public Camera fpsCamera;
-    public Transform muzzlePoint;
+    public Transform leftBarrel;
+    public Transform rightBarrel;
     public GameObject tracerPrefab;
     public LayerMask hitMask;
 
+    private int shellsLoaded = 2;   // 0 to 2
     private bool isReloading = false;
-    private bool onCooldown = false;
+    private bool isFiring = false;
+    private bool fireLeftNext = true;
 
-    public void OnFire(UnityEngine.InputSystem.InputAction.CallbackContext ctx)
+    public void OnFire(InputAction.CallbackContext ctx)
     {
         if (!ctx.performed) return;
-        if (onCooldown || isReloading) return;
-
-        FireShotgun();
+        TryFire();
     }
 
-    private void FireShotgun()
+    public void OnReload(InputAction.CallbackContext ctx)
     {
-        StartCoroutine(FireCooldownRoutine());
+        if (!ctx.performed) return;
+        if (!isReloading) StartCoroutine(ReloadRoutine());
+    }
 
-        for (int i = 0; i < pelletCount; i++)
+    private void TryFire()
+    {
+        if (isReloading) return;
+
+        if (shellsLoaded <= 0)
         {
-            Vector3 direction = GetSpreadDirection();
-            Vector3 origin = fpsCamera.transform.position;
-
-            RaycastHit hit;
-            bool didHit = Physics.Raycast(origin, direction, out hit, range, hitMask);
-
-            // Debug ray (optional)
-            Debug.DrawRay(origin, direction * range, didHit ? Color.green : Color.red, 1f);
-
-            // Spawn tracer
-            SpawnTracer(direction, didHit ? hit.point : origin + direction * range);
-
-            if (!didHit) continue;
-
-            // Handle damage
-            EnemyHealth health = hit.collider.GetComponentInParent<EnemyHealth>();
-            if (health != null)
-            {
-                Vector3 force = direction.normalized * forcePerPellet;
-                health.TakeDamage(damagePerPellet, force);
-            }
-
+            // Dry fire sound here
+            Debug.Log("CLICK! Empty!");
+            return;
         }
 
-        StartCoroutine(ReloadRoutine());
+        StartCoroutine(FireRoutine());
+    }
+
+    private IEnumerator FireRoutine()
+    {
+        isFiring = true;
+
+        Transform muzzle = fireLeftNext ? leftBarrel : rightBarrel;
+        fireLeftNext = !fireLeftNext;
+
+        FirePellets(muzzle);
+
+        shellsLoaded--;
+
+        yield return new WaitForSeconds(0.1f); // optionally time between barrels
+        isFiring = false;
+    }
+
+    private void FirePellets(Transform muzzle)
+    {
+        for (int i = 0; i < pelletsPerShot; i++)
+        {
+            Vector3 direction = GetSpreadDirection();
+
+            if (Physics.Raycast(fpsCamera.transform.position, direction, out RaycastHit hit, range, hitMask))
+            {
+                // Tracer from the barrel to the hit point
+                SpawnTracer(muzzle.position, hit.point);
+
+                // Apply damage + ragdoll force
+                EnemyHealth health = hit.collider.GetComponentInParent<EnemyHealth>();
+                if (health != null)
+                {
+                    Vector3 force = direction.normalized * forcePerPellet;
+                    health.TakeDamage(damagePerPellet, force);
+                }
+            }
+            else
+            {
+                // miss tracer
+                SpawnTracer(muzzle.position, fpsCamera.transform.position + direction * range);
+            }
+        }
     }
 
     private Vector3 GetSpreadDirection()
     {
         float x = Random.Range(-spreadAngle, spreadAngle);
         float y = Random.Range(-spreadAngle, spreadAngle);
-        Quaternion rot = Quaternion.Euler(x, y, 0);
-        return rot * fpsCamera.transform.forward;
+        return Quaternion.Euler(x, y, 0) * fpsCamera.transform.forward;
     }
 
-    private IEnumerator FireCooldownRoutine()
+    private void SpawnTracer(Vector3 start, Vector3 end)
     {
-        onCooldown = true;
-        yield return new WaitForSeconds(fireCooldown);
-        onCooldown = false;
+        if (!tracerPrefab) return;
+
+        GameObject tracer = Instantiate(tracerPrefab, start, Quaternion.identity);
+        var lr = tracer.GetComponent<LineRenderer>();
+        lr.SetPosition(0, start);
+        lr.SetPosition(1, end);
+        Destroy(tracer, 0.2f);
     }
 
     private IEnumerator ReloadRoutine()
     {
         isReloading = true;
-        yield return new WaitForSeconds(reloadTime);
-        isReloading = false;
-    }
 
-    private void SpawnTracer(Vector3 dir, Vector3 endPoint)
-    {
-        if (tracerPrefab == null || muzzlePoint == null) return;
+        Debug.Log("Opening shotgun...");
+        yield return new WaitForSeconds(openTime);
 
-        GameObject tracer = Instantiate(tracerPrefab, muzzlePoint.position, Quaternion.identity);
-        var lr = tracer.GetComponent<LineRenderer>();
-        if (lr != null)
+        while (shellsLoaded < 2)
         {
-            lr.SetPosition(0, muzzlePoint.position);
-            lr.SetPosition(1, endPoint);
+            Debug.Log("Loading shell...");
+            shellsLoaded++;
+            yield return new WaitForSeconds(loadShellTime);
         }
-        Destroy(tracer, 0.2f);
+
+        Debug.Log("Closing shotgun...");
+        yield return new WaitForSeconds(closeTime);
+
+        isReloading = false;
     }
 }
