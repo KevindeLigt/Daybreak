@@ -34,30 +34,44 @@ public class ZombieAI : MonoBehaviour
 
     void Update()
     {
-        if (!target) return;
-
-        float distance = Vector3.Distance(transform.position, target.position);
-
-        if (distance > attackRange)
+        // Do nothing if agent is disabled (ragdoll, death, stun, etc.)
         {
-            MoveAroundPlayer();
-        }
-        else
-        {
-            TryAttack();
+            if (!agent || !agent.enabled)
+                return;
+
+            if (target == null)
+                return;
+
+            float distance = Vector3.Distance(transform.position, target.position);
+
+            if (distance > attackRange)
+            {
+                MoveAroundPlayer();
+            }
+            else
+            {
+                TryAttack();
+            }
         }
     }
 
+
+
+
     void MoveAroundPlayer()
     {
-        // Calculate a circling offset to spread zombies around
-        float angle = Mathf.Atan2(transform.position.z - target.position.z, transform.position.x - target.position.x);
-        angle += Mathf.Sin(Time.time * circleSpeed + GetInstanceID() * 0.1f) * 0.5f; // Add variation
+        if (!agent.enabled)
+            return;
+        {
+            // Calculate a circling offset to spread zombies around
+            float angle = Mathf.Atan2(transform.position.z - target.position.z, transform.position.x - target.position.x);
+            angle += Mathf.Sin(Time.time * circleSpeed + GetInstanceID() * 0.1f) * 0.5f; // Add variation
 
-        Vector3 offset = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * circleDistance;
-        Vector3 destination = target.position + offset;
+            Vector3 offset = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * circleDistance;
+            Vector3 destination = target.position + offset;
 
-        agent.SetDestination(destination);
+            agent.SetDestination(destination);
+        }
     }
 
     void TryAttack()

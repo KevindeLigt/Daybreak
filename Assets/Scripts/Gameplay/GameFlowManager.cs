@@ -14,17 +14,22 @@ public class GameFlowManager : MonoBehaviour
     public float spawnDelay = 0.3f;
 
     [Header("References")]
-    public UIManager uiManager; // assign in inspector
+    public UIManager uiManager;
 
-    private int currentWave = 0;
-    private int aliveEnemies = 0;
-    private int enemiesThisWave = 0;
-    private bool gameActive = false;
+    private int currentWave;
+    private int aliveEnemies;
+    private int enemiesThisWave;
+    private bool gameActive;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) Destroy(gameObject);
+        if (Instance != null && Instance != this)
+            Destroy(gameObject);
+
         Instance = this;
+
+        // Always reset time scale when entering the scene fresh
+        Time.timeScale = 1f;
     }
 
     private void Start()
@@ -32,12 +37,23 @@ public class GameFlowManager : MonoBehaviour
         if (uiManager == null)
             uiManager = FindObjectOfType<UIManager>();
 
+        ResetGameState();
         StartCoroutine(StartGameRoutine());
+    }
+
+    private void ResetGameState()
+    {
+        currentWave = 0;
+        aliveEnemies = 0;
+        enemiesThisWave = 0;
+        gameActive = true;
     }
 
     private IEnumerator StartGameRoutine()
     {
-        yield return new WaitForSeconds(0.5f);
+        // tiny delay so the UI has initialized
+        yield return new WaitForSeconds(0.2f);
+
         StartNextWave();
     }
 
@@ -46,8 +62,10 @@ public class GameFlowManager : MonoBehaviour
         currentWave++;
         enemiesThisWave = startingEnemiesPerWave + (currentWave - 1) * 2;
         aliveEnemies = enemiesThisWave;
+
         uiManager.UpdateWave(currentWave);
         uiManager.UpdateEnemyCount(aliveEnemies, enemiesThisWave);
+
         StartCoroutine(SpawnWaveRoutine());
     }
 
@@ -62,14 +80,15 @@ public class GameFlowManager : MonoBehaviour
 
     private void SpawnEnemy()
     {
-        if (spawnPoints == null || spawnPoints.Length == 0 || enemyPrefabs == null || enemyPrefabs.Length == 0) return;
+        if (spawnPoints == null || spawnPoints.Length == 0) return;
+        if (enemyPrefabs == null || enemyPrefabs.Length == 0) return;
 
         Transform sp = spawnPoints[Random.Range(0, spawnPoints.Length)];
         GameObject prefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
+
         Instantiate(prefab, sp.position, sp.rotation);
     }
 
-    // Called by EnemyHealth when an enemy dies
     public void EnemyDied()
     {
         aliveEnemies = Mathf.Max(0, aliveEnemies - 1);
@@ -77,7 +96,6 @@ public class GameFlowManager : MonoBehaviour
 
         if (aliveEnemies <= 0)
         {
-            // All enemies of the wave are dead
             if (currentWave >= maxWaves)
             {
                 WinGame();
@@ -95,7 +113,6 @@ public class GameFlowManager : MonoBehaviour
         StartNextWave();
     }
 
-    // Called by PlayerHealth when player dies
     public void PlayerDied()
     {
         LoseGame();
@@ -103,15 +120,19 @@ public class GameFlowManager : MonoBehaviour
 
     public void WinGame()
     {
+        if (!gameActive) return;
+
         gameActive = false;
-        uiManager.ShowGameOver(true);
         Time.timeScale = 0f;
+        uiManager.ShowGameOver(true);
     }
 
     public void LoseGame()
     {
+        if (!gameActive) return;
+
         gameActive = false;
-        uiManager.ShowGameOver(false);
         Time.timeScale = 0f;
+        uiManager.ShowGameOver(false);
     }
 }

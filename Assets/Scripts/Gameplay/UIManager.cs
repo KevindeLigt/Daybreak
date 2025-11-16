@@ -13,7 +13,7 @@ public class UIManager : MonoBehaviour
     public GameObject gameOverPanel;
     public TMP_Text gameOverTitle;
     public Button restartButton;
-    public Button quitButton;
+    public Button quitButton;   // Can either quit to Desktop, or return to Menu depending on what you want
 
     private void Awake()
     {
@@ -23,25 +23,35 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);
 
         if (restartButton != null)
-            restartButton.onClick.AddListener(() => UnityEngine.SceneManagement.SceneManager.LoadScene(
-                UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex));
+            restartButton.onClick.AddListener(() =>
+            {
+                // Async load via loading screen
+                SceneLoader.LoadScene("Gameplay");
+            });
 
         if (quitButton != null)
-            quitButton.onClick.AddListener(() => Application.Quit());
+            quitButton.onClick.AddListener(() =>
+            {
+
+                SceneLoader.LoadScene("MainMenu");
+            });
     }
 
     // Public API used by other scripts:
     public void UpdateWave(int waveNumber)
     {
-        if (waveText != null) waveText.text = $"Wave {waveNumber}";
+        if (waveText != null)
+            waveText.text = $"Wave {waveNumber}";
     }
 
     public void UpdateEnemyCount(int remaining, int total)
     {
-        if (enemyCountText != null) enemyCountText.text = $"Enemies: {remaining}/{total}";
+        if (enemyCountText != null)
+            enemyCountText.text = $"Enemies: {remaining}/{total}";
     }
 
     public void UpdateHealth(float current, float max)
@@ -53,11 +63,14 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // Make public so GameFlowManager / PlayerHealth can call it
     public void ShowGameOver(bool playerWon)
     {
-        if (gameOverPanel != null) gameOverPanel.SetActive(true);
-        if (gameOverTitle != null) gameOverTitle.text = playerWon ? "You Survived!" : "You Died";
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
+
+        if (gameOverTitle != null)
+            gameOverTitle.text = playerWon ? "You Survived!" : "You Died";
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }

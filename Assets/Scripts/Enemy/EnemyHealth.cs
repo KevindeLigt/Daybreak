@@ -1,65 +1,65 @@
 using UnityEngine;
-using UnityEngine.AI;
+using System.Collections;
 
 public class EnemyHealth : MonoBehaviour
 {
-    [Header("Health")]
     public float maxHealth = 100f;
     private float currentHealth;
 
-    [Header("Feedback")]
     public Renderer enemyRenderer;
     public Color hitColor = Color.white;
-    public float flashDuration = 0.08f;
-    public float stunDuration = 0.25f;
+    public float flashDuration = 0.1f;
 
     private Color originalColor;
-    private NavMeshAgent agent;
-    private bool isFlashing;
+    private EnemyRagdollController ragdoll;
 
-    private void Start()
+    private bool isDead = false;
+
+    void Start()
     {
         currentHealth = maxHealth;
-        agent = GetComponent<NavMeshAgent>();
+        ragdoll = GetComponent<EnemyRagdollController>();
 
-        if (enemyRenderer == null) enemyRenderer = GetComponentInChildren<Renderer>();
-        if (enemyRenderer != null) originalColor = enemyRenderer.material.color;
+        if (enemyRenderer == null)
+            enemyRenderer = GetComponentInChildren<Renderer>();
+
+        if (enemyRenderer != null)
+            originalColor = enemyRenderer.material.color;
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, Vector3 force)
     {
+        if (isDead) return;
+
         currentHealth -= damage;
 
-        if (!isFlashing)
-            StartCoroutine(FlashAndStun());
+        StartCoroutine(Flash());
+
+        ragdoll.StartCoroutine(ragdoll.TemporaryRagdollBlast(force));
 
         if (currentHealth <= 0f)
-            Die();
+            Die(force);
     }
 
-    private System.Collections.IEnumerator FlashAndStun()
+    private IEnumerator Flash()
     {
-        isFlashing = true;
-
-        if (agent != null) agent.isStopped = true;
-        if (enemyRenderer != null) enemyRenderer.material.color = hitColor;
-
+        if (enemyRenderer) enemyRenderer.material.color = hitColor;
         yield return new WaitForSeconds(flashDuration);
-
-        if (enemyRenderer != null) enemyRenderer.material.color = originalColor;
-
-        yield return new WaitForSeconds(stunDuration);
-
-        if (agent != null) agent.isStopped = false;
-        isFlashing = false;
+        if (enemyRenderer) enemyRenderer.material.color = originalColor;
     }
 
-    private void Die()
+    private void Die(Vector3 force)
     {
-        // inform flow manager
+        if (isDead) return;
+        isDead = true;
+
         GameFlowManager.Instance?.EnemyDied();
 
-        // TODO: play death VFX/animation before destroy
-        Destroy(gameObject);
+        ragdoll.EnableRagdoll();
+
+        foreach (var rb in ragdoll.ragdollBodies)
+            rb.AddForce(force * 2f, ForceMode.Impulse);
+
+        Destroy(gameObject, 10f);
     }
 }

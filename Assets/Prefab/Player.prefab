@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1852167265408765495}
   - component: {fileID: 602987744957374708}
   - component: {fileID: 9104016610191779156}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: PlayerMesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -126,7 +126,7 @@ GameObject:
   - component: {fileID: 6547260024657876998}
   - component: {fileID: 614694295166656794}
   - component: {fileID: 5865455908760669024}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -146,7 +146,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1230086250771317028}
   - {fileID: 731385423978014450}
   - {fileID: 5893763879883738833}
   m_Father: {fileID: 0}
@@ -253,7 +252,7 @@ MonoBehaviour:
     m_ActionName: 'Player/Look[/Mouse/delta,/Pen/delta]'
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 3179057216141037932}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: HunterWeapon, Assembly-CSharp
         m_MethodName: Fire
         m_Mode: 0
@@ -369,7 +368,7 @@ GameObject:
   - component: {fileID: 2426618626291283026}
   - component: {fileID: 1177129900061034918}
   - component: {fileID: 208114797107554788}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -388,7 +387,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1230086250771317028}
   m_Father: {fileID: 5939866282482826227}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &2426618626291283026
@@ -598,8 +598,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1230086250771317028}
-  - component: {fileID: 3179057216141037932}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: WeaponHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -615,26 +614,100 @@ Transform:
   m_GameObject: {fileID: 6516217377330985805}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.51, y: -0.5, z: 1.12}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5939866282482826227}
+  m_Children:
+  - {fileID: 5297495192255261412}
+  m_Father: {fileID: 731385423978014450}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3179057216141037932
-MonoBehaviour:
+--- !u!1001 &5378099734199703473
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1230086250771317028}
+    m_Modifications:
+    - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1255553114298223834, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1989020329038293209, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2979878977590647391, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6517947966368836016, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_Name
+      value: Shotgun
+      objectReference: {fileID: 0}
+    - target: {fileID: 6517947966368836016, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235631892856808707, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: fpsCamera
+      value: 
+      objectReference: {fileID: 2426618626291283026}
+    - target: {fileID: 7235631892856808707, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: hitMask.m_Bits
+      value: 87
+      objectReference: {fileID: 0}
+    - target: {fileID: 8337939801068494617, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+--- !u!4 &5297495192255261412 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+  m_PrefabInstance: {fileID: 5378099734199703473}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6516217377330985805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c00910c2f991ca045bf69e084a610697, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HunterWeapon
-  fireRate: 0.4
-  range: 100
-  damage: 25
-  playerCamera: {fileID: 2426618626291283026}
-  impactEffectPrefab: {fileID: 5359789755273865957, guid: a4f91ae1acff24b41b42ee328c5d45a6, type: 3}

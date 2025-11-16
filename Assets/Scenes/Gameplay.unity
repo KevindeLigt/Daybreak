@@ -957,7 +957,7 @@ GameObject:
   - component: {fileID: 1059040372}
   - component: {fileID: 1059040371}
   - component: {fileID: 1059040375}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: SM_BaseFloor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1076,7 +1076,7 @@ MonoBehaviour:
   m_Center: {x: 0, y: 2, z: 0}
   m_LayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 128
   m_UseGeometry: 0
   m_DefaultArea: 0
   m_GenerateLinks: 0
@@ -1087,7 +1087,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 0827c27317afa944e84836137bbdacac, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 96b7de81499431d459150b8bd79efd14, type: 2}
   m_BuildHeightMesh: 0
 --- !u!1 &1178074006
 GameObject:
@@ -1101,7 +1101,7 @@ GameObject:
   - component: {fileID: 1178074009}
   - component: {fileID: 1178074008}
   - component: {fileID: 1178074007}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1301,7 +1301,7 @@ GameObject:
   - component: {fileID: 1291298326}
   - component: {fileID: 1291298325}
   - component: {fileID: 1291298324}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2116,7 +2116,7 @@ GameObject:
   - component: {fileID: 1573727489}
   - component: {fileID: 1573727488}
   - component: {fileID: 1573727487}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2484,7 +2484,7 @@ GameObject:
   - component: {fileID: 1708473337}
   - component: {fileID: 1708473336}
   - component: {fileID: 1708473335}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2768,6 +2768,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2143926623 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3371219097603748530, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
+  m_PrefabInstance: {fileID: 5282579670289342671}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb37891f62ccde8408b5b97e0c216b2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShotgunController
 --- !u!1001 &5282579670289342671
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2780,9 +2791,37 @@ PrefabInstance:
       propertyPath: m_UIInputModule
       value: 
       objectReference: {fileID: 1000805444}
+    - target: {fileID: 614694295166656794, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2143926623}
+    - target: {fileID: 614694295166656794, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnFire
+      objectReference: {fileID: 0}
+    - target: {fileID: 614694295166656794, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: ShotgunController, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 1223726309849606259, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 3371219097603748530, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
+      propertyPath: range
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 3371219097603748530, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
+      propertyPath: pelletCount
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3371219097603748530, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
+      propertyPath: spreadAngle
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 3371219097603748530, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
+      propertyPath: damagePerPellet
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 5939866282482826227, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
       propertyPath: m_LocalPosition.x
