@@ -28,6 +28,18 @@ public class DoubleBarrelShotgunController : MonoBehaviour
     private bool isFiring = false;
     private bool fireLeftNext = true;
 
+    private RecoilSystem recoil;
+    private CameraShake cameraShake;
+    private WeaponSway weaponSway;
+
+    void Start()
+    {
+        recoil = fpsCamera.GetComponent<RecoilSystem>();
+        cameraShake = fpsCamera.GetComponent<CameraShake>();
+        weaponSway = GetComponentInChildren<WeaponSway>();
+    }
+
+
     public void OnFire(InputAction.CallbackContext ctx)
     {
         if (!ctx.performed) return;
@@ -63,7 +75,14 @@ public class DoubleBarrelShotgunController : MonoBehaviour
 
         FirePellets(muzzle);
 
+        if (recoil) recoil.FireRecoil();
+        if (cameraShake) cameraShake.Shake(0.1f, 0.25f);
+        if (weaponSway) weaponSway.Kick();
+
+
+
         shellsLoaded--;
+        UIManager.Instance.UpdateShotgunAmmo(shellsLoaded);
 
         yield return new WaitForSeconds(0.1f); // optionally time between barrels
         isFiring = false;
@@ -105,13 +124,23 @@ public class DoubleBarrelShotgunController : MonoBehaviour
 
     private void SpawnTracer(Vector3 start, Vector3 end)
     {
-        if (!tracerPrefab) return;
+        if (tracerPrefab == null)
+            return;
 
-        GameObject tracer = Instantiate(tracerPrefab, start, Quaternion.identity);
-        var lr = tracer.GetComponent<LineRenderer>();
-        lr.SetPosition(0, start);
-        lr.SetPosition(1, end);
-        Destroy(tracer, 0.2f);
+        Vector3 direction = (end - start).normalized;
+        float distance = Vector3.Distance(start, end);
+
+        GameObject tracer = Instantiate(tracerPrefab, start, Quaternion.LookRotation(direction));
+
+        // Scale along Z-axis instead of Y
+        tracer.transform.localScale = new Vector3(
+            tracer.transform.localScale.x,
+            tracer.transform.localScale.y,
+            distance * 0.5f
+        );
+
+        // Move tracer to midpoint
+        tracer.transform.position = start + direction * (distance * 0.5f);
     }
 
     private IEnumerator ReloadRoutine()
@@ -125,6 +154,7 @@ public class DoubleBarrelShotgunController : MonoBehaviour
         {
             Debug.Log("Loading shell...");
             shellsLoaded++;
+            UIManager.Instance.UpdateShotgunAmmo(shellsLoaded);
             yield return new WaitForSeconds(loadShellTime);
         }
 

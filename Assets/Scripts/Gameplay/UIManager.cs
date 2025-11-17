@@ -13,7 +13,11 @@ public class UIManager : MonoBehaviour
     public GameObject gameOverPanel;
     public TMP_Text gameOverTitle;
     public Button restartButton;
-    public Button quitButton;   // Can either quit to Desktop, or return to Menu depending on what you want
+    public Button quitButton;
+    public Image leftShell;
+    public Image rightShell;
+    public Sprite loadedSprite;
+    public Sprite emptySprite;
 
     private void Awake()
     {
@@ -61,6 +65,12 @@ public class UIManager : MonoBehaviour
             float f = Mathf.Clamp01(max <= 0 ? 0 : current / max);
             healthBar.fillAmount = f;
         }
+    }
+
+    public void UpdateShotgunAmmo(int count)
+    {
+        leftShell.sprite = count >= 1 ? loadedSprite : emptySprite;
+        rightShell.sprite = count == 2 ? loadedSprite : emptySprite;
     }
 
     public void ShowGameOver(bool playerWon)
