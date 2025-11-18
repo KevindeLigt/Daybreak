@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
 public class EnemyHealth : MonoBehaviour
@@ -32,6 +32,9 @@ public class EnemyHealth : MonoBehaviour
         if (isDead) return;
 
         currentHealth -= damage;
+        if (TryGetComponent(out ZombieAIHybrid ai))
+            ai.HitStun(0.15f);
+
 
         StartCoroutine(Flash());
 
@@ -47,6 +50,7 @@ public class EnemyHealth : MonoBehaviour
         yield return new WaitForSeconds(flashDuration);
         if (enemyRenderer) enemyRenderer.material.color = originalColor;
     }
+
 
     private void Die(Vector3 force)
     {
