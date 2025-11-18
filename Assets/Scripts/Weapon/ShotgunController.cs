@@ -130,9 +130,10 @@ public class DoubleBarrelShotgunController : MonoBehaviour
         Vector3 direction = (end - start).normalized;
         float distance = Vector3.Distance(start, end);
 
+        // Spawn tracer facing direction
         GameObject tracer = Instantiate(tracerPrefab, start, Quaternion.LookRotation(direction));
 
-        // Scale along Z-axis instead of Y
+        // Stretch tracer along Z axis
         tracer.transform.localScale = new Vector3(
             tracer.transform.localScale.x,
             tracer.transform.localScale.y,
@@ -141,7 +142,13 @@ public class DoubleBarrelShotgunController : MonoBehaviour
 
         // Move tracer to midpoint
         tracer.transform.position = start + direction * (distance * 0.5f);
+
+        // Pass distance to tracer script for lifetime scaling
+        Tracer3D tracerComp = tracer.GetComponent<Tracer3D>();
+        if (tracerComp != null)
+            tracerComp.Initialize(distance);
     }
+
 
     private IEnumerator ReloadRoutine()
     {
