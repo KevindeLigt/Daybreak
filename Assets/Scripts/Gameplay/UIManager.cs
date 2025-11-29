@@ -18,6 +18,7 @@ public class UIManager : MonoBehaviour
     public Image rightShell;
     public Sprite loadedSprite;
     public Sprite emptySprite;
+    public Image ramCooldownImage;
 
     private void Awake()
     {
@@ -72,6 +73,13 @@ public class UIManager : MonoBehaviour
         leftShell.sprite = count >= 1 ? loadedSprite : emptySprite;
         rightShell.sprite = count == 2 ? loadedSprite : emptySprite;
     }
+
+    public void UpdateRamCooldown(float normalized)
+    {
+        if (ramCooldownImage)
+            ramCooldownImage.fillAmount = normalized;
+    }
+
 
     public void ShowGameOver(bool playerWon)
     {

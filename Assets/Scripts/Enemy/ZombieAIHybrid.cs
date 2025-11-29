@@ -69,6 +69,10 @@ public class ZombieAIHybrid : MonoBehaviour
 
     private NavMeshAgent agent;
 
+    [Header("Audio")]
+    public AudioSource idleAudioSource;
+    public AudioClip idleLoopClip;
+
     // ---------- STATE MACHINE ----------
     private enum ZombieState
     {
@@ -121,6 +125,14 @@ public class ZombieAIHybrid : MonoBehaviour
 
         SetState(ZombieState.Wander);
         ScheduleNextSurge();
+
+        if (idleAudioSource != null && idleLoopClip != null)
+        {
+            idleAudioSource.clip = idleLoopClip;
+            idleAudioSource.loop = true;
+            idleAudioSource.pitch = Random.Range(0.9f, 1.1f);
+            idleAudioSource.Play();
+        }
     }
 
     void Update()
@@ -210,7 +222,9 @@ public class ZombieAIHybrid : MonoBehaviour
 
             case ZombieState.Dead:
                 agent.isStopped = true;
+                if (idleAudioSource) idleAudioSource.Stop();
                 // visual handled by ragdoll / EnemyHealth
+
                 break;
         }
     }

@@ -16,6 +16,30 @@ public class DoubleBarrelShotgunController : MonoBehaviour
     public float loadShellTime = 0.6f;
     public float closeTime = 0.4f;
 
+    // -----------------------------------------------------------
+    // NEW: Audio
+    // -----------------------------------------------------------
+    [Header("Audio Clips")]
+    public AudioClip shotgunFireSFX;
+    public AudioClip dryFireSFX;
+    public AudioClip shotgunOpenSFX;
+    public AudioClip shotgunInsertShellSFX;
+    public AudioClip shotgunCloseSFX;
+    public AudioClip pelletHitSFX;
+
+    [Header("Audio Settings")]
+    public float fireVolume = 1f;
+    public float hitVolume = 0.6f;
+    public float reloadVolume = 0.8f;
+    public float dryFireVolume = 1f;
+
+    // -----------------------------------------------------------
+    // NEW: VFX
+    // -----------------------------------------------------------
+    [Header("VFX Prefabs")]
+    public GameObject hitParticlePrefab;
+    public GameObject muzzleFlashPrefab;
+
     [Header("References")]
     public Camera fpsCamera;
     public Transform leftBarrel;
@@ -58,7 +82,10 @@ public class DoubleBarrelShotgunController : MonoBehaviour
 
         if (shellsLoaded <= 0)
         {
-            // Dry fire sound here
+            // Dry fire audio
+            if (dryFireSFX)
+                AudioSource.PlayClipAtPoint(dryFireSFX, transform.position, dryFireVolume);
+
             Debug.Log("CLICK! Empty!");
             return;
         }
@@ -73,18 +100,26 @@ public class DoubleBarrelShotgunController : MonoBehaviour
         Transform muzzle = fireLeftNext ? leftBarrel : rightBarrel;
         fireLeftNext = !fireLeftNext;
 
+        // Muzzle flash
+        if (muzzleFlashPrefab)
+            Instantiate(muzzleFlashPrefab, muzzle.position, muzzle.rotation);
+
+        // Pellets
         FirePellets(muzzle);
 
+        // Recoil / camera shake
         if (recoil) recoil.FireRecoil();
         if (cameraShake) cameraShake.Shake(0.1f, 0.25f);
         if (weaponSway) weaponSway.Kick();
 
-
+        // Fire sound
+        if (shotgunFireSFX != null)
+            AudioSource.PlayClipAtPoint(shotgunFireSFX, muzzle.position, fireVolume);
 
         shellsLoaded--;
         UIManager.Instance.UpdateShotgunAmmo(shellsLoaded);
 
-        yield return new WaitForSeconds(0.1f); // optionally time between barrels
+        yield return new WaitForSeconds(0.1f);
         isFiring = false;
     }
 
@@ -96,20 +131,44 @@ public class DoubleBarrelShotgunController : MonoBehaviour
 
             if (Physics.Raycast(fpsCamera.transform.position, direction, out RaycastHit hit, range, hitMask))
             {
-                // Tracer from the barrel to the hit point
+                // Tracer
                 SpawnTracer(muzzle.position, hit.point);
 
-                // Apply damage + ragdoll force
+                // Enemy damage & reaction
                 EnemyHealth health = hit.collider.GetComponentInParent<EnemyHealth>();
                 if (health != null)
                 {
                     Vector3 force = direction.normalized * forcePerPellet;
+
+                    // Damage pipeline
                     health.TakeDamage(damagePerPellet, force);
+
+                    // Reaction pipeline
+                    EnemyHitReaction reaction = health.GetComponent<EnemyHitReaction>();
+                    if (reaction != null)
+                    {
+                        Vector3 hitDir = direction.normalized;
+                        float hitStrength = forcePerPellet;
+                        reaction.OnHit(hitDir, hitStrength);
+                    }
+
+                    // Hit particle
+                    if (hitParticlePrefab != null)
+                    {
+                        Instantiate(
+                            hitParticlePrefab,
+                            hit.point,
+                            Quaternion.LookRotation(hit.normal)
+                        );
+                    }
+
+                    // Hit sound
+                    PlayClipAtPointWithPitch(pelletHitSFX, hit.point, hitVolume, 0.9f, 1.1f);
                 }
             }
             else
             {
-                // miss tracer
+                // Miss tracer
                 SpawnTracer(muzzle.position, fpsCamera.transform.position + direction * range);
             }
         }
@@ -130,20 +189,16 @@ public class DoubleBarrelShotgunController : MonoBehaviour
         Vector3 direction = (end - start).normalized;
         float distance = Vector3.Distance(start, end);
 
-        // Spawn tracer facing direction
         GameObject tracer = Instantiate(tracerPrefab, start, Quaternion.LookRotation(direction));
 
-        // Stretch tracer along Z axis
         tracer.transform.localScale = new Vector3(
             tracer.transform.localScale.x,
             tracer.transform.localScale.y,
             distance * 0.5f
         );
 
-        // Move tracer to midpoint
         tracer.transform.position = start + direction * (distance * 0.5f);
 
-        // Pass distance to tracer script for lifetime scaling
         Tracer3D tracerComp = tracer.GetComponent<Tracer3D>();
         if (tracerComp != null)
             tracerComp.Initialize(distance);
@@ -154,20 +209,46 @@ public class DoubleBarrelShotgunController : MonoBehaviour
     {
         isReloading = true;
 
-        Debug.Log("Opening shotgun...");
+        // OPEN SHOTGUN
+        if (shotgunOpenSFX)
+            AudioSource.PlayClipAtPoint(shotgunOpenSFX, transform.position, reloadVolume);
+
         yield return new WaitForSeconds(openTime);
 
+        // INSERT SHELLS
         while (shellsLoaded < 2)
         {
-            Debug.Log("Loading shell...");
+            if (shotgunInsertShellSFX)
+                AudioSource.PlayClipAtPoint(shotgunInsertShellSFX, transform.position, reloadVolume);
+
             shellsLoaded++;
             UIManager.Instance.UpdateShotgunAmmo(shellsLoaded);
             yield return new WaitForSeconds(loadShellTime);
         }
 
-        Debug.Log("Closing shotgun...");
+        // CLOSE SHOTGUN
+        if (shotgunCloseSFX)
+            AudioSource.PlayClipAtPoint(shotgunCloseSFX, transform.position, reloadVolume);
+
         yield return new WaitForSeconds(closeTime);
 
         isReloading = false;
+    }
+
+    private void PlayClipAtPointWithPitch(AudioClip clip, Vector3 position, float volume, float minPitch = 0.9f, float maxPitch = 1.1f)
+    {
+        if (clip == null) return;
+
+        GameObject go = new GameObject("OneShotAudio");
+        go.transform.position = position;
+
+        AudioSource src = go.AddComponent<AudioSource>();
+        src.clip = clip;
+        src.volume = volume;
+        src.spatialBlend = 1f; // 3D sound
+        src.pitch = Random.Range(minPitch, maxPitch);
+
+        src.Play();
+        Destroy(go, clip.length / Mathf.Max(src.pitch, 0.01f));
     }
 }

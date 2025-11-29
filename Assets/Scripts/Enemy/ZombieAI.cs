@@ -19,6 +19,11 @@ public class ZombieAI : MonoBehaviour
     private NavMeshAgent agent;
     private float lastAttackTime;
 
+    [Header("Audio")]
+    public AudioSource idleAudioSource;
+    public AudioClip idleLoopClip;
+
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -30,6 +35,14 @@ public class ZombieAI : MonoBehaviour
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player) target = player.transform;
         }
+
+        if (idleAudioSource != null && idleLoopClip != null)
+        {
+            idleAudioSource.clip = idleLoopClip;
+            idleAudioSource.loop = true;
+            idleAudioSource.Play();
+        }
+
     }
 
     void Update()

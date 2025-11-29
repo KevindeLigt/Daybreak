@@ -126,6 +126,7 @@ GameObject:
   - component: {fileID: 6547260024657876998}
   - component: {fileID: 614694295166656794}
   - component: {fileID: 5865455908760669024}
+  - component: {fileID: 3099844058878048771}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -322,6 +323,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: aa29ccc4-d086-4716-96c4-1d8c1c9d1891
     m_ActionName: 'Player/Reload[/Keyboard/r,/XInputControllerWindows/buttonEast]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3099844058878048771}
+        m_TargetAssemblyTypeName: ShoulderRam, Assembly-CSharp
+        m_MethodName: OnRam
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: c14750ca-0a4b-4772-9df1-5ffb30c212c3
+    m_ActionName: 'Player/Ram[/Keyboard/leftShift]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -340,6 +357,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   maxHealth: 100
+--- !u!114 &3099844058878048771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1223726309849606259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae0fd07080fd95f418c6bdeebc31f068, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShoulderRam
+  ramSpeed: 14
+  ramDuration: 0.5
+  ramCooldown: 5
+  ramDamage: 30
+  ramKnockbackForce: 15
+  hitRadius: 1
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 192
+  playerCamera: {fileID: 0}
+  fovKick: 10
+  cameraShakeStrength: 0.2
 --- !u!1 &6345558519032021470
 GameObject:
   m_ObjectHideFlags: 0
@@ -628,31 +669,31 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.008318722
       objectReference: {fileID: 0}
     - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.0073845387
       objectReference: {fileID: 0}
     - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.13546073
       objectReference: {fileID: 0}
     - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.9960971
       objectReference: {fileID: 0}
     - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: -0.0033502355
       objectReference: {fileID: 0}
     - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: -0.076732986
       objectReference: {fileID: 0}
     - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0.043490555
       objectReference: {fileID: 0}
     - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -660,11 +701,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: -8.81
       objectReference: {fileID: 0}
     - target: {fileID: 227048025354042709, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1255553114298223834, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_Layer
@@ -699,12 +740,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 7523358957666567661, guid: 9262c7834195e5f4b9da42d1b3594fe9, type: 3}
     - target: {fileID: 7235631892856808707, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: forcePerPellet
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235631892856808707, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: hitMask.m_Bits
-      value: 71
+      value: 199
       objectReference: {fileID: 0}
     - target: {fileID: 7235631892856808707, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: damagePerPellet
-      value: 50
+      value: 35
       objectReference: {fileID: 0}
     - target: {fileID: 8337939801068494617, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_Layer

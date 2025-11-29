@@ -14,6 +14,7 @@ public class EnemyHealth : MonoBehaviour
     private EnemyRagdollController ragdoll;
 
     private bool isDead = false;
+    public bool IsDead => isDead;
 
     void Start()
     {
@@ -58,6 +59,7 @@ public class EnemyHealth : MonoBehaviour
         isDead = true;
 
         GameFlowManager.Instance?.EnemyDied();
+        KillComboSystem.Instance.OnEnemyKilled();
 
         ragdoll.EnableRagdoll();
 
