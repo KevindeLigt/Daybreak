@@ -9,42 +9,28 @@ public class ZombieAIHybrid : MonoBehaviour
 
     // ---------- GENERAL / DETECTION ----------
     [Header("Detection")]
-    [Tooltip("If player is within this radius, zombie will start chasing.")]
     public float detectionRadius = 15f;
-
-    [Tooltip("If player goes beyond this radius, zombie goes back to wandering.")]
     public float loseInterestRadius = 20f;
 
     // ---------- WANDER ----------
     [Header("Wander Settings")]
-    [Tooltip("Radius around spawn position to wander in.")]
     public float wanderRadius = 8f;
-
-    [Tooltip("Min time to pause between wander moves.")]
     public float wanderPauseMin = 1.5f;
-
-    [Tooltip("Max time to pause between wander moves.")]
     public float wanderPauseMax = 3.5f;
 
     // ---------- MOVEMENT ----------
     [Header("Movement Settings")]
     public float walkSpeed = 2f;
-    [Tooltip("Speed when zombie is in close focus mode.")]
     public float focusSpeed = 2.5f;
-    [Tooltip("Speed during chase surge bursts (layered, not its own state).")]
     public float surgeSpeed = 4.2f;
 
-    [Tooltip("Min time between surges.")]
     public float surgeIntervalMin = 2f;
-    [Tooltip("Max time between surges.")]
     public float surgeIntervalMax = 4f;
-    [Tooltip("How long a surge lasts.")]
     public float surgeDuration = 0.6f;
 
-    [Tooltip("Distance at which zombie stops drifting and tightens up.")]
     public float focusDistance = 3.5f;
 
-    [Header("Drift Personality (only when NOT focused)")]
+    [Header("Drift Personality")]
     public float driftAmount = 0.8f;
     public float driftFrequency = 0.7f;
 
@@ -56,22 +42,33 @@ public class ZombieAIHybrid : MonoBehaviour
     public float attackCooldown = 1.2f;
     public float attackDamage = 20f;
 
+    // ---------- NEW LUNGE ATTACK ----------
+    [Header("Lunge Attack")]
+    public float lungeDistance = 3.5f;
+    public float lungeSpeed = 12f;
+    public float lungeCooldown = 4f;
+    public float lungeDamage = 35f;
+    public float minLungeRange = 2f;
+    public float maxLungeRange = 6f;
+    private float lastLungeTime = -999f;
+
     // ---------- STUN ----------
     [Header("Hit / Stun")]
-    [Tooltip("Default stun time if caller doesn't specify.")]
     public float defaultStunTime = 0.2f;
     public Color stunColor = Color.yellow;
     public Color attackColor = Color.red;
     public Color normalColor = Color.white;
 
+    // ---------- VISUAL ----------
     [Header("Visual")]
-    public Renderer visualRenderer; // assign your cube or zombie MeshRenderer here
+    public Renderer visualRenderer;
 
-    private NavMeshAgent agent;
-
+    // ---------- AUDIO ----------
     [Header("Audio")]
     public AudioSource idleAudioSource;
     public AudioClip idleLoopClip;
+
+    private NavMeshAgent agent;
 
     // ---------- STATE MACHINE ----------
     private enum ZombieState
@@ -82,6 +79,10 @@ public class ZombieAIHybrid : MonoBehaviour
         AttackWindup,
         AttackRecover,
         Stunned,
+
+        // === NEW: LUNGE ATTACK STATE ===
+        LungeAttack,
+
         Dead
     }
 
@@ -96,7 +97,7 @@ public class ZombieAIHybrid : MonoBehaviour
     // attack
     private float lastAttackTime = -999f;
 
-    // surge (layered on chase)
+    // surge
     private bool isSurging = false;
     private float surgeEndTime = 0f;
     private float nextSurgeTime = 0f;
@@ -108,6 +109,12 @@ public class ZombieAIHybrid : MonoBehaviour
     private float driftPhase = 0f;
 
     private bool isDead = false;
+
+    // ---------- COLLISION SHOVE ----------
+    [Header("Collision Shove")]
+    public float shoveForce = 2f;
+    public float shoveCooldown = 0.5f;
+    private float lastShoveTime = 0f;
 
     void Start()
     {
@@ -126,7 +133,7 @@ public class ZombieAIHybrid : MonoBehaviour
         SetState(ZombieState.Wander);
         ScheduleNextSurge();
 
-        if (idleAudioSource != null && idleLoopClip != null)
+        if (idleAudioSource && idleLoopClip)
         {
             idleAudioSource.clip = idleLoopClip;
             idleAudioSource.loop = true;
@@ -143,27 +150,17 @@ public class ZombieAIHybrid : MonoBehaviour
 
         switch (state)
         {
-            case ZombieState.Idle:
-                UpdateIdle();
-                break;
-            case ZombieState.Wander:
-                UpdateWander();
-                break;
-            case ZombieState.Chase:
-                UpdateChase();
-                break;
-            case ZombieState.AttackWindup:
-                UpdateAttackWindup();
-                break;
-            case ZombieState.AttackRecover:
-                UpdateAttackRecover();
-                break;
-            case ZombieState.Stunned:
-                UpdateStunned();
-                break;
-            case ZombieState.Dead:
-                // handled by other systems (ragdoll, destroy, etc.)
-                break;
+            case ZombieState.Idle: UpdateIdle(); break;
+            case ZombieState.Wander: UpdateWander(); break;
+            case ZombieState.Chase: UpdateChase(); break;
+            case ZombieState.AttackWindup: UpdateAttackWindup(); break;
+            case ZombieState.AttackRecover: UpdateAttackRecover(); break;
+            case ZombieState.Stunned: UpdateStunned(); break;
+
+            // === NEW ===
+            case ZombieState.LungeAttack: UpdateLungeAttack(); break;
+
+            case ZombieState.Dead: break;
         }
     }
 
@@ -184,10 +181,6 @@ public class ZombieAIHybrid : MonoBehaviour
     {
         switch (newState)
         {
-            case ZombieState.Idle:
-                agent.isStopped = true;
-                break;
-
             case ZombieState.Wander:
                 agent.isStopped = false;
                 agent.speed = walkSpeed * 0.7f;
@@ -208,10 +201,12 @@ public class ZombieAIHybrid : MonoBehaviour
                 }
                 break;
 
-            case ZombieState.AttackRecover:
+            // === NEW LUNGE ENTER ===
+            case ZombieState.LungeAttack:
                 agent.isStopped = true;
-                if (visualRenderer)
-                    visualRenderer.transform.localRotation = Quaternion.identity;
+                Animator anim = GetComponent<Animator>();
+                if (anim)
+                    anim.SetTrigger("LungeTrigger");
                 break;
 
             case ZombieState.Stunned:
@@ -223,8 +218,6 @@ public class ZombieAIHybrid : MonoBehaviour
             case ZombieState.Dead:
                 agent.isStopped = true;
                 if (idleAudioSource) idleAudioSource.Stop();
-                // visual handled by ragdoll / EnemyHealth
-
                 break;
         }
     }
@@ -244,10 +237,11 @@ public class ZombieAIHybrid : MonoBehaviour
                 agent.isStopped = false;
                 break;
 
-            case ZombieState.AttackRecover:
-                agent.isStopped = false;
+            // === RESET AFTER LUNGE ===
+            case ZombieState.LungeAttack:
                 if (visualRenderer)
                     visualRenderer.transform.localRotation = Quaternion.identity;
+                agent.isStopped = false;
                 break;
         }
     }
@@ -256,8 +250,6 @@ public class ZombieAIHybrid : MonoBehaviour
 
     void UpdateIdle()
     {
-        // you can use this later if zombies spawn inactive
-        // for now, go straight to Wander
         SetState(ZombieState.Wander);
     }
 
@@ -267,17 +259,14 @@ public class ZombieAIHybrid : MonoBehaviour
     {
         float distToPlayer = Vector3.Distance(transform.position, target.position);
 
-        // Player detected? go chase
         if (distToPlayer <= detectionRadius)
         {
             SetState(ZombieState.Chase);
             return;
         }
 
-        // wander logic
         if (!agent.hasPath || agent.remainingDistance <= 0.3f)
         {
-            // standing still, wait a bit before picking next wander target
             if (currentWanderPause <= 0f)
             {
                 currentWanderPause = Random.Range(wanderPauseMin, wanderPauseMax);
@@ -297,32 +286,39 @@ public class ZombieAIHybrid : MonoBehaviour
         Vector2 rnd = Random.insideUnitCircle * wanderRadius;
         Vector3 candidate = spawnPosition + new Vector3(rnd.x, 0, rnd.y);
 
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(candidate, out hit, 2f, NavMesh.AllAreas))
+        if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, 2f, NavMesh.AllAreas))
         {
             currentWanderTarget = hit.position;
             agent.SetDestination(currentWanderTarget);
         }
-        else
-        {
-            currentWanderTarget = transform.position;
-        }
     }
 
-    // ===================== CHASE (with drift + surge + focus) =====================
+    // ===================== CHASE =====================
 
     void UpdateChase()
     {
         float distance = Vector3.Distance(transform.position, target.position);
 
-        // lost the player? back to wander
         if (distance > loseInterestRadius)
         {
             SetState(ZombieState.Wander);
             return;
         }
 
-        // inside attack range? go into windup
+        // === NEW: LUNGE CONDITIONS ===
+        bool canLunge =
+            Time.time >= lastLungeTime + lungeCooldown &&
+            distance >= minLungeRange &&
+            distance <= maxLungeRange &&
+            isSurging;
+
+        if (canLunge)
+        {
+            SetState(ZombieState.LungeAttack);
+            return;
+        }
+
+        // normal melee attack
         if (distance <= attackRange)
         {
             if (Time.time >= lastAttackTime + attackCooldown)
@@ -333,70 +329,52 @@ public class ZombieAIHybrid : MonoBehaviour
         }
 
         bool inFocusZone = distance <= focusDistance;
-
         MoveChaseWithPersonality(inFocusZone);
         HandleSurgeLayered(distance, inFocusZone);
     }
 
-    void MoveChaseWithPersonality(bool inFocusZone)
+    // ===================== LUNGE ATTACK =====================
+
+    void UpdateLungeAttack()
     {
         Vector3 toPlayer = (target.position - transform.position);
-        toPlayer.y = 0f;
-        Vector3 dirToPlayer = toPlayer.normalized;
-        Vector3 moveDir = dirToPlayer;
+        toPlayer.y = 0;
+        Vector3 dir = toPlayer.normalized;
 
-        if (!inFocusZone)
-        {
-            // drifting/sway only when NOT close
-            driftPhase += Time.deltaTime * driftFrequency;
-            Vector3 drift = transform.right * Mathf.Sin(driftPhase) * driftAmount;
-            moveDir = (dirToPlayer + drift).normalized;
+        float step = lungeSpeed * Time.deltaTime;
+        transform.position += dir * step;
 
-            if (visualRenderer)
-            {
-                visualRenderer.transform.localRotation = Quaternion.Euler(
-                    Mathf.Sin(Time.time * 3f) * 5f,
-                    0f,
-                    Mathf.Sin(Time.time * 2f) * 5f
-                );
-            }
-        }
-        else
+        float dist = Vector3.Distance(transform.position, target.position);
+
+        if (dist < attackRange + 0.5f)
         {
-            // lock in: face player, no drift, no tilt
-            FaceTarget();
-            if (visualRenderer)
-                visualRenderer.transform.localRotation = Quaternion.identity;
+            if (target.TryGetComponent(out PlayerHealth p))
+                p.TakeDamage(lungeDamage);
+
+            lastLungeTime = Time.time;
+            SetState(ZombieState.AttackRecover);
+            return;
         }
 
-        // speed
-        if (isSurging)
+        if (stateTimer >= 0.35f)
         {
-            agent.speed = surgeSpeed;
+            lastLungeTime = Time.time;
+            SetState(ZombieState.Chase);
         }
-        else
-        {
-            agent.speed = inFocusZone ? focusSpeed : walkSpeed;
-        }
-
-        agent.isStopped = false;
-        agent.SetDestination(transform.position + moveDir * 2f);
     }
+
+    // ===================== SURGE =====================
 
     void HandleSurgeLayered(float distanceToPlayer, bool inFocusZone)
     {
-        // end surge if time over
         if (isSurging && Time.time >= surgeEndTime)
         {
             isSurging = false;
         }
 
         if (isSurging) return;
-
-        // only consider surging if not in immediate attack range
         if (distanceToPlayer <= attackRange * 0.9f) return;
 
-        // surge on timer to help close distance
         if (Time.time >= nextSurgeTime)
         {
             StartSurge();
@@ -415,28 +393,14 @@ public class ZombieAIHybrid : MonoBehaviour
         nextSurgeTime = Time.time + Random.Range(surgeIntervalMin, surgeIntervalMax);
     }
 
-    void FaceTarget()
-    {
-        Vector3 toPlayer = target.position - transform.position;
-        toPlayer.y = 0f;
-        if (toPlayer.sqrMagnitude < 0.001f) return;
-
-        Quaternion targetRot = Quaternion.LookRotation(toPlayer);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 10f);
-    }
-
-    // ===================== ATTACK: WINDUP =====================
+    // ===================== ATTACK WINDUP =====================
 
     void UpdateAttackWindup()
     {
-        // shotgun can interrupt: if stunned, state will change externally
-
-        // keep facing the player
         FaceTarget();
 
         if (stateTimer >= attackWindupTime)
         {
-            // time to actually strike
             PerformAttack();
             SetState(ZombieState.AttackRecover);
         }
@@ -447,20 +411,19 @@ public class ZombieAIHybrid : MonoBehaviour
         float dist = Vector3.Distance(transform.position, target.position);
         if (dist <= attackRange + 0.2f)
         {
-            if (target.TryGetComponent(out PlayerHealth playerHealth))
+            if (target.TryGetComponent(out PlayerHealth p))
             {
-                playerHealth.TakeDamage(attackDamage);
+                p.TakeDamage(attackDamage);
             }
         }
 
         lastAttackTime = Time.time;
     }
 
-    // ===================== ATTACK: RECOVER =====================
+    // ===================== ATTACK RECOVER =====================
 
     void UpdateAttackRecover()
     {
-        // slight overcommit/recovery before going back to chase
         if (stateTimer >= attackRecoveryTime)
         {
             SetState(ZombieState.Chase);
@@ -471,61 +434,95 @@ public class ZombieAIHybrid : MonoBehaviour
 
     void UpdateStunned()
     {
-        // shotgun should fully interrupt attacks: we never reach PerformAttack while stunned
         if (stateTimer >= currentStunDuration)
         {
             SetState(ZombieState.Chase);
         }
     }
 
-    private void OnDrawGizmos()
-    {
-        // only draw when object is selected? → use OnDrawGizmosSelected instead.
-        Gizmos.color = new Color(1f, 0.8f, 0f, 0.15f);  // yellow, transparent
-        Gizmos.DrawSphere(transform.position, detectionRadius);
+    // ===================== COLLISIONS (ZOMBIE SHOVE) =====================
 
-        Gizmos.color = new Color(1f, 0f, 0f, 0.1f);     // red, transparent
-        Gizmos.DrawSphere(transform.position, loseInterestRadius);
+    void OnCollisionEnter(Collision collision)
+    {
+        if (Time.time < lastShoveTime + shoveCooldown)
+            return;
+
+        // shove other zombies
+        if (collision.collider.TryGetComponent(out ZombieAIHybrid other))
+        {
+            Vector3 dir = (other.transform.position - transform.position).normalized;
+            transform.position -= dir * 0.15f;
+            other.transform.position += dir * 0.15f;
+
+            lastShoveTime = Time.time;
+            return;
+        }
+
+        // bumped by ragdoll
+        if (collision.collider.attachedRigidbody != null)
+        {
+            Vector3 shove = collision.relativeVelocity * 0.05f;
+            agent.Move(shove * Time.deltaTime);
+        }
     }
 
+    // ===================== SUPPORT =====================
 
-    /// <summary>
-    /// Called externally (e.g. from EnemyHealth when hit by shotgun) to briefly stun/interrupt.
-    /// </summary>
+    void MoveChaseWithPersonality(bool inFocusZone)
+    {
+        Vector3 toPlayer = (target.position - transform.position);
+        toPlayer.y = 0f;
+        Vector3 dirToPlayer = toPlayer.normalized;
+        Vector3 moveDir = dirToPlayer;
+
+        if (!inFocusZone)
+        {
+            driftPhase += Time.deltaTime * driftFrequency;
+            Vector3 drift = transform.right * Mathf.Sin(driftPhase) * driftAmount;
+            moveDir = (dirToPlayer + drift).normalized;
+
+            if (visualRenderer)
+            {
+                visualRenderer.transform.localRotation = Quaternion.Euler(
+                    Mathf.Sin(Time.time * 3f) * 5f,
+                    0f,
+                    Mathf.Sin(Time.time * 2f) * 5f
+                );
+            }
+        }
+        else
+        {
+            FaceTarget();
+            if (visualRenderer)
+                visualRenderer.transform.localRotation = Quaternion.identity;
+        }
+
+        agent.speed = isSurging ? surgeSpeed : (inFocusZone ? focusSpeed : walkSpeed);
+        agent.isStopped = false;
+        agent.SetDestination(transform.position + moveDir * 2f);
+    }
+
+    void FaceTarget()
+    {
+        Vector3 toPlayer = target.position - transform.position;
+        toPlayer.y = 0f;
+        if (toPlayer.sqrMagnitude < 0.001f) return;
+
+        Quaternion targetRot = Quaternion.LookRotation(toPlayer);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 10f);
+    }
+
     public void HitStun(float stunTime)
     {
         if (isDead) return;
-
-        // fully interrupt attacks
-        if (state == ZombieState.AttackWindup || state == ZombieState.AttackRecover)
-        {
-            // attack will NOT complete
-        }
-
         currentStunDuration = stunTime > 0f ? stunTime : defaultStunTime;
         SetState(ZombieState.Stunned);
     }
-
-    // ===================== PUBLIC DEATH HOOK =====================
 
     public void Die()
     {
         if (isDead) return;
         isDead = true;
         SetState(ZombieState.Dead);
-        // Ragdoll / destroy handled by EnemyHealth or another script
-    }
-
-    // optional: helper to visualize detection/wander radii
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, detectionRadius);
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, loseInterestRadius);
-
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(Application.isPlaying ? spawnPosition : transform.position, wanderRadius);
     }
 }

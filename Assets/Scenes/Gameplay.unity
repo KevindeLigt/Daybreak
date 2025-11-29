@@ -11239,9 +11239,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 0.6415094, g: 0, b: 0, a: 0}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -18447,6 +18447,14 @@ PrefabInstance:
     - target: {fileID: 1223726309849606259, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 2930984376195863204, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
+      propertyPath: m_AnimatePhysics
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2930984376195863204, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3099844058878048771, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
       propertyPath: fovKick

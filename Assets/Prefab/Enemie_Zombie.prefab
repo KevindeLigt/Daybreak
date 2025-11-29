@@ -881,9 +881,9 @@ MonoBehaviour:
   target: {fileID: 0}
   detectionRadius: 40
   loseInterestRadius: 60
-  wanderRadius: 12
+  wanderRadius: 25
   wanderPauseMin: 1.5
-  wanderPauseMax: 3.5
+  wanderPauseMax: 5
   walkSpeed: 2.5
   focusSpeed: 3.5
   surgeSpeed: 6
@@ -893,18 +893,26 @@ MonoBehaviour:
   focusDistance: 7
   driftAmount: 1
   driftFrequency: 1
-  attackRange: 3
-  attackWindupTime: 2
+  attackRange: 2
+  attackWindupTime: 1.5
   attackRecoveryTime: 3
   attackCooldown: 3
-  attackDamage: 45
+  attackDamage: 15
+  lungeDistance: 3
+  lungeSpeed: 12
+  lungeCooldown: 4
+  lungeDamage: 25
+  minLungeRange: 2
+  maxLungeRange: 6
   defaultStunTime: 0.5
   stunColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   attackColor: {r: 1, g: 0, b: 0, a: 1}
   normalColor: {r: 0.3254717, g: 1, b: 0.55999994, a: 1}
   visualRenderer: {fileID: 0}
   idleAudioSource: {fileID: -2367427823780114271}
-  idleLoopClip: {fileID: 0}
+  idleLoopClip: {fileID: 8300000, guid: a1c107f53d168f24fb487147d5205742, type: 3}
+  shoveForce: 5
+  shoveCooldown: 1.5
 --- !u!195 &7457324879406706566
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1065,7 +1073,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: a1c107f53d168f24fb487147d5205742, type: 3}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 0.5
   m_Pitch: 1
@@ -1111,7 +1119,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 0.553
       inSlope: 0
       outSlope: 0
       tangentMode: 0

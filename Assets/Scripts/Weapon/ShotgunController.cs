@@ -56,11 +56,23 @@ public class DoubleBarrelShotgunController : MonoBehaviour
     private CameraShake cameraShake;
     private WeaponSway weaponSway;
 
+    [Header("Animation")]
+    private Animator anim;
+    [Header("Animation Triggers")]
+    public string fireTrigger = "FireTrigger";
+    public string reloadOpenTrigger = "ReloadOpenTrigger";
+    public string insertShellTrigger = "InsertShellTrigger";
+    public string reloadCloseTrigger = "ReloadCloseTrigger";
+    public string idleState = "SG_Idle";
+
+
+
     void Start()
     {
         recoil = fpsCamera.GetComponent<RecoilSystem>();
         cameraShake = fpsCamera.GetComponent<CameraShake>();
         weaponSway = GetComponentInChildren<WeaponSway>();
+        anim = GetComponentInChildren<Animator>();
     }
 
 
@@ -99,7 +111,7 @@ public class DoubleBarrelShotgunController : MonoBehaviour
 
         Transform muzzle = fireLeftNext ? leftBarrel : rightBarrel;
         fireLeftNext = !fireLeftNext;
-
+        if (anim) anim.SetTrigger(fireTrigger);
         // Muzzle flash
         if (muzzleFlashPrefab)
             Instantiate(muzzleFlashPrefab, muzzle.position, muzzle.rotation);
@@ -208,6 +220,7 @@ public class DoubleBarrelShotgunController : MonoBehaviour
     private IEnumerator ReloadRoutine()
     {
         isReloading = true;
+        if (anim) anim.SetTrigger(reloadOpenTrigger);
 
         // OPEN SHOTGUN
         if (shotgunOpenSFX)
@@ -218,8 +231,7 @@ public class DoubleBarrelShotgunController : MonoBehaviour
         // INSERT SHELLS
         while (shellsLoaded < 2)
         {
-            if (shotgunInsertShellSFX)
-                AudioSource.PlayClipAtPoint(shotgunInsertShellSFX, transform.position, reloadVolume);
+            if (anim) anim.SetTrigger(insertShellTrigger);
 
             shellsLoaded++;
             UIManager.Instance.UpdateShotgunAmmo(shellsLoaded);
@@ -229,6 +241,7 @@ public class DoubleBarrelShotgunController : MonoBehaviour
         // CLOSE SHOTGUN
         if (shotgunCloseSFX)
             AudioSource.PlayClipAtPoint(shotgunCloseSFX, transform.position, reloadVolume);
+        if (anim) anim.SetTrigger(reloadCloseTrigger);
 
         yield return new WaitForSeconds(closeTime);
 
