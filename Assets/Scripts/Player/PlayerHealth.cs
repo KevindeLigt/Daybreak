@@ -1,67 +1,79 @@
 using UnityEngine;
 
-
-
-
 public class PlayerHealth : MonoBehaviour
 {
+    [Header("Health Settings")]
     public float maxHealth = 100f;
-    private float currentHealth;
+    public float currentHealth = 100f;
+
+    [Tooltip("If true, the player heals to full when max health increases.")]
+    public bool healToFullOnMaxIncrease = true;
+
+    // Reference to your damage flash script
     public DamageFlashEffect damageFlash;
 
+    // Hit sound
     [Header("Audio")]
     public AudioClip playerHitSFX;
     public float playerHitVolume = 1f;
 
-    private void Start()
+    void Start()
     {
-        currentHealth = maxHealth;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         UIManager.Instance?.UpdateHealth(currentHealth, maxHealth);
     }
 
     public void TakeDamage(float dmg)
     {
         currentHealth -= dmg;
-        currentHealth = Mathf.Max(0, currentHealth);
+        currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+
+        // UI update
         UIManager.Instance?.UpdateHealth(currentHealth, maxHealth);
-        KillComboSystem.Instance.OnPlayerDamaged();
+
+        // Visual flash
         damageFlash?.PlayFlash();
 
-
+        // Hit SFX with pitch variation
         if (playerHitSFX != null)
         {
             float pitch = Random.Range(0.9f, 1.1f);
             PlayClipAtPointWithPitch(playerHitSFX, transform.position, playerHitVolume, pitch);
         }
 
-
         if (currentHealth <= 0f)
         {
-            // inform the flow manager
             GameFlowManager.Instance?.PlayerDied();
         }
     }
 
-    // convenience method to heal
-    public void Heal(float amount)
+    // ===== NEW: Increase Max Health =====
+    public void IncreaseMaxHealth(float amount)
     {
-        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
+        maxHealth += amount;
+        currentHealth = healToFullOnMaxIncrease ? maxHealth : currentHealth;
+
         UIManager.Instance?.UpdateHealth(currentHealth, maxHealth);
+
+        UIManager.Instance?.SetStatusEffect(
+            "MaxHealth",
+            $"Max Health +{maxHealth - 100f}"
+        );
     }
 
-    private void PlayClipAtPointWithPitch(AudioClip clip, Vector3 position, float volume, float pitch)
+    // ===== Helper for pitched 1-shot audio =====
+    private void PlayClipAtPointWithPitch(AudioClip clip, Vector3 pos, float volume, float pitch)
     {
         GameObject go = new GameObject("PlayerHitAudio");
-        go.transform.position = position;
+        go.transform.position = pos;
 
         AudioSource src = go.AddComponent<AudioSource>();
         src.clip = clip;
         src.volume = volume;
         src.pitch = pitch;
-        src.spatialBlend = 0f; // keep it 2D UI feedback
-        src.Play();
+        src.spatialBlend = 0f; // 2D UI-style sound
 
+        src.Play();
         Destroy(go, clip.length / Mathf.Max(pitch, 0.01f));
     }
-
 }

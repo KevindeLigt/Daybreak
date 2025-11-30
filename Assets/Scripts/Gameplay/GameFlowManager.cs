@@ -39,6 +39,10 @@ public class GameFlowManager : MonoBehaviour
 
         ResetGameState();
         StartCoroutine(StartGameRoutine());
+        FindObjectOfType<ShrineSpawnerManager>()?.SpawnShrinesForRun();
+        UIManager.Instance.ClearAllStatusEffects();
+        PlayerWeaponStats.Instance.ResetRunStats();
+
     }
 
     private void ResetGameState()

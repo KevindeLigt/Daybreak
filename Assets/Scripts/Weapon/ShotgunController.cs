@@ -153,7 +153,8 @@ public class DoubleBarrelShotgunController : MonoBehaviour
                     Vector3 force = direction.normalized * forcePerPellet;
 
                     // Damage pipeline
-                    health.TakeDamage(damagePerPellet, force);
+                    float finalDamage = PlayerWeaponStats.Instance.CalculatePelletDamage(damagePerPellet);
+                    health.TakeDamage(finalDamage, force);
 
                     // Reaction pipeline
                     EnemyHitReaction reaction = health.GetComponent<EnemyHitReaction>();

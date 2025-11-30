@@ -1,6 +1,7 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class UIManager : MonoBehaviour
 {
@@ -20,6 +21,17 @@ public class UIManager : MonoBehaviour
     public Sprite emptySprite;
     public Image ramCooldownImage;
 
+    // ================================
+    // STATUS EFFECT SYSTEM
+    // ================================
+    [Header("Status Effect UI")]
+    public Transform statusEffectPanel;      // Vertical Layout Group
+    public GameObject statusEffectEntryPrefab;
+
+    // key → instance
+    private Dictionary<string, GameObject> activeStatusEffects = new();
+
+
     private void Awake()
     {
         if (Instance != null && Instance != this) Destroy(gameObject);
@@ -34,19 +46,20 @@ public class UIManager : MonoBehaviour
         if (restartButton != null)
             restartButton.onClick.AddListener(() =>
             {
-                // Async load via loading screen
                 SceneLoader.LoadScene("Gameplay");
             });
 
         if (quitButton != null)
             quitButton.onClick.AddListener(() =>
             {
-
                 SceneLoader.LoadScene("MainMenu");
             });
     }
 
-    // Public API used by other scripts:
+    // ================================
+    // PUBLIC UI API
+    // ================================
+
     public void UpdateWave(int waveNumber)
     {
         if (waveText != null)
@@ -80,7 +93,6 @@ public class UIManager : MonoBehaviour
             ramCooldownImage.fillAmount = normalized;
     }
 
-
     public void ShowGameOver(bool playerWon)
     {
         if (gameOverPanel != null)
@@ -91,5 +103,54 @@ public class UIManager : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+    }
+
+    // ================================
+    // STATUS EFFECT UI METHODS
+    // ================================
+
+    /// <summary>
+    /// Creates or updates a status entry.
+    /// </summary>
+    public void SetStatusEffect(string key, string text)
+    {
+        if (statusEffectPanel == null || statusEffectEntryPrefab == null)
+        {
+            Debug.LogWarning("StatusEffectPanel or Prefab not assigned!");
+            return;
+        }
+
+        if (!activeStatusEffects.TryGetValue(key, out GameObject entry))
+        {
+            entry = Instantiate(statusEffectEntryPrefab, statusEffectPanel);
+            activeStatusEffects[key] = entry;
+        }
+
+        var txt = entry.GetComponentInChildren<TMP_Text>();
+        if (txt != null)
+            txt.text = text;
+    }
+
+    /// <summary>
+    /// Removes a status entry if it exists.
+    /// </summary>
+    public void RemoveStatusEffect(string key)
+    {
+        if (activeStatusEffects.TryGetValue(key, out GameObject entry))
+        {
+            Destroy(entry);
+            activeStatusEffects.Remove(key);
+        }
+    }
+
+    /// <summary>
+    /// Clears all status effect entries.
+    /// </summary>
+    public void ClearAllStatusEffects()
+    {
+        foreach (var entry in activeStatusEffects.Values)
+            Destroy(entry);
+
+        activeStatusEffects.Clear();
     }
 }
