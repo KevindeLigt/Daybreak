@@ -9,13 +9,17 @@ public class PlayerHealth : MonoBehaviour
     [Tooltip("If true, the player heals to full when max health increases.")]
     public bool healToFullOnMaxIncrease = true;
 
-    // Reference to your damage flash script
-    public DamageFlashEffect damageFlash;
+
+    public ScreenFlashEffect screenFlash;
 
     // Hit sound
     [Header("Audio")]
     public AudioClip playerHitSFX;
     public float playerHitVolume = 1f;
+
+    public AudioClip healPickupSFX;
+    public float healPickupVolume = 1f;
+
 
     void Start()
     {
@@ -32,7 +36,8 @@ public class PlayerHealth : MonoBehaviour
         UIManager.Instance?.UpdateHealth(currentHealth, maxHealth);
 
         // Visual flash
-        damageFlash?.PlayFlash();
+        screenFlash?.Flash(Color.red, 0.4f, 0.25f);
+        Debug.Log("Pain Flash triggered!");
 
         // Hit SFX with pitch variation
         if (playerHitSFX != null)
@@ -60,6 +65,22 @@ public class PlayerHealth : MonoBehaviour
             $"Max Health +{maxHealth - 100f}"
         );
     }
+
+    public void PlayHealFeedback()
+    {
+        // Heal SFX
+        if (healPickupSFX != null)
+            AudioSource.PlayClipAtPoint(healPickupSFX, transform.position, healPickupVolume);
+
+        // Heal flash (green-ish)
+        if (screenFlash != null)
+        {
+            var healColor = new Color(0f, 1f, 0.2f);
+            screenFlash.Flash(healColor, 0.3f, 0.25f);
+            Debug.Log("Heal Flash triggered!");
+        }
+    }
+
 
     // ===== Helper for pitched 1-shot audio =====
     private void PlayClipAtPointWithPitch(AudioClip clip, Vector3 pos, float volume, float pitch)

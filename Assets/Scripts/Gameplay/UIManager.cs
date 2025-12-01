@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour
     public TMP_Text waveText;
     public TMP_Text enemyCountText;
     public Image healthBar;
+    public TMP_Text healthText;
     public GameObject gameOverPanel;
     public TMP_Text gameOverTitle;
     public Button restartButton;
@@ -79,6 +80,9 @@ public class UIManager : MonoBehaviour
             float f = Mathf.Clamp01(max <= 0 ? 0 : current / max);
             healthBar.fillAmount = f;
         }
+
+        if (healthText != null)
+            healthText.text = $"{Mathf.RoundToInt(current)} / {Mathf.RoundToInt(max)}";
     }
 
     public void UpdateShotgunAmmo(int count)

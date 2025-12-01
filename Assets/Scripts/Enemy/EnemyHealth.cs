@@ -6,6 +6,11 @@ public class EnemyHealth : MonoBehaviour
     public float maxHealth = 100f;
     private float currentHealth;
 
+    [Header("Drop Settings")]
+    public GameObject healthOrbPrefab;
+    [Range(0f, 1f)] public float healthOrbDropChance = 0.10f; // 10% default
+
+
     public Renderer enemyRenderer;
     public Color hitColor = Color.white;
     public float flashDuration = 0.1f;
@@ -66,6 +71,24 @@ public class EnemyHealth : MonoBehaviour
         foreach (var rb in ragdoll.ragdollBodies)
             rb.AddForce(force * 2f, ForceMode.Impulse);
 
+        TryDropHealthOrb();
         Destroy(gameObject, 10f);
+
     }
+
+    private void TryDropHealthOrb()
+    {
+        if (healthOrbPrefab == null)
+            return;
+
+        if (Random.value <= healthOrbDropChance)
+        {
+            Instantiate(
+                healthOrbPrefab,
+                transform.position + Vector3.up * 0.5f,
+                Quaternion.identity
+            );
+        }
+    }
+
 }
