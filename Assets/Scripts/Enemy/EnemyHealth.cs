@@ -58,6 +58,8 @@ public class EnemyHealth : MonoBehaviour
     }
 
 
+
+
     private void Die(Vector3 force)
     {
         if (isDead) return;
@@ -75,6 +77,28 @@ public class EnemyHealth : MonoBehaviour
         Destroy(gameObject, 10f);
 
     }
+    public Transform GetClosestRagdollBone(Vector3 hitPoint)
+    {
+        if (ragdoll == null || ragdoll.ragdollBodies == null)
+            return null;
+
+        float best = float.MaxValue;
+        Transform bestBone = null;
+
+        foreach (var rb in ragdoll.ragdollBodies)
+        {
+            float d = Vector3.Distance(rb.transform.position, hitPoint);
+            if (d < best)
+            {
+                best = d;
+                bestBone = rb.transform;
+            }
+        }
+
+        return bestBone;
+    }
+
+
 
     private void TryDropHealthOrb()
     {
