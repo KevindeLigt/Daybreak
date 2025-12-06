@@ -5,6 +5,7 @@ public class SkeletonArrow : MonoBehaviour
     public float damage = 10f;
     public float speed = 40f;
     public float lifetime = 5f;
+    private Vector3 moveDir;
 
     public GameObject hitVFX;
 
@@ -17,8 +18,15 @@ public class SkeletonArrow : MonoBehaviour
 
     void Update()
     {
-        transform.position += transform.forward * speed * Time.deltaTime;
+        transform.position += moveDir * speed * Time.deltaTime;
     }
+
+    public void SetDirection(Vector3 dir)
+    {
+        moveDir = dir;
+    }
+
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -28,6 +36,7 @@ public class SkeletonArrow : MonoBehaviour
         if (other.TryGetComponent(out PlayerHealth player))
         {
             player.TakeDamage(damage);
+            PlayerStatsManager.Instance.AddDamageDealt(damage);
         }
 
         if (hitVFX)

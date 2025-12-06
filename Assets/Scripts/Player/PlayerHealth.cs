@@ -39,6 +39,8 @@ public class PlayerHealth : MonoBehaviour
         screenFlash?.Flash(Color.red, 0.4f, 0.25f);
         Debug.Log("Pain Flash triggered!");
 
+        PlayerStatsManager.Instance.AddDamageTaken(dmg);
+
         // Hit SFX with pitch variation
         if (playerHitSFX != null)
         {

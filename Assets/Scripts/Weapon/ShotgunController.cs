@@ -117,6 +117,7 @@ public class DoubleBarrelShotgunController : WeaponBase
         fireLeftNext = !fireLeftNext;
 
         if (anim) anim.SetTrigger(fireTrigger);
+        PlayerStatsManager.Instance.AddShot("Shotgun");
 
         if (muzzleFlashPrefab)
             Instantiate(muzzleFlashPrefab, muzzle.position, muzzle.rotation);
@@ -153,6 +154,7 @@ public class DoubleBarrelShotgunController : WeaponBase
                     float finalDamage = PlayerWeaponStats.Instance.CalculatePelletDamage(damagePerPellet);
                     Vector3 force = direction.normalized * forcePerPellet;
                     health.TakeDamage(finalDamage, force);
+                    PlayerStatsManager.Instance.AddDamageDealt(finalDamage);
 
                     EnemyHitReaction reaction = health.GetComponent<EnemyHitReaction>();
                     if (reaction != null)
@@ -163,6 +165,7 @@ public class DoubleBarrelShotgunController : WeaponBase
 
                     PlayClipAtPointWithPitch(pelletHitSFX, hit.point, hitVolume, 0.9f, 1.1f);
                 }
+
             }
             else
             {

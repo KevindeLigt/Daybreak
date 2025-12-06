@@ -3,6 +3,9 @@ using System.Collections;
 
 public class EnemyHealth : MonoBehaviour
 {
+    [Header("Stats")]
+    public string enemyType = "Unknown";
+
     public float maxHealth = 100f;
     private float currentHealth;
 
@@ -74,9 +77,13 @@ public class EnemyHealth : MonoBehaviour
             rb.AddForce(force * 2f, ForceMode.Impulse);
 
         TryDropHealthOrb();
+        PlayerStatsManager.Instance.AddKill(enemyType);
         Destroy(gameObject, 10f);
 
     }
+
+
+
     public Transform GetClosestRagdollBone(Vector3 hitPoint)
     {
         if (ragdoll == null || ragdoll.ragdollBodies == null)

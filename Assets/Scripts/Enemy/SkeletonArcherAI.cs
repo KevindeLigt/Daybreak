@@ -248,29 +248,46 @@ public class SkeletonArcherAI : MonoBehaviour
     // ---------------------------------------------------------------------------
     // HELPERS
     // ---------------------------------------------------------------------------
-
     void FaceTarget()
     {
-        Vector3 toPlayer = target.position - transform.position;
-        toPlayer.y = 0f;
-        if (toPlayer.sqrMagnitude > 0.05f)
+        FaceTargetHorizontal();
+        FaceTargetVertical();
+    }
+
+    void FaceTargetHorizontal()
+    {
+        Vector3 dir = target.position - transform.position;
+        dir.y = 0f; // flatten for body rotation
+        if (dir.sqrMagnitude > 0.01f)
         {
-            transform.rotation = Quaternion.Slerp(transform.rotation,
-                Quaternion.LookRotation(toPlayer), Time.deltaTime * 10f);
+            Quaternion rot = Quaternion.LookRotation(dir);
+            transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * 10f);
         }
     }
 
-    void FireArrow()
+    void FaceTargetVertical()
+    {
+        if (!arrowSpawnPoint) return;
+
+        Vector3 dir = target.position - arrowSpawnPoint.position;
+        Quaternion rot = Quaternion.LookRotation(dir);
+        arrowSpawnPoint.rotation = Quaternion.Slerp(arrowSpawnPoint.rotation, rot, Time.deltaTime * 15f);
+    }
+
+    private void FireArrow()
     {
         if (!arrowPrefab || !arrowSpawnPoint) return;
 
-        GameObject arrow = Instantiate(arrowPrefab, arrowSpawnPoint.position, arrowSpawnPoint.rotation);
+        Vector3 dir = (target.position - arrowSpawnPoint.position).normalized;
+
+        GameObject arrow = Instantiate(arrowPrefab, arrowSpawnPoint.position, Quaternion.LookRotation(dir));
         SkeletonArrow arr = arrow.GetComponent<SkeletonArrow>();
 
         if (arr)
         {
             arr.damage = arrowDamage;
             arr.speed = arrowSpeed;
+            arr.SetDirection(dir);   // NEW
         }
     }
 

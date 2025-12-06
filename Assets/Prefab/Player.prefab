@@ -194,8 +194,9 @@ MonoBehaviour:
   gravity: -9.81
   jumpHeight: 1
   cameraRoot: {fileID: 731385423978014450}
-  mouseSensitivity: 1.2
   lookClamp: 80
+  mouseSensitivity: 10
+  controllerSensitivity: 120
 --- !u!114 &614694295166656794
 MonoBehaviour:
   m_ObjectHideFlags: 0

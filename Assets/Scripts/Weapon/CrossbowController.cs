@@ -94,7 +94,7 @@ public class CrossbowController : WeaponBase
     private void FireBolt()
     {
         if (!boltPrefab || !boltSpawnPoint) return;
-
+        PlayerStatsManager.Instance.AddShot("Crossbow");
         GameObject bolt = Instantiate(boltPrefab, boltSpawnPoint.position, boltSpawnPoint.rotation);
 
         Rigidbody rb = bolt.GetComponent<Rigidbody>();

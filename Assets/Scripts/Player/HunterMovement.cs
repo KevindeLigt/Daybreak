@@ -12,8 +12,12 @@ public class HunterMovement : MonoBehaviour
 
     [Header("Look Settings")]
     public Transform cameraRoot;
-    public float mouseSensitivity = 1.2f;
     public float lookClamp = 80f;
+
+    [Header("Sensitivity Settings")]
+    public float mouseSensitivity = 1.0f;
+    public float controllerSensitivity = 120f; // gamepad usually needs MUCH higher values
+    private float currentSensitivity = 1f;
 
     private CharacterController controller;
     private Vector2 moveInput;
@@ -39,8 +43,22 @@ public class HunterMovement : MonoBehaviour
 
     public void Look(InputAction.CallbackContext context)
     {
+        if (!context.performed)
+            return;
+
         lookInput = context.ReadValue<Vector2>();
+
+        // Detect device
+        if (context.control.device is Mouse)
+        {
+            currentSensitivity = mouseSensitivity;
+        }
+        else
+        {
+            currentSensitivity = controllerSensitivity;
+        }
     }
+
 
     public void Jump(InputAction.CallbackContext context)
     {
@@ -68,8 +86,11 @@ public class HunterMovement : MonoBehaviour
 
     void HandleLook()
     {
-        float mouseX = lookInput.x * mouseSensitivity;
-        float mouseY = lookInput.y * mouseSensitivity;
+        Vector2 delta = lookInput;
+        lookInput = Vector2.zero; // <-- STOP DRIFT
+
+        float mouseX = delta.x * currentSensitivity * Time.deltaTime;
+        float mouseY = delta.y * currentSensitivity * Time.deltaTime;
 
         cameraPitch -= mouseY;
         cameraPitch = Mathf.Clamp(cameraPitch, -lookClamp, lookClamp);
@@ -77,4 +98,5 @@ public class HunterMovement : MonoBehaviour
         cameraRoot.localRotation = Quaternion.Euler(cameraPitch, 0, 0);
         transform.Rotate(Vector3.up * mouseX);
     }
+
 }

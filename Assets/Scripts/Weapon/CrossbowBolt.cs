@@ -32,6 +32,8 @@ public class CrossbowBolt : MonoBehaviour
 
         // Enemy hit?
         EnemyHealth enemy = collision.collider.GetComponentInParent<EnemyHealth>();
+        PlayerStatsManager.Instance.AddCrossbowHit();
+        PlayerStatsManager.Instance.AddDamageDealt(damage);
         if (enemy != null)
         {
             OnHitEnemy(enemy, collision, hitPoint, hitNormal);
