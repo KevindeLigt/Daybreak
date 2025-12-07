@@ -7,7 +7,6 @@ public class GameFlowManager : MonoBehaviour
 
     [Header("Wave Settings")]
     public GameObject[] enemyPrefabs;
-    public Transform[] spawnPoints;
     public int startingEnemiesPerWave = 5;
     public int maxWaves = 5;
     public float timeBetweenWaves = 3f;
@@ -84,14 +83,20 @@ public class GameFlowManager : MonoBehaviour
 
     private void SpawnEnemy()
     {
-        if (spawnPoints == null || spawnPoints.Length == 0) return;
-        if (enemyPrefabs == null || enemyPrefabs.Length == 0) return;
+        EnemySpawner[] active = RegionManager.Instance.GetActiveSpawners();
+        if (active.Length == 0)
+        {
+            Debug.LogWarning("No active spawners found!");
+            return;
+        }
 
-        Transform sp = spawnPoints[Random.Range(0, spawnPoints.Length)];
+        EnemySpawner chosen = active[Random.Range(0, active.Length)];
         GameObject prefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
 
-        Instantiate(prefab, sp.position, sp.rotation);
+        Instantiate(prefab, chosen.spawnPoint.position, chosen.spawnPoint.rotation);
     }
+
+
 
     public void EnemyDied()
     {
