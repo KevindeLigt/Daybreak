@@ -21,6 +21,7 @@ public class UIManager : MonoBehaviour
     public Sprite loadedSprite;
     public Sprite emptySprite;
     public Image ramCooldownImage;
+    public TMP_Text interactPrompt;
 
     // ================================
     // STATUS EFFECT SYSTEM
@@ -107,6 +108,20 @@ public class UIManager : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+    }
+
+
+    public void ShowInteractPrompt(string text)
+    {
+        if (!interactPrompt) return;
+        interactPrompt.text = text;
+        interactPrompt.gameObject.SetActive(true);
+    }
+
+    public void HideInteractPrompt()
+    {
+        if (!interactPrompt) return;
+        interactPrompt.gameObject.SetActive(false);
     }
 
     // ================================
