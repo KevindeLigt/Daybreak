@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_RenderPipelineSettings:
     supportShadowMask: 0
-    supportSSR: 0
+    supportSSR: 1
     supportSSRTransparent: 0
     supportSSAO: 1
     supportSSGI: 1
@@ -56,7 +56,7 @@ MonoBehaviour:
     customBufferFormat: 12
     supportedLitShaderMode: 2
     planarReflectionResolution:
-      m_Values: 000100000004000000080000
+      m_Values: 000200000008000000100000
       m_SchemaId:
         m_Id: With3Levels
     cubeReflectionResolution:
@@ -98,7 +98,7 @@ MonoBehaviour:
       reflectionCubemapSize: 256
       maxEnvLightsOnScreen: 32
       reflectionCacheCompressed: 1
-      reflectionProbeFormat: 74
+      reflectionProbeFormat: 48
       reflectionProbeTexCacheSize: 4096
       reflectionProbeTexLastValidCubeMip: 3
       reflectionProbeTexLastValidPlanarMip: 0
@@ -111,7 +111,7 @@ MonoBehaviour:
       maxDirectionalLightsOnScreen: 16
       maxPunctualLightsOnScreen: 512
       maxAreaLightsOnScreen: 64
-      maxCubeReflectionOnScreen: 32
+      maxCubeReflectionOnScreen: 64
       maxPlanarReflectionOnScreen: 16
       maxDecalsOnScreen: 512
       maxLightsPerClusterCell: 16

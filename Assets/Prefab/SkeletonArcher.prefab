@@ -1852,6 +1852,10 @@ MonoBehaviour:
   loseInterestRadius: 120
   idealMinDistance: 20
   idealMaxDistance: 40
+  losMask:
+    serializedVersion: 2
+    m_Bits: 137
+  losMaxDistance: 60
   windupTime: 1
   recoveryTime: 2
   attackCooldown: 5
@@ -1877,6 +1881,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da42a57bd22c3fc4f92a01e74f62e778, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  enemyType: Unknown
   maxHealth: 100
   healthOrbPrefab: {fileID: 1906950436779646774, guid: ba243559442fcf24bbe0cea757273f89, type: 3}
   healthOrbDropChance: 0.1
@@ -1895,8 +1900,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f47ef5253f67bc45a9612f2b958606e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHitReaction
-  animator: {fileID: 0}
-  ragdoll: {fileID: 0}
+  animator: {fileID: 1228794766555171620}
+  ragdoll: {fileID: 3791309635809480944}
   hipRigidbody: {fileID: 0}
   aiBehaviour: {fileID: 0}
   stumbleThreshold: 5

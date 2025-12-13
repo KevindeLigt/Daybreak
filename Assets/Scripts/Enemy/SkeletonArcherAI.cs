@@ -15,6 +15,10 @@ public class SkeletonArcherAI : MonoBehaviour
     public float idealMinDistance = 10f;
     public float idealMaxDistance = 18f;
 
+    [Header("Line of Sight")]
+    public LayerMask losMask;  // Set to: Default, Environment, etc.
+    public float losMaxDistance = 60f;
+
     [Header("Attack Settings")]
     public float windupTime = 1.0f;
     public float recoveryTime = 0.6f;
@@ -192,9 +196,31 @@ public class SkeletonArcherAI : MonoBehaviour
             // Try attacking
             if (Time.time > lastAttackTime + attackCooldown)
             {
-                SetState(State.AimWindup);
+                if (HasLineOfSight())
+                    SetState(State.AimWindup);
             }
         }
+    }
+
+    private bool HasLineOfSight()
+    {
+        if (!arrowSpawnPoint || !target) return false;
+
+        Vector3 dir = (target.position - arrowSpawnPoint.position);
+        float dist = dir.magnitude;
+
+        if (Physics.Raycast(
+            arrowSpawnPoint.position,
+            dir.normalized,
+            out RaycastHit hit,
+            losMaxDistance,
+            losMask
+        ))
+        {
+            return hit.collider.CompareTag("Player");
+        }
+
+        return false;
     }
 
     void UpdateStrafe()

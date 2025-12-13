@@ -196,28 +196,7 @@ MonoBehaviour:
       - rid: 3887492988046409754
       - rid: 3887492988046409755
     m_RuntimeSettings:
-      m_List:
-      - rid: 8556427327610290176
-      - rid: 8556427327610290180
-      - rid: 3887492988046409728
-      - rid: 3887492988046409732
-      - rid: 3887492988046409733
-      - rid: 3887492988046409734
-      - rid: 3887492988046409735
-      - rid: 3887492988046409736
-      - rid: 3887492988046409737
-      - rid: 3887492988046409738
-      - rid: 3887492988046409741
-      - rid: 3887492988046409742
-      - rid: 3887492988046409743
-      - rid: 3887492988046409745
-      - rid: 3887492988046409747
-      - rid: 3887492988046409748
-      - rid: 3887492988046409751
-      - rid: 3887492988046409752
-      - rid: 3887492988046409753
-      - rid: 3887492988046409754
-      - rid: 3887492988046409755
+      m_List: []
   renderingLayerNames:
   - Light Layer default
   - Light Layer 1
@@ -266,7 +245,7 @@ MonoBehaviour:
       type: {class: HDRPDefaultVolumeProfileSettings, ns: UnityEngine.Rendering.HighDefinition, asm: Unity.RenderPipelines.HighDefinition.Runtime}
       data:
         m_Version: 0
-        m_VolumeProfile: {fileID: 11400000, guid: 14b392ee213d25a48b1feddbd9f5a9be, type: 2}
+        m_VolumeProfile: {fileID: 11400000, guid: 4594f4a3fb14247e192bcca6dc23c8ed, type: 2}
     - rid: 3887492988046409729
       type: {class: VolumetricCloudsRuntimeResources, ns: UnityEngine.Rendering.HighDefinition, asm: Unity.RenderPipelines.HighDefinition.Runtime}
       data:
