@@ -1,0 +1,73 @@
+# Daybreak — One-Page Game Concept
+
+## High Concept
+
+**Daybreak** is a compact gothic first-person survival shooter where a lone vampire hunter must survive the final hours of night inside a cursed chapel courtyard. Armed with a brutal double-barrel shotgun, the player fights escalating waves of undead until sunrise finally breaks the curse.
+
+## Genre
+
+First-person survival shooter
+Single-player
+Compact premium indie experience
+Target platform: PC / Steam
+
+## Core Fantasy
+
+The player is not a fast superhero. They are a tired, desperate hunter with one powerful weapon, limited breathing room, and undead closing in from all sides. Every shot matters. Every reload is dangerous. Survival depends on positioning, timing, and staying calm under pressure.
+
+## Core Pillars
+
+### 1. Heavy Weapon Feel
+
+The double-barrel shotgun is the heart of the game. It fires devastating pellet blasts, knocks enemies backward, and creates short moments of safety. With only two shells before reloading, the player must choose shots carefully.
+
+### 2. Survive Until Sunrise
+
+The goal is not simply to clear enemies. The player must survive until daybreak. Waves escalate as the night gets closer to ending, creating a clear dramatic arc from moonlit dread to sunrise victory.
+
+### 3. Gothic Atmosphere
+
+The game takes place in a dark gothic environment filled with black stone, worn gold details, candlelight, fog, graveyard silhouettes, and warm sunrise contrast. The environment should feel handcrafted, readable, and strongly art-directed.
+
+### 4. Simple Systems, High Polish
+
+Daybreak avoids large RPG systems, multiplayer, inventory bloat, and excessive weapon variety. The focus is on a small number of mechanics polished to a high standard: movement, shooting, reloading, enemy pressure, hit reactions, sound, and atmosphere.
+
+## Core Gameplay Loop
+
+1. The player enters the chapel courtyard.
+2. A wave of undead begins.
+3. The player uses the shotgun to create space and survive.
+4. Enemies pressure the player into repositioning.
+5. The player survives the wave and gets a short breathing moment.
+6. The night grows more intense.
+7. After the final wave, sunrise breaks through and the player wins.
+
+## Minimum Viable Version
+
+The first complete version should include:
+
+* One polished arena
+* First-person hunter movement
+* Double-barrel shotgun
+* Manual reload rhythm
+* One melee undead enemy
+* One ranged undead enemy
+* Five-wave survival structure
+* Health and shell UI
+* Game over and victory screens
+* Basic menu and restart flow
+* Ragdoll / hit reaction feedback
+* Dynamic music intensity
+
+## Cut From First Version
+
+The first version will not include multiplayer, co-op, large progression systems, procedural levels, multiple maps, weapon inventory, complex story dialogue, shopkeepers, crafting, or large enemy rosters.
+
+## Target Experience
+
+A first playable version should last around 10–15 minutes. A fuller release could become a 30–60 minute polished gothic survival experience with replayable challenge value.
+
+## One-Sentence Pitch
+
+**Survive the night as a lone vampire hunter, using a devastating double-barrel shotgun to hold back the undead until daybreak.**
