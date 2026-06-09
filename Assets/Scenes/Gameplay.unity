@@ -93,7 +93,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000000, guid: 47feb35a284bacf41935757568bb4256, type: 2}
+  m_LightingDataAsset: {fileID: 0}
   m_LightingSettings: {fileID: 4890085278179872738, guid: fafcff3b3df8c084cbf568fa50bdff08, type: 2}
 --- !u!196 &4
 NavMeshSettings:
@@ -3314,7 +3314,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &282720994
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5251,7 +5251,7 @@ MonoBehaviour:
   priority: 0
   blendDistance: 0
   weight: 0
-  sharedProfile: {fileID: 11400000, guid: 8ba92e2dd7f884a0f88b98fa2d235fe7, type: 2}
+  sharedProfile: {fileID: 11400000, guid: 14b392ee213d25a48b1feddbd9f5a9be, type: 2}
 --- !u!4 &432432461
 Transform:
   m_ObjectHideFlags: 0
@@ -5554,7 +5554,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &468751828
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5806,7 +5806,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a83d2f7ae04ab6f4f99b0d85377be998, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.ProbeVolumePerSceneData
-  serializedBakingSet: {fileID: 11400000, guid: 14920e827454b3f41986c7ae325062a9, type: 2}
+  serializedBakingSet: {fileID: 0}
   sceneGUID: 8124e5870f4fd4c779e7a5f994e84ad1
   obsoleteAsset: {fileID: 0}
   obsoleteCellSharedDataAsset: {fileID: 0}
@@ -14348,7 +14348,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1055332996
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18572,7 +18572,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1329943588
 Transform:
   m_ObjectHideFlags: 0
@@ -20467,7 +20467,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1464417095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22617,35 +22617,35 @@ MonoBehaviour:
     m_CaptureRotation: {x: 0, y: 0, z: 0, w: 0}
     m_FieldOfView: 0
     m_Aspect: 0
-  m_HasValidSHForNormalization: 1
+  m_HasValidSHForNormalization: 0
   m_SHForNormalization:
-    'sh[ 0]': 5.365779
-    'sh[ 1]': 2.9587002
-    'sh[ 2]': 2.4113002
-    'sh[ 3]': 0.30764022
-    'sh[ 4]': 0.13708651
-    'sh[ 5]': 0.8988189
-    'sh[ 6]': 0.13725413
-    'sh[ 7]': 0.14842314
-    'sh[ 8]': -0.09748873
-    'sh[ 9]': 1.5008844
-    'sh[10]': 0.8401588
-    'sh[11]': 0.08332568
-    'sh[12]': 0.015996933
-    'sh[13]': 0.016683545
-    'sh[14]': 0.030500881
-    'sh[15]': -0.0059785056
-    'sh[16]': 0.0021297797
-    'sh[17]': -0.0011317539
-    'sh[18]': 3.2257347
-    'sh[19]': 1.877321
-    'sh[20]': 0.13130763
-    'sh[21]': 0.038310345
-    'sh[22]': 0.03666292
-    'sh[23]': 0.059761625
-    'sh[24]': -0.02080367
-    'sh[25]': 0.004422326
-    'sh[26]': -0.020179544
+    'sh[ 0]': 0
+    'sh[ 1]': 0
+    'sh[ 2]': 0
+    'sh[ 3]': 0
+    'sh[ 4]': 0
+    'sh[ 5]': 0
+    'sh[ 6]': 0
+    'sh[ 7]': 0
+    'sh[ 8]': 0
+    'sh[ 9]': 0
+    'sh[10]': 0
+    'sh[11]': 0
+    'sh[12]': 0
+    'sh[13]': 0
+    'sh[14]': 0
+    'sh[15]': 0
+    'sh[16]': 0
+    'sh[17]': 0
+    'sh[18]': 0
+    'sh[19]': 0
+    'sh[20]': 0
+    'sh[21]': 0
+    'sh[22]': 0
+    'sh[23]': 0
+    'sh[24]': 0
+    'sh[25]': 0
+    'sh[26]': 0
   m_SHValidForCapturePosition: {x: 0, y: 10, z: 0}
   m_SHValidForSourcePosition: {x: 0, y: 10, z: 0}
   m_HDProbeVersion: 9
@@ -24524,7 +24524,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1611699308
 Transform:
   m_ObjectHideFlags: 0
@@ -29366,9 +29366,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Profile: {fileID: 11400000, guid: 14b392ee213d25a48b1feddbd9f5a9be, type: 2}
-  m_StaticLightingSkyUniqueID: 0
-  m_StaticLightingCloudsUniqueID: 0
-  m_StaticLightingVolumetricClouds: 0
+  m_StaticLightingSkyUniqueID: 4
+  m_StaticLightingCloudsUniqueID: 1
+  m_StaticLightingVolumetricClouds: 1
   bounces: 1
 --- !u!4 &2013410475
 Transform:
@@ -31534,8 +31534,11 @@ SceneRoots:
   - {fileID: 89003975}
   - {fileID: 999376844}
   - {fileID: 1482148533}
+  - {fileID: 466271742}
+  - {fileID: 1864912804}
   - {fileID: 1839894928}
   - {fileID: 1359398767}
+  - {fileID: 1331536421}
   - {fileID: 2013410475}
   - {fileID: 1505494524}
   - {fileID: 5282579670289342671}
@@ -31554,14 +31557,11 @@ SceneRoots:
   - {fileID: 1742453899}
   - {fileID: 838373456}
   - {fileID: 1942712435}
-  - {fileID: 1331536421}
   - {fileID: 1575589808}
   - {fileID: 1762217388}
   - {fileID: 2037687361}
   - {fileID: 1089519321}
   - {fileID: 1041273859}
   - {fileID: 1693185380}
-  - {fileID: 466271742}
-  - {fileID: 1864912804}
   - {fileID: 469635384}
   - {fileID: 428200607}
