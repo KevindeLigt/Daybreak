@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4881f9a2c4d568047b316028d20a8dca, type: 3}
   m_Name: Gameplay Baking Set
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.ProbeVolumeBakingSet
-  singleSceneMode: 0
+  singleSceneMode: 1
   dialogNoProbeVolumeInSetShown: 1
   settings:
     m_Version: 1
@@ -124,7 +124,7 @@ MonoBehaviour:
     m_Keys:
     - 8124e5870f4fd4c779e7a5f994e84ad1
     m_Values:
-    - hasProbeVolume: 1
+    - hasProbeVolume: 0
       bakeScene: 1
       bounds:
         m_Center: {x: 40.5, y: 0, z: -40.5}

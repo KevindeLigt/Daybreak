@@ -15,6 +15,20 @@ public class DoubleBarrelShotgunController : WeaponBase
     public float loadShellTime = 0.6f;
     public float closeTime = 0.4f;
 
+    [Header("Eviscerate")]
+    public bool enableEviscerate = true;
+    [Tooltip("Very close range where zombies can be instantly killed.")]
+    public float eviscerateRange = 2.2f;
+    [Tooltip("Half-angle of the cone. 35 means 70 degrees total.")]
+    [Range(5f, 90f)]
+    public float eviscerateHalfAngle = 35f;
+    [Tooltip("Maximum zombies instantly killed per shell.")]
+    public int maxEvisceratesPerShot = 2;
+    [Tooltip("Force applied to eviscerated ragdolls.")]
+    public float eviscerateForce = 18f;
+    [Tooltip("Layer mask for enemy detection. Prefer an Enemy layer.")]
+    public LayerMask enemyDetectionMask;
+
     [Header("Audio Clips")]
     public AudioClip shotgunFireSFX;
     public AudioClip dryFireSFX;
@@ -122,6 +136,9 @@ public class DoubleBarrelShotgunController : WeaponBase
         if (muzzleFlashPrefab)
             Instantiate(muzzleFlashPrefab, muzzle.position, muzzle.rotation);
 
+        if (enableEviscerate)
+            TryEviscerateCloseEnemies();
+
         FirePellets(muzzle);
 
         if (recoil) recoil.FireRecoil();
@@ -136,6 +153,76 @@ public class DoubleBarrelShotgunController : WeaponBase
 
         yield return new WaitForSeconds(0.1f);
         isFiring = false;
+    }
+
+    private void TryEviscerateCloseEnemies()
+    {
+        Collider[] hits = Physics.OverlapSphere(
+            fpsCamera.transform.position,
+            eviscerateRange,
+            enemyDetectionMask,
+            QueryTriggerInteraction.Ignore
+        );
+
+        if (hits == null || hits.Length == 0)
+            return;
+
+        Vector3 origin = fpsCamera.transform.position;
+        Vector3 forward = fpsCamera.transform.forward;
+
+        // Collect unique enemies first, because one enemy can have multiple colliders.
+        System.Collections.Generic.List<EnemyHealth> candidates = new();
+
+        foreach (Collider col in hits)
+        {
+            EnemyHealth health = col.GetComponentInParent<EnemyHealth>();
+            if (health == null || health.IsDead)
+                continue;
+
+            if (candidates.Contains(health))
+                continue;
+
+            Vector3 toEnemy = health.transform.position - origin;
+            toEnemy.y = 0f;
+
+            float distance = toEnemy.magnitude;
+            if (distance <= 0.01f)
+                continue;
+
+            Vector3 directionToEnemy = toEnemy.normalized;
+
+            float angle = Vector3.Angle(forward, directionToEnemy);
+            if (angle > eviscerateHalfAngle)
+                continue;
+
+            candidates.Add(health);
+            Debug.Log("Eviscerate!");
+        }
+
+        if (candidates.Count == 0)
+            return;
+
+        // Sort closest first, so the front line gets deleted.
+        candidates.Sort((a, b) =>
+        {
+            float da = Vector3.Distance(origin, a.transform.position);
+            float db = Vector3.Distance(origin, b.transform.position);
+            return da.CompareTo(db);
+        });
+
+        int killed = 0;
+
+        foreach (EnemyHealth health in candidates)
+        {
+            if (killed >= maxEvisceratesPerShot)
+                break;
+
+            Vector3 forceDir = (health.transform.position - origin).normalized;
+            Vector3 force = forceDir * eviscerateForce;
+
+            health.Eviscerate(force);
+            killed++;
+        }
     }
 
     private void FirePellets(Transform muzzle)

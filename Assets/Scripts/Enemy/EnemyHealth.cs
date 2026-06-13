@@ -53,6 +53,14 @@ public class EnemyHealth : MonoBehaviour
             Die(force);
     }
 
+    public void Eviscerate(Vector3 force)
+    {
+        if (isDead) return;
+
+        currentHealth = 0f;
+        Die(force);
+    }
+
     private IEnumerator Flash()
     {
         if (enemyRenderer) enemyRenderer.material.color = hitColor;
