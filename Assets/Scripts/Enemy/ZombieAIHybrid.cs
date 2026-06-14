@@ -34,6 +34,96 @@ public class ZombieAIHybrid : MonoBehaviour
     public float driftAmount = 0.8f;
     public float driftFrequency = 0.7f;
 
+    // ---------- PERSONALITY RANDOMIZATION ----------
+    [Header("Per-Zombie Personality")]
+    public bool randomizePersonality = true;
+    public bool appendPersonalityToName = false;
+
+    [Tooltip("Small runtime speed variation so zombies do not move as clones.")]
+    public Vector2 speedMultiplierRange = new Vector2(0.88f, 1.12f);
+
+    [Tooltip("Runtime attack timing variation. Higher values make some zombies slower to swing.")]
+    public Vector2 attackWindupMultiplierRange = new Vector2(0.85f, 1.25f);
+
+    [Tooltip("Runtime cooldown variation so attacks do not happen in sync.")]
+    public Vector2 attackCooldownMultiplierRange = new Vector2(0.85f, 1.25f);
+
+    [Tooltip("Runtime drift amount variation. Makes some zombies direct and others more wobbly.")]
+    public Vector2 driftAmountMultiplierRange = new Vector2(0.55f, 1.55f);
+
+    [Tooltip("Runtime drift timing variation.")]
+    public Vector2 driftFrequencyMultiplierRange = new Vector2(0.65f, 1.45f);
+
+    [Tooltip("Runtime wander pause variation.")]
+    public Vector2 wanderPauseMultiplierRange = new Vector2(0.75f, 1.35f);
+
+    [Tooltip("How strongly some zombies prefer left/right approaches while chasing.")]
+    public float sideBiasStrength = 0.45f;
+
+    [Tooltip("How often chase destinations are refreshed. Small random differences reduce conga-line movement.")]
+    public Vector2 destinationUpdateIntervalRange = new Vector2(0.08f, 0.22f);
+
+    [Tooltip("Only this percentage of zombies are allowed to lunge. Prevents synchronized lunge behavior.")]
+    [Range(0f, 1f)] public float lungeEnabledChance = 0.30f;
+
+    [Header("Zombie Hesitation")]
+    public bool enableChaseHesitation = true;
+
+    [Tooltip("Base chance that a zombie briefly hesitates when its hesitation timer fires.")]
+    [Range(0f, 1f)] public float baseHesitationChance = 0.12f;
+
+    public Vector2 hesitationIntervalRange = new Vector2(2.0f, 4.5f);
+    public Vector2 hesitationDurationRange = new Vector2(0.12f, 0.38f);
+
+    [Header("NavMesh Desync")]
+    [Range(0, 99)] public int avoidancePriorityMin = 20;
+    [Range(0, 99)] public int avoidancePriorityMax = 80;
+    public Vector2 agentAccelerationMultiplierRange = new Vector2(0.85f, 1.2f);
+    public Vector2 agentAngularSpeedMultiplierRange = new Vector2(0.8f, 1.25f);
+
+    private enum ZombiePersonality
+    {
+        Shambler,
+        Hungry,
+        Drifter,
+        Surger,
+        Clumsy
+    }
+
+    private ZombiePersonality personality;
+
+    // Runtime personality values. Public inspector values stay as the base tuning.
+    private float pWalkSpeed;
+    private float pFocusSpeed;
+    private float pSurgeSpeed;
+    private float pSurgeIntervalMin;
+    private float pSurgeIntervalMax;
+    private float pSurgeDuration;
+    private float pFocusDistance;
+    private float pDriftAmount;
+    private float pDriftFrequency;
+    private float pAttackRange;
+    private float pAttackWindupTime;
+    private float pAttackRecoveryTime;
+    private float pAttackCooldown;
+    private float pWanderRadius;
+    private float pWanderPauseMin;
+    private float pWanderPauseMax;
+    private float pLungeCooldown;
+    private float pLungeSpeed;
+    private float pLungeDamage;
+    private float pHesitationChance;
+    private float pDestinationUpdateInterval;
+
+    private float sideBias = 0f;
+    private float visualWobbleSeed = 0f;
+    private bool personalityCanLunge = true;
+
+    private float nextDestinationUpdateTime = 0f;
+    private bool isHesitating = false;
+    private float hesitationEndTime = 0f;
+    private float nextHesitationTime = 0f;
+
     // ---------- ATTACK ----------
     [Header("Attack Settings")]
     public float attackRange = 1.6f;
@@ -79,10 +169,7 @@ public class ZombieAIHybrid : MonoBehaviour
         AttackWindup,
         AttackRecover,
         Stunned,
-
-        // === NEW: LUNGE ATTACK STATE ===
         LungeAttack,
-
         Dead
     }
 
@@ -121,6 +208,8 @@ public class ZombieAIHybrid : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         spawnPosition = transform.position;
 
+        ApplyPersonality();
+
         if (!target)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -132,12 +221,13 @@ public class ZombieAIHybrid : MonoBehaviour
 
         SetState(ZombieState.Wander);
         ScheduleNextSurge();
+        ScheduleNextHesitation();
 
         if (idleAudioSource && idleLoopClip)
         {
             idleAudioSource.clip = idleLoopClip;
             idleAudioSource.loop = true;
-            idleAudioSource.pitch = Random.Range(0.9f, 1.1f);
+            idleAudioSource.pitch = Random.Range(0.88f, 1.14f);
             idleAudioSource.Play();
         }
     }
@@ -156,12 +246,156 @@ public class ZombieAIHybrid : MonoBehaviour
             case ZombieState.AttackWindup: UpdateAttackWindup(); break;
             case ZombieState.AttackRecover: UpdateAttackRecover(); break;
             case ZombieState.Stunned: UpdateStunned(); break;
-
-            // === NEW ===
             case ZombieState.LungeAttack: UpdateLungeAttack(); break;
-
             case ZombieState.Dead: break;
         }
+    }
+
+    // ===================== PERSONALITY =====================
+
+    void ApplyPersonality()
+    {
+        pWalkSpeed = walkSpeed;
+        pFocusSpeed = focusSpeed;
+        pSurgeSpeed = surgeSpeed;
+        pSurgeIntervalMin = surgeIntervalMin;
+        pSurgeIntervalMax = surgeIntervalMax;
+        pSurgeDuration = surgeDuration;
+        pFocusDistance = focusDistance;
+        pDriftAmount = driftAmount;
+        pDriftFrequency = driftFrequency;
+        pAttackRange = attackRange;
+        pAttackWindupTime = attackWindupTime;
+        pAttackRecoveryTime = attackRecoveryTime;
+        pAttackCooldown = attackCooldown;
+        pWanderRadius = wanderRadius;
+        pWanderPauseMin = wanderPauseMin;
+        pWanderPauseMax = wanderPauseMax;
+        pLungeCooldown = lungeCooldown;
+        pLungeSpeed = lungeSpeed;
+        pLungeDamage = lungeDamage;
+        pHesitationChance = baseHesitationChance;
+        pDestinationUpdateInterval = RandomRange(destinationUpdateIntervalRange);
+
+        driftPhase = Random.Range(0f, Mathf.PI * 2f);
+        visualWobbleSeed = Random.Range(0f, 100f);
+        sideBias = Random.value < 0.5f ? -1f : 1f;
+        sideBias *= Random.Range(0.25f, 1f);
+        personalityCanLunge = Random.value <= lungeEnabledChance;
+
+        if (!randomizePersonality)
+        {
+            ApplyAgentDesync();
+            return;
+        }
+
+        personality = (ZombiePersonality)Random.Range(0, System.Enum.GetValues(typeof(ZombiePersonality)).Length);
+
+        float speedMult = RandomRange(speedMultiplierRange);
+        float attackWindupMult = RandomRange(attackWindupMultiplierRange);
+        float attackCooldownMult = RandomRange(attackCooldownMultiplierRange);
+        float driftAmountMult = RandomRange(driftAmountMultiplierRange);
+        float driftFrequencyMult = RandomRange(driftFrequencyMultiplierRange);
+        float wanderPauseMult = RandomRange(wanderPauseMultiplierRange);
+
+        pWalkSpeed *= speedMult;
+        pFocusSpeed *= speedMult;
+        pSurgeSpeed *= speedMult;
+        pAttackWindupTime *= attackWindupMult;
+        pAttackCooldown *= attackCooldownMult;
+        pDriftAmount *= driftAmountMult;
+        pDriftFrequency *= driftFrequencyMult;
+        pWanderPauseMin *= wanderPauseMult;
+        pWanderPauseMax *= wanderPauseMult;
+
+        switch (personality)
+        {
+            case ZombiePersonality.Shambler:
+                pWalkSpeed *= 0.86f;
+                pFocusSpeed *= 0.92f;
+                pAttackWindupTime *= 1.18f;
+                pAttackCooldown *= 1.12f;
+                pDriftAmount *= 1.15f;
+                pHesitationChance += 0.08f;
+                personalityCanLunge = false;
+                break;
+
+            case ZombiePersonality.Hungry:
+                pWalkSpeed *= 1.10f;
+                pFocusSpeed *= 1.12f;
+                pAttackWindupTime *= 0.88f;
+                pAttackCooldown *= 0.88f;
+                pDriftAmount *= 0.65f;
+                pHesitationChance *= 0.55f;
+                sideBias *= 0.35f;
+                break;
+
+            case ZombiePersonality.Drifter:
+                pWalkSpeed *= 0.96f;
+                pFocusSpeed *= 0.96f;
+                pDriftAmount *= 1.55f;
+                pDriftFrequency *= 1.15f;
+                pFocusDistance += 0.35f;
+                pHesitationChance += 0.04f;
+                personalityCanLunge = false;
+                break;
+
+            case ZombiePersonality.Surger:
+                pWalkSpeed *= 1.02f;
+                pFocusSpeed *= 1.03f;
+                pSurgeSpeed *= 1.22f;
+                pSurgeIntervalMin *= 0.72f;
+                pSurgeIntervalMax *= 0.82f;
+                pSurgeDuration *= 1.08f;
+                pDriftAmount *= 0.85f;
+                break;
+
+            case ZombiePersonality.Clumsy:
+                pWalkSpeed *= 0.91f;
+                pFocusSpeed *= 0.94f;
+                pAttackWindupTime *= 1.25f;
+                pAttackRecoveryTime *= 1.18f;
+                pDriftAmount *= 1.35f;
+                pHesitationChance += 0.14f;
+                personalityCanLunge = false;
+                break;
+        }
+
+        // Clamp so extreme inspector values do not create broken zombies.
+        pWalkSpeed = Mathf.Max(0.2f, pWalkSpeed);
+        pFocusSpeed = Mathf.Max(0.2f, pFocusSpeed);
+        pSurgeSpeed = Mathf.Max(pFocusSpeed, pSurgeSpeed);
+        pAttackWindupTime = Mathf.Max(0.1f, pAttackWindupTime);
+        pAttackCooldown = Mathf.Max(0.25f, pAttackCooldown);
+        pDestinationUpdateInterval = Mathf.Max(0.02f, pDestinationUpdateInterval);
+        pHesitationChance = Mathf.Clamp01(pHesitationChance);
+
+        // Desync first available attacks/surges so a group does not act together.
+        lastAttackTime = Time.time - Random.Range(0f, pAttackCooldown);
+        lastLungeTime = Time.time - Random.Range(0f, pLungeCooldown);
+        nextDestinationUpdateTime = Time.time + Random.Range(0f, pDestinationUpdateInterval);
+
+        if (appendPersonalityToName)
+            gameObject.name = $"{gameObject.name}_{personality}";
+
+        ApplyAgentDesync();
+    }
+
+    void ApplyAgentDesync()
+    {
+        if (!agent) return;
+
+        int min = Mathf.Min(avoidancePriorityMin, avoidancePriorityMax);
+        int max = Mathf.Max(avoidancePriorityMin, avoidancePriorityMax);
+        agent.avoidancePriority = Random.Range(min, max + 1);
+
+        agent.acceleration *= RandomRange(agentAccelerationMultiplierRange);
+        agent.angularSpeed *= RandomRange(agentAngularSpeedMultiplierRange);
+    }
+
+    float RandomRange(Vector2 range)
+    {
+        return Random.Range(range.x, range.y);
     }
 
     // ===================== STATE MACHINE CORE =====================
@@ -182,17 +416,21 @@ public class ZombieAIHybrid : MonoBehaviour
         switch (newState)
         {
             case ZombieState.Wander:
+                isHesitating = false;
                 agent.isStopped = false;
-                agent.speed = walkSpeed * 0.7f;
+                agent.speed = pWalkSpeed * 0.7f;
                 PickNewWanderTarget();
                 break;
 
             case ZombieState.Chase:
+                isHesitating = false;
                 agent.isStopped = false;
-                agent.speed = walkSpeed;
+                agent.speed = pWalkSpeed;
+                ScheduleNextHesitation();
                 break;
 
             case ZombieState.AttackWindup:
+                isHesitating = false;
                 agent.isStopped = true;
                 if (visualRenderer)
                 {
@@ -201,8 +439,8 @@ public class ZombieAIHybrid : MonoBehaviour
                 }
                 break;
 
-            // === NEW LUNGE ENTER ===
             case ZombieState.LungeAttack:
+                isHesitating = false;
                 agent.isStopped = true;
                 Animator anim = GetComponent<Animator>();
                 if (anim)
@@ -210,12 +448,14 @@ public class ZombieAIHybrid : MonoBehaviour
                 break;
 
             case ZombieState.Stunned:
+                isHesitating = false;
                 agent.isStopped = true;
                 if (visualRenderer)
                     visualRenderer.material.color = stunColor;
                 break;
 
             case ZombieState.Dead:
+                isHesitating = false;
                 agent.isStopped = true;
                 if (idleAudioSource) idleAudioSource.Stop();
                 break;
@@ -237,7 +477,6 @@ public class ZombieAIHybrid : MonoBehaviour
                 agent.isStopped = false;
                 break;
 
-            // === RESET AFTER LUNGE ===
             case ZombieState.LungeAttack:
                 if (visualRenderer)
                     visualRenderer.transform.localRotation = Quaternion.identity;
@@ -269,7 +508,7 @@ public class ZombieAIHybrid : MonoBehaviour
         {
             if (currentWanderPause <= 0f)
             {
-                currentWanderPause = Random.Range(wanderPauseMin, wanderPauseMax);
+                currentWanderPause = Random.Range(pWanderPauseMin, pWanderPauseMax);
             }
 
             if (stateTimer >= currentWanderPause)
@@ -283,7 +522,7 @@ public class ZombieAIHybrid : MonoBehaviour
 
     void PickNewWanderTarget()
     {
-        Vector2 rnd = Random.insideUnitCircle * wanderRadius;
+        Vector2 rnd = Random.insideUnitCircle * pWanderRadius;
         Vector3 candidate = spawnPosition + new Vector3(rnd.x, 0, rnd.y);
 
         if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, 2f, NavMesh.AllAreas))
@@ -305,9 +544,14 @@ public class ZombieAIHybrid : MonoBehaviour
             return;
         }
 
-        // === NEW: LUNGE CONDITIONS ===
+        bool inFocusZone = distance <= pFocusDistance;
+
+        if (TryHandleChaseHesitation(distance, inFocusZone))
+            return;
+
         bool canLunge =
-            Time.time >= lastLungeTime + lungeCooldown &&
+            personalityCanLunge &&
+            Time.time >= lastLungeTime + pLungeCooldown &&
             distance >= minLungeRange &&
             distance <= maxLungeRange &&
             isSurging;
@@ -318,19 +562,68 @@ public class ZombieAIHybrid : MonoBehaviour
             return;
         }
 
-        // normal melee attack
-        if (distance <= attackRange)
+        if (distance <= pAttackRange)
         {
-            if (Time.time >= lastAttackTime + attackCooldown)
+            if (Time.time >= lastAttackTime + pAttackCooldown)
             {
                 SetState(ZombieState.AttackWindup);
                 return;
             }
         }
 
-        bool inFocusZone = distance <= focusDistance;
         MoveChaseWithPersonality(inFocusZone);
         HandleSurgeLayered(distance, inFocusZone);
+    }
+
+    bool TryHandleChaseHesitation(float distance, bool inFocusZone)
+    {
+        if (!enableChaseHesitation)
+            return false;
+
+        // Do not randomly pause when already close enough to threaten the player.
+        if (inFocusZone || distance <= pAttackRange + 0.5f || isSurging)
+            return false;
+
+        if (isHesitating)
+        {
+            agent.isStopped = true;
+
+            if (visualRenderer)
+            {
+                visualRenderer.transform.localRotation = Quaternion.Euler(
+                    Mathf.Sin((Time.time + visualWobbleSeed) * 5f) * 4f,
+                    0f,
+                    Mathf.Sin((Time.time + visualWobbleSeed) * 4f) * 4f
+                );
+            }
+
+            if (Time.time >= hesitationEndTime)
+            {
+                isHesitating = false;
+                agent.isStopped = false;
+                ScheduleNextHesitation();
+            }
+
+            return true;
+        }
+
+        if (Time.time >= nextHesitationTime && Random.value <= pHesitationChance)
+        {
+            isHesitating = true;
+            hesitationEndTime = Time.time + RandomRange(hesitationDurationRange);
+            agent.isStopped = true;
+            return true;
+        }
+
+        if (Time.time >= nextHesitationTime)
+            ScheduleNextHesitation();
+
+        return false;
+    }
+
+    void ScheduleNextHesitation()
+    {
+        nextHesitationTime = Time.time + RandomRange(hesitationIntervalRange);
     }
 
     // ===================== LUNGE ATTACK =====================
@@ -341,15 +634,15 @@ public class ZombieAIHybrid : MonoBehaviour
         toPlayer.y = 0;
         Vector3 dir = toPlayer.normalized;
 
-        float step = lungeSpeed * Time.deltaTime;
+        float step = pLungeSpeed * Time.deltaTime;
         transform.position += dir * step;
 
         float dist = Vector3.Distance(transform.position, target.position);
 
-        if (dist < attackRange + 0.5f)
+        if (dist < pAttackRange + 0.5f)
         {
             if (target.TryGetComponent(out PlayerHealth p))
-                p.TakeDamage(lungeDamage);
+                p.TakeDamage(pLungeDamage);
 
             lastLungeTime = Time.time;
             SetState(ZombieState.AttackRecover);
@@ -373,7 +666,7 @@ public class ZombieAIHybrid : MonoBehaviour
         }
 
         if (isSurging) return;
-        if (distanceToPlayer <= attackRange * 0.9f) return;
+        if (distanceToPlayer <= pAttackRange * 0.9f) return;
 
         if (Time.time >= nextSurgeTime)
         {
@@ -384,13 +677,13 @@ public class ZombieAIHybrid : MonoBehaviour
     void StartSurge()
     {
         isSurging = true;
-        surgeEndTime = Time.time + surgeDuration;
+        surgeEndTime = Time.time + pSurgeDuration;
         ScheduleNextSurge();
     }
 
     void ScheduleNextSurge()
     {
-        nextSurgeTime = Time.time + Random.Range(surgeIntervalMin, surgeIntervalMax);
+        nextSurgeTime = Time.time + Random.Range(pSurgeIntervalMin, pSurgeIntervalMax);
     }
 
     // ===================== ATTACK WINDUP =====================
@@ -399,7 +692,7 @@ public class ZombieAIHybrid : MonoBehaviour
     {
         FaceTarget();
 
-        if (stateTimer >= attackWindupTime)
+        if (stateTimer >= pAttackWindupTime)
         {
             PerformAttack();
             SetState(ZombieState.AttackRecover);
@@ -409,7 +702,7 @@ public class ZombieAIHybrid : MonoBehaviour
     void PerformAttack()
     {
         float dist = Vector3.Distance(transform.position, target.position);
-        if (dist <= attackRange + 0.2f)
+        if (dist <= pAttackRange + 0.2f)
         {
             if (target.TryGetComponent(out PlayerHealth p))
             {
@@ -424,7 +717,7 @@ public class ZombieAIHybrid : MonoBehaviour
 
     void UpdateAttackRecover()
     {
-        if (stateTimer >= attackRecoveryTime)
+        if (stateTimer >= pAttackRecoveryTime)
         {
             SetState(ZombieState.Chase);
         }
@@ -447,18 +740,16 @@ public class ZombieAIHybrid : MonoBehaviour
         if (Time.time < lastShoveTime + shoveCooldown)
             return;
 
-        // shove other zombies
         if (collision.collider.TryGetComponent(out ZombieAIHybrid other))
         {
             Vector3 dir = (other.transform.position - transform.position).normalized;
-            transform.position -= dir * 0.15f;
-            other.transform.position += dir * 0.15f;
+            transform.position -= dir * shoveForce * 0.075f;
+            other.transform.position += dir * shoveForce * 0.075f;
 
             lastShoveTime = Time.time;
             return;
         }
 
-        // bumped by ragdoll
         if (collision.collider.attachedRigidbody != null)
         {
             Vector3 shove = collision.relativeVelocity * 0.05f;
@@ -472,21 +763,30 @@ public class ZombieAIHybrid : MonoBehaviour
     {
         Vector3 toPlayer = (target.position - transform.position);
         toPlayer.y = 0f;
+
+        if (toPlayer.sqrMagnitude < 0.001f)
+            return;
+
         Vector3 dirToPlayer = toPlayer.normalized;
         Vector3 moveDir = dirToPlayer;
 
         if (!inFocusZone)
         {
-            driftPhase += Time.deltaTime * driftFrequency;
-            Vector3 drift = transform.right * Mathf.Sin(driftPhase) * driftAmount;
+            driftPhase += Time.deltaTime * pDriftFrequency;
+
+            Vector3 sideways = Vector3.Cross(Vector3.up, dirToPlayer).normalized;
+            float wavyDrift = Mathf.Sin(driftPhase + visualWobbleSeed) * pDriftAmount;
+            float biasedDrift = sideBias * sideBiasStrength;
+
+            Vector3 drift = sideways * (wavyDrift + biasedDrift);
             moveDir = (dirToPlayer + drift).normalized;
 
             if (visualRenderer)
             {
                 visualRenderer.transform.localRotation = Quaternion.Euler(
-                    Mathf.Sin(Time.time * 3f) * 5f,
+                    Mathf.Sin((Time.time + visualWobbleSeed) * 3f) * 5f,
                     0f,
-                    Mathf.Sin(Time.time * 2f) * 5f
+                    Mathf.Sin((Time.time + visualWobbleSeed) * 2f) * 5f
                 );
             }
         }
@@ -497,9 +797,22 @@ public class ZombieAIHybrid : MonoBehaviour
                 visualRenderer.transform.localRotation = Quaternion.identity;
         }
 
-        agent.speed = isSurging ? surgeSpeed : (inFocusZone ? focusSpeed : walkSpeed);
+        agent.speed = isSurging ? pSurgeSpeed : (inFocusZone ? pFocusSpeed : pWalkSpeed);
         agent.isStopped = false;
-        agent.SetDestination(transform.position + moveDir * 2f);
+
+        SetChaseDestination(transform.position + moveDir * 2f);
+    }
+
+    void SetChaseDestination(Vector3 destination)
+    {
+        if (Time.time < nextDestinationUpdateTime)
+            return;
+
+        if (!agent || !agent.enabled || !agent.isOnNavMesh)
+            return;
+
+        agent.SetDestination(destination);
+        nextDestinationUpdateTime = Time.time + pDestinationUpdateInterval;
     }
 
     void FaceTarget()
