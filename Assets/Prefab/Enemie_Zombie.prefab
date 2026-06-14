@@ -893,6 +893,32 @@ MonoBehaviour:
   focusDistance: 7
   driftAmount: 1
   driftFrequency: 1
+  randomizePersonality: 1
+  appendPersonalityToName: 0
+  speedMultiplierRange: {x: 0.88, y: 1.12}
+  attackWindupMultiplierRange: {x: 0.85, y: 1.25}
+  attackCooldownMultiplierRange: {x: 0.85, y: 1.25}
+  driftAmountMultiplierRange: {x: 0.55, y: 1.55}
+  driftFrequencyMultiplierRange: {x: 0.65, y: 1.45}
+  wanderPauseMultiplierRange: {x: 0.75, y: 1.35}
+  sideBiasStrength: 0.45
+  destinationUpdateIntervalRange: {x: 0.08, y: 0.22}
+  enableApproachOffsets: 1
+  preferredApproachDistanceRange: {x: 1.75, y: 2.75}
+  sideApproachOffsetRange: {x: 1, y: 3}
+  directApproachChance: 0.1
+  closeOffsetFadeDistance: 4
+  approachJitterAmount: 0.25
+  debugDrawApproachTarget: 1
+  lungeEnabledChance: 0.3
+  enableChaseHesitation: 1
+  baseHesitationChance: 0.12
+  hesitationIntervalRange: {x: 2, y: 4.5}
+  hesitationDurationRange: {x: 0.12, y: 0.38}
+  avoidancePriorityMin: 20
+  avoidancePriorityMax: 80
+  agentAccelerationMultiplierRange: {x: 0.85, y: 1.2}
+  agentAngularSpeedMultiplierRange: {x: 0.8, y: 1.25}
   attackRange: 2
   attackWindupTime: 4
   attackRecoveryTime: 4

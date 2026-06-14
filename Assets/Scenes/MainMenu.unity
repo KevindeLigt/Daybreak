@@ -1070,7 +1070,7 @@ Light:
   m_LightShadowCasterMode: 2
   m_AreaSize: {x: 0.5, y: 0.5}
   m_BounceIntensity: 1
-  m_ColorTemperature: 4657
+  m_ColorTemperature: 4386
   m_UseColorTemperature: 1
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
@@ -2275,7 +2275,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 3
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_Intensity: 509.2958
   m_Range: 52.18
   m_SpotAngle: 137.08252
@@ -2319,7 +2319,7 @@ Light:
   m_LightShadowCasterMode: 2
   m_AreaSize: {x: 5, y: 5}
   m_BounceIntensity: 1
-  m_ColorTemperature: 6570
+  m_ColorTemperature: 1500
   m_UseColorTemperature: 1
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 55.715534}
   m_UseBoundingSphereOverride: 1
@@ -2763,7 +2763,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 6, z: 0}
-  m_LocalScale: {x: 2.6352, y: 2.6351998, z: 2.6352}
+  m_LocalScale: {x: 2.6352, y: 2.6351998, z: 10.5408}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4858300452998872189}
@@ -3842,7 +3842,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 895990cfb35423244a48805a65be4628, type: 2}
+  - {fileID: 2100000, guid: bfc8d797acdfd924cb80f47fc9367deb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -63,6 +63,29 @@ public class ZombieAIHybrid : MonoBehaviour
     [Tooltip("How often chase destinations are refreshed. Small random differences reduce conga-line movement.")]
     public Vector2 destinationUpdateIntervalRange = new Vector2(0.08f, 0.22f);
 
+    // ---------- SOFT SURROUND / APPROACH OFFSETS ----------
+    [Header("Soft Surround Approach")]
+    [Tooltip("When enabled, zombies aim for personal offset positions around the player instead of all targeting the player center.")]
+    public bool enableApproachOffsets = true;
+
+    [Tooltip("Personal preferred distance around the player while chasing. Keep near attack range so they still feel threatening.")]
+    public Vector2 preferredApproachDistanceRange = new Vector2(1.75f, 2.75f);
+
+    [Tooltip("How far left/right zombies try to bias their approach. Higher values create more wrapping, but can feel less direct.")]
+    public Vector2 sideApproachOffsetRange = new Vector2(0.55f, 1.85f);
+
+    [Tooltip("Some zombies should still be direct, otherwise the horde can feel too tactical.")]
+    [Range(0f, 1f)] public float directApproachChance = 0.20f;
+
+    [Tooltip("How close the zombie must be before offset behavior fades and it commits to the attack.")]
+    public float closeOffsetFadeDistance = 3.0f;
+
+    [Tooltip("Small moving offset so zombies do not hold perfectly static surround points.")]
+    public float approachJitterAmount = 0.25f;
+
+    [Tooltip("Runtime-only debug draw for the current approach destination.")]
+    public bool debugDrawApproachTarget = false;
+
     [Tooltip("Only this percentage of zombies are allowed to lunge. Prevents synchronized lunge behavior.")]
     [Range(0f, 1f)] public float lungeEnabledChance = 0.30f;
 
@@ -114,6 +137,12 @@ public class ZombieAIHybrid : MonoBehaviour
     private float pLungeDamage;
     private float pHesitationChance;
     private float pDestinationUpdateInterval;
+    private float pPreferredApproachDistance;
+    private float pSideApproachOffset;
+    private float pApproachJitterSeed;
+    private float pApproachJitterFrequency;
+
+    private Vector3 lastApproachDestination;
 
     private float sideBias = 0f;
     private float visualWobbleSeed = 0f;
@@ -285,6 +314,7 @@ public class ZombieAIHybrid : MonoBehaviour
 
         if (!randomizePersonality)
         {
+            InitializeApproachOffsetPersonality();
             ApplyAgentDesync();
             return;
         }
@@ -375,6 +405,8 @@ public class ZombieAIHybrid : MonoBehaviour
         lastLungeTime = Time.time - Random.Range(0f, pLungeCooldown);
         nextDestinationUpdateTime = Time.time + Random.Range(0f, pDestinationUpdateInterval);
 
+        InitializeApproachOffsetPersonality();
+
         if (appendPersonalityToName)
             gameObject.name = $"{gameObject.name}_{personality}";
 
@@ -396,6 +428,60 @@ public class ZombieAIHybrid : MonoBehaviour
     float RandomRange(Vector2 range)
     {
         return Random.Range(range.x, range.y);
+    }
+
+    void InitializeApproachOffsetPersonality()
+    {
+        pPreferredApproachDistance = RandomRange(preferredApproachDistanceRange);
+        pSideApproachOffset = RandomRange(sideApproachOffsetRange);
+
+        float sideSign = Mathf.Abs(sideBias) > 0.01f ? Mathf.Sign(sideBias) : (Random.value < 0.5f ? -1f : 1f);
+        pSideApproachOffset *= sideSign;
+
+        // A few zombies should remain direct. This stops the horde from feeling too clever or too neatly spaced.
+        if (Random.value <= directApproachChance)
+        {
+            pSideApproachOffset *= Random.Range(0.1f, 0.35f);
+            pPreferredApproachDistance *= Random.Range(0.9f, 1.05f);
+        }
+
+        // Personality flavor: still the same enemy, but different approach instincts.
+        if (randomizePersonality)
+        {
+            switch (personality)
+            {
+                case ZombiePersonality.Hungry:
+                    pPreferredApproachDistance *= 0.88f;
+                    pSideApproachOffset *= 0.45f;
+                    break;
+
+                case ZombiePersonality.Drifter:
+                    pPreferredApproachDistance *= 1.08f;
+                    pSideApproachOffset *= 1.35f;
+                    break;
+
+                case ZombiePersonality.Surger:
+                    pPreferredApproachDistance *= 0.95f;
+                    pSideApproachOffset *= 0.75f;
+                    break;
+
+                case ZombiePersonality.Shambler:
+                    pPreferredApproachDistance *= 1.05f;
+                    pSideApproachOffset *= 1.05f;
+                    break;
+
+                case ZombiePersonality.Clumsy:
+                    pPreferredApproachDistance *= 1.12f;
+                    pSideApproachOffset *= 1.15f;
+                    break;
+            }
+        }
+
+        pPreferredApproachDistance = Mathf.Max(pAttackRange + 0.15f, pPreferredApproachDistance);
+        pSideApproachOffset = Mathf.Clamp(pSideApproachOffset, -3.0f, 3.0f);
+
+        pApproachJitterSeed = Random.Range(0f, 100f);
+        pApproachJitterFrequency = Random.Range(0.35f, 0.9f);
     }
 
     // ===================== STATE MACHINE CORE =====================
@@ -767,8 +853,19 @@ public class ZombieAIHybrid : MonoBehaviour
         if (toPlayer.sqrMagnitude < 0.001f)
             return;
 
+        float distanceToPlayer = toPlayer.magnitude;
         Vector3 dirToPlayer = toPlayer.normalized;
-        Vector3 moveDir = dirToPlayer;
+
+        Vector3 approachDestination = GetApproachDestination(dirToPlayer, distanceToPlayer, inFocusZone);
+        Vector3 toApproachDestination = approachDestination - transform.position;
+        toApproachDestination.y = 0f;
+
+        Vector3 dirToApproachDestination = toApproachDestination.sqrMagnitude > 0.001f
+            ? toApproachDestination.normalized
+            : dirToPlayer;
+
+        Vector3 moveDir = dirToApproachDestination;
+        Vector3 extraDrift = Vector3.zero;
 
         if (!inFocusZone)
         {
@@ -778,8 +875,8 @@ public class ZombieAIHybrid : MonoBehaviour
             float wavyDrift = Mathf.Sin(driftPhase + visualWobbleSeed) * pDriftAmount;
             float biasedDrift = sideBias * sideBiasStrength;
 
-            Vector3 drift = sideways * (wavyDrift + biasedDrift);
-            moveDir = (dirToPlayer + drift).normalized;
+            extraDrift = sideways * (wavyDrift + biasedDrift);
+            moveDir = (dirToApproachDestination + extraDrift).normalized;
 
             if (visualRenderer)
             {
@@ -800,7 +897,50 @@ public class ZombieAIHybrid : MonoBehaviour
         agent.speed = isSurging ? pSurgeSpeed : (inFocusZone ? pFocusSpeed : pWalkSpeed);
         agent.isStopped = false;
 
-        SetChaseDestination(transform.position + moveDir * 2f);
+        Vector3 destination;
+
+        if (enableApproachOffsets)
+        {
+            // Aim for the personal surround point, with a little of the old drift layered on top.
+            // This makes the group wrap and stagger instead of all targeting the same player center.
+            destination = approachDestination + extraDrift;
+        }
+        else
+        {
+            // Original steering behavior.
+            destination = transform.position + moveDir * 2f;
+        }
+
+        SetChaseDestination(destination);
+    }
+
+    Vector3 GetApproachDestination(Vector3 dirToPlayer, float distanceToPlayer, bool inFocusZone)
+    {
+        if (!enableApproachOffsets || target == null)
+            return target.position;
+
+        Vector3 sideways = Vector3.Cross(Vector3.up, dirToPlayer).normalized;
+
+        // Fade offsets close to attack range. Zombies should wrap while approaching,
+        // but commit when they are close enough to actually threaten the player.
+        float fadeStart = Mathf.Max(pAttackRange + 0.15f, closeOffsetFadeDistance);
+        float offsetWeight = Mathf.InverseLerp(pAttackRange + 0.1f, fadeStart, distanceToPlayer);
+
+        float jitter = Mathf.Sin((Time.time + pApproachJitterSeed) * pApproachJitterFrequency) * approachJitterAmount;
+
+        Vector3 desired = target.position
+            - dirToPlayer * (pPreferredApproachDistance * offsetWeight)
+            + sideways * ((pSideApproachOffset + jitter) * offsetWeight);
+
+        // Keep the target point valid on the NavMesh. If this fails, fall back to the player position.
+        if (NavMesh.SamplePosition(desired, out NavMeshHit hit, 1.5f, NavMesh.AllAreas))
+        {
+            lastApproachDestination = hit.position;
+            return hit.position;
+        }
+
+        lastApproachDestination = target.position;
+        return target.position;
     }
 
     void SetChaseDestination(Vector3 destination)
@@ -837,5 +977,21 @@ public class ZombieAIHybrid : MonoBehaviour
         if (isDead) return;
         isDead = true;
         SetState(ZombieState.Dead);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, loseInterestRadius);
+
+        if (!debugDrawApproachTarget || !Application.isPlaying)
+            return;
+
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(lastApproachDestination, 0.25f);
+        Gizmos.DrawLine(transform.position + Vector3.up * 0.2f, lastApproachDestination + Vector3.up * 0.2f);
     }
 }
