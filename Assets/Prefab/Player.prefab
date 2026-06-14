@@ -191,12 +191,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HunterMovement
   walkSpeed: 4
+  groundAcceleration: 28
+  groundDeceleration: 34
+  airAcceleration: 8
   gravity: -9.81
   jumpHeight: 1
+  fallMultiplier: 1.8
+  groundedStickForce: -5
+  maxFallSpeed: -35
+  coyoteTime: 0.08
+  jumpBufferTime: 0.1
   cameraRoot: {fileID: 731385423978014450}
   lookClamp: 80
-  mouseSensitivity: 10
-  controllerSensitivity: 120
+  mouseSensitivity: 0.1
+  controllerSensitivity: 0.1
 --- !u!114 &614694295166656794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -390,6 +398,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: cee92e05-7f90-42f2-bcd7-9618958326ff
     m_ActionName: 'Player/WeaponSwap2[/Keyboard/2,/XInputControllerWindows/dpad/left]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: InteractionManager, Assembly-CSharp
+        m_MethodName: TryInteract
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: e7c2af91-019a-4404-833f-1e787095201c
+    m_ActionName: 'Player/Interact[/Keyboard/e,/XInputControllerWindows/buttonWest]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -429,7 +453,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponManager
   weaponSlots:
   - {fileID: 3371219097603748530}
-  - {fileID: 301848146633561520}
 --- !u!114 &3242892524222320894
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -458,18 +481,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae0fd07080fd95f418c6bdeebc31f068, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShoulderRam
-  ramSpeed: 16
-  ramDuration: 0.65
-  ramCooldown: 5
+  ramSpeed: 10
+  ramDuration: 0.4
+  ramCooldown: 6
   ramDamage: 30
-  ramKnockbackForce: 15
+  ramKnockbackForce: 16
+  enemyStunTime: 0.3
+  groundedStickForce: -8
+  recoveryTime: 0.12
+  minMoveInputForRam: 0.15
+  ramSpeedCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.65
+      value: 0.55
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   hitRadius: 2
+  hitForwardOffset: 0.9
   enemyMask:
     serializedVersion: 2
     m_Bits: 192
+  wallMask:
+    serializedVersion: 2
+    m_Bits: 128
+  wallCheckDistance: 0.65
   playerCamera: {fileID: 2426618626291283026}
-  fovKick: 20
+  fovKick: 4
+  fovKickInTime: 0.04
+  fovReturnTime: 0.12
   cameraShakeStrength: 3
+  cameraShakeDuration: 0.07
 --- !u!1 &6345558519032021470
 GameObject:
   m_ObjectHideFlags: 0
@@ -850,6 +918,10 @@ PrefabInstance:
       value: 199
       objectReference: {fileID: 0}
     - target: {fileID: 7235631892856808707, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: pelletsPerShot
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235631892856808707, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: shotgunFireSFX
       value: 
       objectReference: {fileID: 8300000, guid: 3a0a66acbbc256c45865373624e24730, type: 3}
@@ -862,6 +934,10 @@ PrefabInstance:
       value: 35
       objectReference: {fileID: 0}
     - target: {fileID: 7235631892856808707, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: eviscerateRange
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235631892856808707, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: hitParticlePrefab
       value: 
       objectReference: {fileID: 5359789755273865957, guid: a4f91ae1acff24b41b42ee328c5d45a6, type: 3}
@@ -869,6 +945,10 @@ PrefabInstance:
       propertyPath: muzzleFlashPrefab
       value: 
       objectReference: {fileID: 5359789755273865957, guid: 35b62ede1131759499a0b5b46dd25431, type: 3}
+    - target: {fileID: 7235631892856808707, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: enemyDetectionMask.m_Bits
+      value: 64
+      objectReference: {fileID: 0}
     - target: {fileID: 8337939801068494617, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_Layer
       value: 3
@@ -898,7 +978,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a178e5ecb3c0d14bb91f56116e8a2ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponSway
-  swayAmount: 1
+  swayAmount: 0.1
   swaySmooth: 8
   kickAmount: 5
   kickReturnSpeed: 8
@@ -926,9 +1006,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1230086250771317028}
     m_Modifications:
+    - target: {fileID: 449511140161887666, guid: 6db0a5496478f8641891b67aab1657dd, type: 3}
+      propertyPath: swayAmount
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 5020288342258759086, guid: 6db0a5496478f8641891b67aab1657dd, type: 3}
       propertyPath: m_Name
       value: Crossbow
+      objectReference: {fileID: 0}
+    - target: {fileID: 5020288342258759086, guid: 6db0a5496478f8641891b67aab1657dd, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7785745671300436366, guid: 6db0a5496478f8641891b67aab1657dd, type: 3}
       propertyPath: baseDamage
@@ -979,17 +1067,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6db0a5496478f8641891b67aab1657dd, type: 3}
---- !u!114 &301848146633561520 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7785745671300436366, guid: 6db0a5496478f8641891b67aab1657dd, type: 3}
-  m_PrefabInstance: {fileID: 7511132427823203390}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f1a61ad1eaf68c4ba337923fad0a24d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CrossbowController
 --- !u!4 &1790160917700552031 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8136609225112936801, guid: 6db0a5496478f8641891b67aab1657dd, type: 3}

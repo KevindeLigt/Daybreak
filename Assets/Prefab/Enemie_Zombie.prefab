@@ -881,7 +881,7 @@ MonoBehaviour:
   target: {fileID: 0}
   detectionRadius: 40
   loseInterestRadius: 60
-  wanderRadius: 25
+  wanderRadius: 50
   wanderPauseMin: 1.5
   wanderPauseMax: 5
   walkSpeed: 2.5
@@ -894,9 +894,9 @@ MonoBehaviour:
   driftAmount: 1
   driftFrequency: 1
   attackRange: 2
-  attackWindupTime: 1.5
-  attackRecoveryTime: 3
-  attackCooldown: 3
+  attackWindupTime: 4
+  attackRecoveryTime: 4
+  attackCooldown: 5
   attackDamage: 15
   lungeDistance: 3
   lungeSpeed: 12
@@ -974,7 +974,6 @@ MonoBehaviour:
   heavyStunDuration: 0.4
   stumbleImpulseMultiplier: 1.5
   ragdollImpulseMultiplier: 2.5
-  archerAI: {fileID: 0}
 --- !u!114 &518766693666692743
 MonoBehaviour:
   m_ObjectHideFlags: 0
