@@ -23167,7 +23167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameFlowManager
   enemyPrefabs:
-  - {fileID: 1791027144357810680, guid: 2b5a505ab25c152469c6047b3e9c102d, type: 3}
+  - {fileID: 1791027144357810680, guid: 774ec21dbdb21504ab0780c068d697ee, type: 3}
   startingEnemiesPerWave: 7
   maxWaves: 5
   timeBetweenWaves: 10
@@ -27571,7 +27571,7 @@ MonoBehaviour:
   m_EvsmLightLeakBias: 0
   m_EvsmVarianceBias: 0.00001
   m_EvsmBlurPasses: 0
-  m_LightlayersMask: 1
+  m_LightlayersMask: 3
   m_LinkShadowLayers: 1
   m_ShadowNearPlane: 0.1
   m_BlockerSampleCount: 24
@@ -27653,7 +27653,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 1
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -27685,7 +27685,7 @@ Light:
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_RenderingLayerMask: 1
+  m_RenderingLayerMask: 3
   m_Lightmapping: 4
   m_LightShadowCasterMode: 2
   m_AreaSize: {x: 11.942791, y: 20}
@@ -30035,6 +30035,63 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1373353208}
   m_SourcePrefab: {fileID: 100100000, guid: d68eea0424682ec4486a1329807279e8, type: 3}
+--- !u!1001 &1669299246
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -10.2852335
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -12.330195
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.60876113
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7933537
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -105
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+      propertyPath: m_Name
+      value: SK_Zombie_Basic
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
 --- !u!1 &1671742221
 GameObject:
   m_ObjectHideFlags: 0
@@ -31867,7 +31924,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MusicLayersController
   baseLayer: {fileID: 572090974}
-  baseLayerVolume: 0.65
+  baseLayerVolume: 0.493
   drumsLayer: {fileID: 881212290}
   drumsMaxVolume: 0.35
   rhythmGuitarLayer: {fileID: 1242530170}
@@ -39897,3 +39954,4 @@ SceneRoots:
   - {fileID: 1521544946}
   - {fileID: 1162612652}
   - {fileID: 1007961985}
+  - {fileID: 1669299246}
