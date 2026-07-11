@@ -4,122 +4,114 @@ using UnityEngine;
 public class EnemyHitReaction : MonoBehaviour
 {
     [Header("References")]
-    public Animator animator;
-    public EnemyRagdollController ragdoll;
-    public Rigidbody hipRigidbody;   // optional: main body rigidbody
-    public MonoBehaviour aiBehaviour;  // e.g. ZombieAIHybrid
-                                       // must have a HitStun(float) method
+    [SerializeField] private Animator animator;
+    [SerializeField] private ZombieAIHybrid zombieAI;
 
     [Header("Hit Strength Thresholds")]
-    [Tooltip("Below this = light flinch only.")]
+    [Tooltip("Hits below this value cause a light flinch.")]
     public float stumbleThreshold = 5f;
 
-    [Tooltip("Above this = full temporary ragdoll blast.")]
-    public float ragdollThreshold = 10f;
+    [Tooltip("Hits at or above this value cause a heavy reaction.")]
+    public float heavyHitThreshold = 10f;
 
     [Header("Reaction Settings")]
     public float lightStunDuration = 0.05f;
     public float stumbleStunDuration = 0.2f;
     public float heavyStunDuration = 0.4f;
 
-    [Tooltip("Impulse applied on medium hits, before full ragdoll territory.")]
-    public float stumbleImpulseMultiplier = 1.5f;
-
-    [Tooltip("Impulse multiplier for heavy hits when triggering TemporaryRagdollBlast.")]
-    public float ragdollImpulseMultiplier = 2.5f;
+    [Header("Debug")]
+    public bool debugReactions = false;
 
     private EnemyHealth health;
 
-    void Awake()
+    private static readonly int FlinchHash =
+        Animator.StringToHash("Flinch");
+
+    private static readonly int StumbleHash =
+        Animator.StringToHash("Stumble");
+
+    private static readonly int HeavyHitHash =
+        Animator.StringToHash("HeavyHit");
+
+    private void Awake()
     {
         health = GetComponent<EnemyHealth>();
+
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>(true);
+
+        if (zombieAI == null)
+            zombieAI = GetComponent<ZombieAIHybrid>();
+
+        if (animator == null)
+        {
+            Debug.LogError(
+                $"{name}: EnemyHitReaction could not find an Animator.",
+                this
+            );
+        }
+        else if (animator.runtimeAnimatorController == null)
+        {
+            Debug.LogError(
+                $"{name}: Animator has no Runtime Animator Controller assigned.",
+                animator
+            );
+        }
     }
 
-    /// <summary>
-    /// Call this when the enemy is hit.
-    /// hitDirection: normalized direction away from the attacker.
-    /// hitStrength: arbitrary 'power' value (you decide the scale).
-    /// </summary>
     public void OnHit(Vector3 hitDirection, float hitStrength)
     {
         if (health != null && health.IsDead)
             return;
 
-        if (hitStrength >= ragdollThreshold)
+        if (hitStrength >= heavyHitThreshold)
         {
-            HandleHeavyHit(hitDirection, hitStrength);
+            PlayReaction(
+                HeavyHitHash,
+                "HeavyHit",
+                heavyStunDuration
+            );
         }
         else if (hitStrength >= stumbleThreshold)
         {
-            HandleStumble(hitDirection, hitStrength);
+            PlayReaction(
+                StumbleHash,
+                "Stumble",
+                stumbleStunDuration
+            );
         }
         else
         {
-            HandleLightHit(hitDirection, hitStrength);
+            PlayReaction(
+                FlinchHash,
+                "Flinch",
+                lightStunDuration
+            );
         }
     }
 
-    void HandleLightHit(Vector3 hitDirection, float hitStrength)
+    private void PlayReaction(
+        int triggerHash,
+        string triggerName,
+        float stunDuration
+    )
     {
-        // Small animation + micro stun
-        if (animator != null)
+        if (animator != null && animator.enabled)
         {
-            animator.SetTrigger("Flinch");
+            animator.SetTrigger(triggerHash);
+
+            if (debugReactions)
+            {
+                Debug.Log(
+                    $"{name}: Triggered {triggerName}",
+                    this
+                );
+            }
         }
 
-        CallHitStun(lightStunDuration);
-    }
-
-    void HandleStumble(Vector3 hitDirection, float hitStrength)
-    {
-        // Stumble animation + small physical shove + longer stun
-        if (animator != null)
+        if (zombieAI != null && stunDuration > 0f)
         {
-            animator.SetTrigger("Stumble");
-        }
-
-        if (hipRigidbody != null)
-        {
-            Vector3 force = hitDirection * hitStrength * stumbleImpulseMultiplier;
-            hipRigidbody.AddForce(force, ForceMode.Impulse);
-        }
-
-        CallHitStun(stumbleStunDuration);
-    }
-
-    void HandleHeavyHit(Vector3 hitDirection, float hitStrength)
-    {
-        if (ragdoll != null)
-        {
-            Vector3 force = hitDirection * hitStrength * ragdollImpulseMultiplier;
-            // You already have this coroutine in your ragdoll controller
-            ragdoll.StartCoroutine(ragdoll.TemporaryRagdollBlast(force));
-        }
-        else if (hipRigidbody != null)
-        {
-            // Fallback: big shove without full ragdoll if ragdoll ref is missing
-            Vector3 force = hitDirection * hitStrength * ragdollImpulseMultiplier;
-            hipRigidbody.AddForce(force, ForceMode.Impulse);
-        }
-
-        if (animator != null)
-        {
-            animator.SetTrigger("HeavyHit");
-        }
-
-        CallHitStun(heavyStunDuration);
-    }
-
-    void CallHitStun(float duration)
-    {
-        if (aiBehaviour == null || duration <= 0f)
-            return;
-
-        // We assume your AI script has a public HitStun(float) method.
-        var method = aiBehaviour.GetType().GetMethod("HitStun");
-        if (method != null)
-        {
-            method.Invoke(aiBehaviour, new object[] { duration });
+            zombieAI.HitStun(stunDuration);
         }
     }
 }

@@ -1,109 +1,198 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
+using System.Linq;
 
 public class EnemyRagdollController : MonoBehaviour
 {
     private NavMeshAgent agent;
     private Animator animator;
-    private ZombieAI zombieAI;
+    private ZombieAIHybrid zombieAI;
+
     private Collider mainCollider;
-    private Rigidbody rootRB;
+    private Rigidbody rootRigidbody;
 
     [Header("Ragdoll Parts")]
+    [Tooltip("Assign the single central hips/pelvis Rigidbody.")]
+    public Rigidbody pelvisRigidbody;
+
     public Rigidbody[] ragdollBodies;
     public Collider[] ragdollColliders;
 
-    private bool isDead = false;
+    [Header("Temporary Ragdoll")]
+    public float temporaryRagdollDuration = 0.25f;
 
-    void Awake()
+    private bool isDead;
+    private bool isTemporarilyRagdolled;
+
+    private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
-        animator = GetComponentInChildren<Animator>();
-        zombieAI = GetComponent<ZombieAI>();
+        animator = GetComponentInChildren<Animator>(true);
+        zombieAI = GetComponent<ZombieAIHybrid>();
+
         mainCollider = GetComponent<Collider>();
-        rootRB = GetComponent<Rigidbody>();
+        rootRigidbody = GetComponent<Rigidbody>();
 
-        ragdollBodies = GetComponentsInChildren<Rigidbody>();
-        ragdollColliders = GetComponentsInChildren<Collider>();
+        // Never include the prefab root Rigidbody in the ragdoll.
+        ragdollBodies = GetComponentsInChildren<Rigidbody>(true)
+            .Where(rb => rb != null && rb != rootRigidbody)
+            .ToArray();
 
+        // Never include the main navigation capsule in ragdoll colliders.
+        ragdollColliders = GetComponentsInChildren<Collider>(true)
+            .Where(col => col != null && col != mainCollider)
+            .ToArray();
+
+        ConfigureJointStability();
         DisableRagdoll();
+    }
+
+    private void ConfigureJointStability()
+    {
+        foreach (CharacterJoint joint in GetComponentsInChildren<CharacterJoint>(true))
+        {
+            joint.enableCollision = false;
+            joint.enableProjection = true;
+        }
+
+        foreach (ConfigurableJoint joint in GetComponentsInChildren<ConfigurableJoint>(true))
+        {
+            joint.enableCollision = false;
+            joint.projectionMode = JointProjectionMode.PositionAndRotation;
+            joint.projectionDistance = 0.05f;
+            joint.projectionAngle = 5f;
+        }
     }
 
     public void DisableRagdoll()
     {
-        // Ragdoll OFF: AI / animator / main collider ON, bones kinematic & colliders disabled
-        if (agent) agent.enabled = true;
-        if (zombieAI) zombieAI.enabled = true;
-        if (animator) animator.enabled = true;
-        if (mainCollider) mainCollider.enabled = true;
+        isTemporarilyRagdolled = false;
 
-        foreach (var rb in ragdollBodies)
+        // Disable ragdoll physics first.
+        foreach (Rigidbody rb in ragdollBodies)
         {
-            if (rb == null) continue;
-            // Keep rootRB kinematic as well (should already be)
+            if (rb == null)
+                continue;
+
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
             rb.isKinematic = true;
+            rb.useGravity = false;
         }
 
-        foreach (var col in ragdollColliders)
+        foreach (Collider col in ragdollColliders)
         {
-            if (col == null) continue;
-            // Keep only the main collider enabled in non-ragdoll mode
-            if (col != mainCollider)
+            if (col != null)
                 col.enabled = false;
         }
+
+        // Root Rigidbody must never become a loose ragdoll body.
+        if (rootRigidbody != null)
+        {
+            rootRigidbody.isKinematic = true;
+            rootRigidbody.useGravity = false;
+        }
+
+        if (mainCollider != null)
+            mainCollider.enabled = true;
+
+        if (animator != null)
+            animator.enabled = true;
+
+        if (agent != null)
+            agent.enabled = true;
+
+        if (zombieAI != null)
+            zombieAI.enabled = true;
     }
 
+    public void EnableRagdoll(Vector3 impulse)
+    {
+        if (isDead)
+            return;
+
+        isDead = true;
+        isTemporarilyRagdolled = false;
+
+        EnableRagdollPhysics();
+        ApplyImpulse(impulse);
+    }
+
+    // Keeps compatibility with any old calls.
     public void EnableRagdoll()
     {
-        isDead = true;
+        EnableRagdoll(Vector3.zero);
+    }
 
-        if (agent) agent.enabled = false;
-        if (zombieAI) zombieAI.enabled = false;
-        if (animator) animator.enabled = false;
-        if (mainCollider) mainCollider.enabled = false;
+    private void EnableRagdollPhysics()
+    {
+        if (zombieAI != null)
+            zombieAI.enabled = false;
 
-        foreach (var rb in ragdollBodies)
+        if (agent != null)
+            agent.enabled = false;
+
+        if (animator != null)
+            animator.enabled = false;
+
+        if (mainCollider != null)
+            mainCollider.enabled = false;
+
+        if (rootRigidbody != null)
         {
-            if (rb == null) continue;
-            rb.isKinematic = false;
+            rootRigidbody.isKinematic = true;
+            rootRigidbody.useGravity = false;
         }
 
-        foreach (var col in ragdollColliders)
+        foreach (Rigidbody rb in ragdollBodies)
         {
-            if (col == null) continue;
-            col.enabled = true;
+            if (rb == null)
+                continue;
+
+            rb.isKinematic = false;
+            rb.useGravity = true;
+        }
+
+        foreach (Collider col in ragdollColliders)
+        {
+            if (col != null)
+                col.enabled = true;
         }
     }
 
-    public IEnumerator TemporaryRagdollBlast(Vector3 force)
+    public IEnumerator TemporaryRagdollBlast(Vector3 impulse)
     {
-        if (isDead) yield break; // don't recover if already dead
+        // Prevent every shotgun pellet from starting another blast.
+        if (isDead || isTemporarilyRagdolled)
+            yield break;
 
-        // Turn AI off
-        if (agent) agent.enabled = false;
-        if (zombieAI) zombieAI.enabled = false;
-        if (animator) animator.enabled = false;
+        isTemporarilyRagdolled = true;
 
-        foreach (var rb in ragdollBodies)
-        {
-            if (rb == null) continue;
-            rb.isKinematic = false;
-            rb.AddForce(force, ForceMode.Impulse);
-        }
+        EnableRagdollPhysics();
+        ApplyImpulse(impulse);
 
-        foreach (var col in ragdollColliders)
-        {
-            if (col == null) continue;
-            col.enabled = true;
-        }
+        yield return new WaitForSeconds(temporaryRagdollDuration);
 
-        yield return new WaitForSeconds(0.25f);
+        if (isDead)
+            yield break;
 
-        // If enemy died during this time, do not restore
-        if (isDead) yield break;
-
-        // Restore non-ragdoll state
         DisableRagdoll();
+    }
+
+    private void ApplyImpulse(Vector3 impulse)
+    {
+        // Apply the impulse once to the central body.
+        // Do not apply the full force independently to every limb.
+        if (pelvisRigidbody != null)
+        {
+            pelvisRigidbody.AddForce(impulse, ForceMode.Impulse);
+            return;
+        }
+
+        Debug.LogWarning(
+            $"{name}: No pelvis Rigidbody assigned on EnemyRagdollController.",
+            this
+        );
     }
 }

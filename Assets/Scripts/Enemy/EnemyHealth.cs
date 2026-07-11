@@ -5,29 +5,44 @@ public class EnemyHealth : MonoBehaviour
 {
     [Header("Stats")]
     public string enemyType = "Unknown";
-
     public float maxHealth = 100f;
-    private float currentHealth;
+
+    [Header("Death Settings")]
+    [Tooltip("Multiplier applied to the final hit force when entering death ragdoll.")]
+    public float deathForceMultiplier = 2f;
+
+    public float destroyDelay = 10f;
 
     [Header("Drop Settings")]
     public GameObject healthOrbPrefab;
-    [Range(0f, 1f)] public float healthOrbDropChance = 0.10f; // 10% default
 
+    [Range(0f, 1f)]
+    public float healthOrbDropChance = 0.10f;
 
+    [Header("Hit Feedback")]
     public Renderer enemyRenderer;
     public Color hitColor = Color.white;
     public float flashDuration = 0.1f;
+    public float hitStunDuration = 0.15f;
 
+    private float currentHealth;
     private Color originalColor;
+
     private EnemyRagdollController ragdoll;
+    private ZombieAIHybrid zombieAI;
 
-    private bool isDead = false;
+    private Coroutine flashRoutine;
+    private bool isDead;
+
     public bool IsDead => isDead;
+    public float CurrentHealth => currentHealth;
 
-    void Start()
+    private void Awake()
     {
         currentHealth = maxHealth;
+
         ragdoll = GetComponent<EnemyRagdollController>();
+        zombieAI = GetComponent<ZombieAIHybrid>();
 
         if (enemyRenderer == null)
             enemyRenderer = GetComponentInChildren<Renderer>();
@@ -38,24 +53,38 @@ public class EnemyHealth : MonoBehaviour
 
     public void TakeDamage(float damage, Vector3 force)
     {
-        if (isDead) return;
+        if (isDead || damage <= 0f)
+            return;
 
-        currentHealth -= damage;
-        if (TryGetComponent(out ZombieAIHybrid ai))
-            ai.HitStun(0.15f);
+        currentHealth = Mathf.Max(0f, currentHealth - damage);
 
-
-        StartCoroutine(Flash());
-
-        ragdoll.StartCoroutine(ragdoll.TemporaryRagdollBlast(force));
-
+        // Lethal damage goes directly into permanent death ragdoll.
         if (currentHealth <= 0f)
+        {
             Die(force);
+            return;
+        }
+
+        // Non-lethal hits stay animated.
+        if (zombieAI != null)
+            zombieAI.HitStun(hitStunDuration);
+
+        if (enemyRenderer != null)
+        {
+            if (flashRoutine != null)
+                StopCoroutine(flashRoutine);
+
+            flashRoutine = StartCoroutine(Flash());
+        }
+
+        // No temporary ragdoll here.
+        // EnemyHitReaction handles Flinch / Stumble / HeavyHit animations.
     }
 
     public void Eviscerate(Vector3 force)
     {
-        if (isDead) return;
+        if (isDead)
+            return;
 
         currentHealth = 0f;
         Die(force);
@@ -63,71 +92,97 @@ public class EnemyHealth : MonoBehaviour
 
     private IEnumerator Flash()
     {
-        if (enemyRenderer) enemyRenderer.material.color = hitColor;
+        enemyRenderer.material.color = hitColor;
+
         yield return new WaitForSeconds(flashDuration);
-        if (enemyRenderer) enemyRenderer.material.color = originalColor;
+
+        if (!isDead && enemyRenderer != null)
+            enemyRenderer.material.color = originalColor;
+
+        flashRoutine = null;
     }
-
-
-
 
     private void Die(Vector3 force)
     {
-        if (isDead) return;
+        if (isDead)
+            return;
+
         isDead = true;
+        currentHealth = 0f;
+
+        if (flashRoutine != null)
+        {
+            StopCoroutine(flashRoutine);
+            flashRoutine = null;
+        }
+
+        // Cleans up AI state, including attack-slot ownership.
+        if (zombieAI != null)
+            zombieAI.Die();
 
         GameFlowManager.Instance?.EnemyDied();
-        KillComboSystem.Instance.OnEnemyKilled();
-
-        ragdoll.EnableRagdoll();
-
-        foreach (var rb in ragdoll.ragdollBodies)
-            rb.AddForce(force * 2f, ForceMode.Impulse);
+        KillComboSystem.Instance?.OnEnemyKilled();
 
         TryDropHealthOrb();
-        PlayerStatsManager.Instance.AddKill(enemyType);
-        Destroy(gameObject, 10f);
+        PlayerStatsManager.Instance?.AddKill(enemyType);
 
+        if (ragdoll != null)
+        {
+            // Uses the corrected ragdoll controller that applies one impulse
+            // to the central pelvis instead of every individual body.
+            ragdoll.EnableRagdoll(force * deathForceMultiplier);
+        }
+        else
+        {
+            Debug.LogWarning(
+                $"{name}: Enemy died without an EnemyRagdollController.",
+                this
+            );
+        }
+
+        Destroy(gameObject, destroyDelay);
     }
-
-
 
     public Transform GetClosestRagdollBone(Vector3 hitPoint)
     {
         if (ragdoll == null || ragdoll.ragdollBodies == null)
             return null;
 
-        float best = float.MaxValue;
-        Transform bestBone = null;
+        float closestDistance = float.MaxValue;
+        Transform closestBone = null;
 
-        foreach (var rb in ragdoll.ragdollBodies)
+        foreach (Rigidbody body in ragdoll.ragdollBodies)
         {
-            float d = Vector3.Distance(rb.transform.position, hitPoint);
-            if (d < best)
+            if (body == null)
+                continue;
+
+            float distance = Vector3.Distance(
+                body.transform.position,
+                hitPoint
+            );
+
+            if (distance < closestDistance)
             {
-                best = d;
-                bestBone = rb.transform;
+                closestDistance = distance;
+                closestBone = body.transform;
             }
         }
 
-        return bestBone;
+        return closestBone;
     }
-
-
 
     private void TryDropHealthOrb()
     {
         if (healthOrbPrefab == null)
             return;
 
-        if (Random.value <= healthOrbDropChance)
-        {
-            Instantiate(
-                healthOrbPrefab,
-                transform.position + Vector3.up * 0.5f,
-                Quaternion.identity
-            );
-        }
-    }
+        if (Random.value > healthOrbDropChance)
+            return;
 
+        Instantiate(
+            healthOrbPrefab,
+            transform.position + Vector3.up * 0.5f,
+            Quaternion.identity
+        );
+    }
 }
