@@ -65,11 +65,14 @@ public class EnemyRagdollController : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        if (!isDead)
+            DisableRagdoll();
+    }
+
     public void DisableRagdoll()
     {
-        isTemporarilyRagdolled = false;
-
-        // Disable ragdoll physics first.
         foreach (Rigidbody rb in ragdollBodies)
         {
             if (rb == null)
@@ -77,8 +80,10 @@ public class EnemyRagdollController : MonoBehaviour
 
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
+
             rb.isKinematic = true;
             rb.useGravity = false;
+            rb.detectCollisions = false;
         }
 
         foreach (Collider col in ragdollColliders)
@@ -87,18 +92,17 @@ public class EnemyRagdollController : MonoBehaviour
                 col.enabled = false;
         }
 
-        // Root Rigidbody must never become a loose ragdoll body.
-        if (rootRigidbody != null)
-        {
-            rootRigidbody.isKinematic = true;
-            rootRigidbody.useGravity = false;
-        }
-
         if (mainCollider != null)
             mainCollider.enabled = true;
 
         if (animator != null)
+        {
             animator.enabled = true;
+            animator.speed = 1f;
+
+            animator.Rebind();
+            animator.Update(0f);
+        }
 
         if (agent != null)
             agent.enabled = true;

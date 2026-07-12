@@ -23110,7 +23110,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameFlowManager
   enemyPrefabs:
-  - {fileID: 8113246048059566227, guid: feb19c1fbeb01eb41ad0c78e5ed310d1, type: 3}
+  - {fileID: 6423268733560515579, guid: 711cc903c0c53794ba16cc6b8bd6db1d, type: 3}
   startingEnemiesPerWave: 7
   maxWaves: 5
   timeBetweenWaves: 10
