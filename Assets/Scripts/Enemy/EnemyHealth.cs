@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(EnemyRagdollController))]
 public class EnemyHealth : MonoBehaviour
 {
     [Header("Stats")]
@@ -8,7 +9,7 @@ public class EnemyHealth : MonoBehaviour
     public float maxHealth = 100f;
 
     [Header("Death Settings")]
-    [Tooltip("Multiplier applied to the final hit force when entering death ragdoll.")]
+    [Tooltip("Multiplier applied to the final hit force on a normal ragdoll death.")]
     public float deathForceMultiplier = 2f;
 
     public float destroyDelay = 10f;
@@ -29,6 +30,7 @@ public class EnemyHealth : MonoBehaviour
     private Color originalColor;
 
     private EnemyRagdollController ragdoll;
+    private EnemyEviscerationController eviscerationController;
     private ZombieAIHybrid zombieAI;
 
     private Coroutine flashRoutine;
@@ -42,6 +44,7 @@ public class EnemyHealth : MonoBehaviour
         currentHealth = maxHealth;
 
         ragdoll = GetComponent<EnemyRagdollController>();
+        eviscerationController = GetComponent<EnemyEviscerationController>();
         zombieAI = GetComponent<ZombieAIHybrid>();
 
         if (enemyRenderer == null)
@@ -58,14 +61,13 @@ public class EnemyHealth : MonoBehaviour
 
         currentHealth = Mathf.Max(0f, currentHealth - damage);
 
-        // Lethal damage goes directly into permanent death ragdoll.
         if (currentHealth <= 0f)
         {
-            Die(force);
+            Kill(force, false);
             return;
         }
 
-        // Non-lethal hits stay animated.
+        // Non-lethal damage stays animated.
         if (zombieAI != null)
             zombieAI.HitStun(hitStunDuration);
 
@@ -76,33 +78,21 @@ public class EnemyHealth : MonoBehaviour
 
             flashRoutine = StartCoroutine(Flash());
         }
-
-        // No temporary ragdoll here.
-        // EnemyHitReaction handles Flinch / Stumble / HeavyHit animations.
     }
 
+    /// <summary>
+    /// Called by the shotgun's close-range evisceration check.
+    /// </summary>
     public void Eviscerate(Vector3 force)
     {
         if (isDead)
             return;
 
         currentHealth = 0f;
-        Die(force);
+        Kill(force, true);
     }
 
-    private IEnumerator Flash()
-    {
-        enemyRenderer.material.color = hitColor;
-
-        yield return new WaitForSeconds(flashDuration);
-
-        if (!isDead && enemyRenderer != null)
-            enemyRenderer.material.color = originalColor;
-
-        flashRoutine = null;
-    }
-
-    private void Die(Vector3 force)
+    private void Kill(Vector3 force, bool wasEviscerated)
     {
         if (isDead)
             return;
@@ -116,20 +106,27 @@ public class EnemyHealth : MonoBehaviour
             flashRoutine = null;
         }
 
-        // Cleans up AI state, including attack-slot ownership.
+        // Cleans up the active attack slot and AI state.
         if (zombieAI != null)
             zombieAI.Die();
 
+        // Shared kill bookkeeping: exactly once.
         GameFlowManager.Instance?.EnemyDied();
         KillComboSystem.Instance?.OnEnemyKilled();
-
-        TryDropHealthOrb();
         PlayerStatsManager.Instance?.AddKill(enemyType);
+        TryDropHealthOrb();
 
-        if (ragdoll != null)
+        if (wasEviscerated && eviscerationController != null)
         {
-            // Uses the corrected ragdoll controller that applies one impulse
-            // to the central pelvis instead of every individual body.
+            if (ragdoll != null)
+                ragdoll.DisableBodyForEvisceration();
+
+            eviscerationController.Eviscerate(force);
+        }
+        else if (ragdoll != null)
+        {
+            // Safe fallback: if no evisceration component is assigned,
+            // use a normal full-body death ragdoll.
             ragdoll.EnableRagdoll(force * deathForceMultiplier);
         }
         else
@@ -141,6 +138,21 @@ public class EnemyHealth : MonoBehaviour
         }
 
         Destroy(gameObject, destroyDelay);
+    }
+
+    private IEnumerator Flash()
+    {
+        if (enemyRenderer == null)
+            yield break;
+
+        enemyRenderer.material.color = hitColor;
+
+        yield return new WaitForSeconds(flashDuration);
+
+        if (!isDead && enemyRenderer != null)
+            enemyRenderer.material.color = originalColor;
+
+        flashRoutine = null;
     }
 
     public Transform GetClosestRagdollBone(Vector3 hitPoint)

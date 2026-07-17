@@ -22,15 +22,15 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 760c4dbf9f082934f93ff5ebff89bbed, type: 2}
     - target: {fileID: -8679921383154817045, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.39
+      value: -2.8703144
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.00000023841858
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.39623976
+      value: 8.849501
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
       propertyPath: m_LocalRotation.w
@@ -244,6 +244,9 @@ PrefabInstance:
       addedObject: {fileID: 7520308135904735104}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 6424280100689343707}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+      insertIndex: -1
       addedObject: {fileID: -2953771497533380965}
     - targetCorrespondingSourceObject: {fileID: 1925743485829178620, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
       insertIndex: -1
@@ -342,6 +345,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 93941466380519431}
   m_SourcePrefab: {fileID: 100100000, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+--- !u!95 &328750238060964667 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+  m_PrefabInstance: {fileID: 6189460123769001642}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &636827473013474167 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6715735684576957917, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
@@ -1302,6 +1310,16 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!137 &5832836045786645458 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -8856605423599921800, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+  m_PrefabInstance: {fileID: 6189460123769001642}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5940204258783605057 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+  m_PrefabInstance: {fileID: 6189460123769001642}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &6423268733560515579 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
@@ -1380,7 +1398,7 @@ MonoBehaviour:
   driftAmount: 0.8
   driftFrequency: 0.7
   randomizePersonality: 1
-  appendPersonalityToName: 0
+  appendPersonalityToName: 1
   speedMultiplierRange: {x: 0.88, y: 1.12}
   attackWindupMultiplierRange: {x: 0.85, y: 1.25}
   attackCooldownMultiplierRange: {x: 0.85, y: 1.25}
@@ -1420,7 +1438,7 @@ MonoBehaviour:
   stunColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   attackColor: {r: 1, g: 0, b: 0, a: 1}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
-  visualRenderer: {fileID: 0}
+  visualRenderer: {fileID: 5832836045786645458}
   idleAudioSource: {fileID: 0}
   idleLoopClip: {fileID: 0}
   shoveForce: 2
@@ -1462,7 +1480,6 @@ MonoBehaviour:
   - {fileID: 7157918107600178461}
   - {fileID: 4470580273486622399}
   - {fileID: 1433978469461444932}
-  temporaryRagdollDuration: 0.25
 --- !u!114 &3898547028658176421
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1475,11 +1492,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da42a57bd22c3fc4f92a01e74f62e778, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  enemyType: Unknown
+  enemyType: Zombie
   maxHealth: 100
-  deathForceMultiplier: 2
+  deathForceMultiplier: 10
   destroyDelay: 10
-  healthOrbPrefab: {fileID: 0}
+  healthOrbPrefab: {fileID: 1906950436779646774, guid: ba243559442fcf24bbe0cea757273f89, type: 3}
   healthOrbDropChance: 0.1
   enemyRenderer: {fileID: 0}
   hitColor: {r: 1, g: 1, b: 1, a: 1}
@@ -1497,14 +1514,75 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f47ef5253f67bc45a9612f2b958606e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHitReaction
-  animator: {fileID: 0}
-  zombieAI: {fileID: 0}
+  animator: {fileID: 328750238060964667}
+  zombieAI: {fileID: 2430623026696426519}
   stumbleThreshold: 5
   heavyHitThreshold: 10
   lightStunDuration: 0.05
   stumbleStunDuration: 0.2
   heavyStunDuration: 0.4
-  debugReactions: 0
+  debugReactions: 1
+--- !u!114 &6424280100689343707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6423268733560515579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1672149f3e6c2ce48b9e176f51f39163, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyEviscerationController
+  originalBodyRenderers:
+  - {fileID: 5832836045786645458}
+  gibSpawns:
+  - gibPrefab: {fileID: 7581268083563548207, guid: 15296f9c5fbf5f5418ec36a8eff3fb88, type: 3}
+    spawnAnchor: {fileID: 8086090971823034271}
+    alwaysSpawn: 1
+    spawnChance: 0
+    forceMultiplier: 1
+    torqueMultiplier: 1
+    attachBloodTrail: 0
+  - gibPrefab: {fileID: 7581268083563548207, guid: 15296f9c5fbf5f5418ec36a8eff3fb88, type: 3}
+    spawnAnchor: {fileID: 8086090971823034271}
+    alwaysSpawn: 1
+    spawnChance: 0
+    forceMultiplier: 1
+    torqueMultiplier: 1
+    attachBloodTrail: 0
+  - gibPrefab: {fileID: 7581268083563548207, guid: 15296f9c5fbf5f5418ec36a8eff3fb88, type: 3}
+    spawnAnchor: {fileID: 8086090971823034271}
+    alwaysSpawn: 1
+    spawnChance: 0
+    forceMultiplier: 1
+    torqueMultiplier: 1
+    attachBloodTrail: 0
+  - gibPrefab: {fileID: 7581268083563548207, guid: 15296f9c5fbf5f5418ec36a8eff3fb88, type: 3}
+    spawnAnchor: {fileID: 8086090971823034271}
+    alwaysSpawn: 1
+    spawnChance: 0
+    forceMultiplier: 1
+    torqueMultiplier: 1
+    attachBloodTrail: 0
+  maxGibsToSpawn: 4
+  bloodBurstPrefab: {fileID: 5359789755273865957, guid: aa4f11e8830c4e94daa4d74d0e6b269b, type: 3}
+  bloodBurstAnchor: {fileID: 5940204258783605057}
+  bloodTrailPrefab: {fileID: 7523358957666567661, guid: cb7a724a36c4cde4b9db3e00fd6680a0, type: 3}
+  eviscerationClips:
+  - {fileID: 8300000, guid: 811c49692a778e64c9d9ba2a4d77e4e8, type: 3}
+  eviscerationVolume: 1
+  pitchRange: {x: 0.92, y: 1.08}
+  audioMinDistance: 2
+  audioMaxDistance: 30
+  minimumBaseImpulse: 10
+  forceVariation: {x: 0.8, y: 1.25}
+  directionRandomness: 0.45
+  upwardBias: 0.35
+  torqueStrength: 8
+  gibLifetime: 8
+  gibLifetimeVariation: 1.5
+  debugLogs: 1
 --- !u!82 &-2953771497533380965
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1516,7 +1594,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: a1c107f53d168f24fb487147d5205742, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -1527,7 +1605,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 500
+  MaxDistance: 5
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -1701,3 +1779,8 @@ CharacterJoint:
   m_EnablePreprocessing: 0
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!4 &8086090971823034271 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6497865411425265355, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+  m_PrefabInstance: {fileID: 6189460123769001642}
+  m_PrefabAsset: {fileID: 0}
