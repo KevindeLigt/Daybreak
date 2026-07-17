@@ -32,22 +32,43 @@ ModelImporter:
       animation that will be discarded.\n\t'DEF-foot.L' has translation animation
       that will be discarded.\n\t'DEF-shin.R' has translation animation that will
       be discarded.\n\t'DEF-foot.R' has translation animation that will be discarded.\n\t'DEF-toe.R'
-      has translation animation that will be discarded.\n\nClip 'Zombie_SKEL|HeavyHit'
-      has import animation warnings that might lower retargeting quality:\nNote:
-      Activate translation DOF on avatar to improve retargeting quality.\n\t'DEF-shoulder.L'
-      has translation animation that will be discarded.\n\t'DEF-forearm.L' has translation
-      animation that will be discarded.\n\t'DEF-hand.L' has translation animation
-      that will be discarded.\n\t'DEF-shoulder.R' has translation animation that
-      will be discarded.\n\t'DEF-forearm.R' has translation animation that will be
-      discarded.\n\t'DEF-hand.R' has translation animation that will be discarded.\n\t'DEF-spine.004'
-      has translation animation that will be discarded.\n\t'DEF-spine.005' has translation
-      animation that will be discarded.\n\t'DEF-spine.006' has translation animation
+      has translation animation that will be discarded.\n\nClip 'Walk' has import
+      animation warnings that might lower retargeting quality:\nNote: Activate translation
+      DOF on avatar to improve retargeting quality.\n\t'DEF-shoulder.L' has translation
+      animation that will be discarded.\n\t'DEF-forearm.L' has translation animation
+      that will be discarded.\n\t'DEF-hand.L' has translation animation that will
+      be discarded.\n\t'DEF-shoulder.R' has translation animation that will be discarded.\n\t'DEF-forearm.R'
+      has translation animation that will be discarded.\n\t'DEF-hand.R' has translation
+      animation that will be discarded.\n\t'DEF-spine.004' has translation animation
       that will be discarded.\n\t'DEF-shin.L' has translation animation that will
       be discarded.\n\t'DEF-foot.L' has translation animation that will be discarded.\n\t'DEF-shin.R'
       has translation animation that will be discarded.\n\t'DEF-foot.R' has translation
       animation that will be discarded.\n\t'DEF-toe.R' has translation animation
-      that will be discarded.\n\nClip 'Zombie_SKEL|Idle' has import animation warnings
-      that might lower retargeting quality:\nNote: Activate translation DOF on avatar
+      that will be discarded.\n\nClip 'Zombie_SKEL|HeavyHit' has import animation
+      warnings that might lower retargeting quality:\nNote: Activate translation
+      DOF on avatar to improve retargeting quality.\n\t'DEF-shoulder.L' has translation
+      animation that will be discarded.\n\t'DEF-forearm.L' has translation animation
+      that will be discarded.\n\t'DEF-hand.L' has translation animation that will
+      be discarded.\n\t'DEF-shoulder.R' has translation animation that will be discarded.\n\t'DEF-forearm.R'
+      has translation animation that will be discarded.\n\t'DEF-hand.R' has translation
+      animation that will be discarded.\n\t'DEF-spine.004' has translation animation
+      that will be discarded.\n\t'DEF-spine.005' has translation animation that will
+      be discarded.\n\t'DEF-spine.006' has translation animation that will be discarded.\n\t'DEF-shin.L'
+      has translation animation that will be discarded.\n\t'DEF-foot.L' has translation
+      animation that will be discarded.\n\t'DEF-shin.R' has translation animation
+      that will be discarded.\n\t'DEF-foot.R' has translation animation that will
+      be discarded.\n\t'DEF-toe.R' has translation animation that will be discarded.\n\nClip
+      'Zombie_SKEL|Idle' has import animation warnings that might lower retargeting
+      quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'DEF-shoulder.L'
+      has translation animation that will be discarded.\n\t'DEF-shoulder.R' has translation
+      animation that will be discarded.\n\t'DEF-forearm.R' has translation animation
+      that will be discarded.\n\t'DEF-hand.R' has translation animation that will
+      be discarded.\n\t'DEF-spine.004' has translation animation that will be discarded.\n\t'DEF-shin.L'
+      has translation animation that will be discarded.\n\t'DEF-foot.L' has translation
+      animation that will be discarded.\n\t'DEF-shin.R' has translation animation
+      that will be discarded.\n\t'DEF-foot.R' has translation animation that will
+      be discarded.\n\nClip 'Zombie_SKEL|Walk' has import animation warnings that
+      might lower retargeting quality:\nNote: Activate translation DOF on avatar
       to improve retargeting quality.\n\t'DEF-shoulder.L' has translation animation
       that will be discarded.\n\t'DEF-forearm.L' has translation animation that will
       be discarded.\n\t'DEF-hand.L' has translation animation that will be discarded.\n\t'DEF-shoulder.R'
@@ -57,17 +78,10 @@ ModelImporter:
       be discarded.\n\t'DEF-shin.L' has translation animation that will be discarded.\n\t'DEF-foot.L'
       has translation animation that will be discarded.\n\t'DEF-shin.R' has translation
       animation that will be discarded.\n\t'DEF-foot.R' has translation animation
-      that will be discarded.\n\t'DEF-toe.R' has translation animation that will
-      be discarded.\n\nClip 'Zombie_SKEL|Stumble' has import animation warnings that
-      might lower retargeting quality:\nNote: Activate translation DOF on avatar
-      to improve retargeting quality.\n\t'DEF-forearm.R' has translation animation
-      that will be discarded.\n\t'DEF-shin.L' has translation animation that will
-      be discarded.\n\t'DEF-foot.L' has translation animation that will be discarded.\n\t'DEF-shin.R'
-      has translation animation that will be discarded.\n\t'DEF-foot.R' has translation
-      animation that will be discarded.\n"
+      that will be discarded.\n"
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
-    importAnimatedCustomProperties: 1
+    importAnimatedCustomProperties: 0
     importConstraints: 1
     animationCompression: 0
     animationRotationError: 0.5
@@ -78,11 +92,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Zombie_SKEL|Stumble
-      takeName: Zombie_SKEL|Stumble
+      name: Walk
+      takeName: Walk
       internalID: -7459661702386903993
       firstFrame: 0
-      lastFrame: 60
+      lastFrame: 120
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
