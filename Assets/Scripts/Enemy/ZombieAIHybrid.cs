@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
 
@@ -179,8 +179,21 @@ public class ZombieAIHybrid : MonoBehaviour
     public Color normalColor = Color.white;
 
     // ---------- VISUAL ----------
+    // ---------- VISUAL ----------
     [Header("Visual")]
     public Renderer visualRenderer;
+
+    [Header("Animation")]
+    public Animator animator;
+
+    [Tooltip("How quickly locomotion blends between idle and walking.")]
+    public float moveAnimationDampTime = 0.1f;
+
+    private static readonly int MoveSpeedHash =
+        Animator.StringToHash("MoveSpeed");
+
+    private static readonly int LungeTriggerHash =
+        Animator.StringToHash("LungeTrigger");
 
     // ---------- AUDIO ----------
     [Header("Audio")]
@@ -248,6 +261,17 @@ public class ZombieAIHybrid : MonoBehaviour
         if (visualRenderer == null)
             visualRenderer = GetComponentInChildren<Renderer>();
 
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>(true);
+
+        if (animator == null)
+        {
+            Debug.LogError(
+                $"{name}: ZombieAIHybrid could not find an Animator.",
+                this
+            );
+        }
+
         SetState(ZombieState.Wander);
         ScheduleNextSurge();
         ScheduleNextHesitation();
@@ -263,21 +287,72 @@ public class ZombieAIHybrid : MonoBehaviour
 
     void Update()
     {
-        if (isDead || !target) return;
+        if (isDead)
+            return;
 
-        stateTimer += Time.deltaTime;
-
-        switch (state)
+        if (target != null)
         {
-            case ZombieState.Idle: UpdateIdle(); break;
-            case ZombieState.Wander: UpdateWander(); break;
-            case ZombieState.Chase: UpdateChase(); break;
-            case ZombieState.AttackWindup: UpdateAttackWindup(); break;
-            case ZombieState.AttackRecover: UpdateAttackRecover(); break;
-            case ZombieState.Stunned: UpdateStunned(); break;
-            case ZombieState.LungeAttack: UpdateLungeAttack(); break;
-            case ZombieState.Dead: break;
+            stateTimer += Time.deltaTime;
+
+            switch (state)
+            {
+                case ZombieState.Idle:
+                    UpdateIdle();
+                    break;
+
+                case ZombieState.Wander:
+                    UpdateWander();
+                    break;
+
+                case ZombieState.Chase:
+                    UpdateChase();
+                    break;
+
+                case ZombieState.AttackWindup:
+                    UpdateAttackWindup();
+                    break;
+
+                case ZombieState.AttackRecover:
+                    UpdateAttackRecover();
+                    break;
+
+                case ZombieState.Stunned:
+                    UpdateStunned();
+                    break;
+
+                case ZombieState.LungeAttack:
+                    UpdateLungeAttack();
+                    break;
+
+                case ZombieState.Dead:
+                    break;
+            }
         }
+
+        UpdateAnimation();
+    }
+
+    private void UpdateAnimation()
+    {
+        if (animator == null || !animator.enabled)
+            return;
+
+        float currentMoveSpeed = 0f;
+
+        if (agent != null &&
+            agent.enabled &&
+            agent.isOnNavMesh &&
+            !agent.isStopped)
+        {
+            currentMoveSpeed = agent.velocity.magnitude;
+        }
+
+        animator.SetFloat(
+            MoveSpeedHash,
+            currentMoveSpeed,
+            moveAnimationDampTime,
+            Time.deltaTime
+        );
     }
 
     // ===================== PERSONALITY =====================
@@ -528,9 +603,10 @@ public class ZombieAIHybrid : MonoBehaviour
             case ZombieState.LungeAttack:
                 isHesitating = false;
                 agent.isStopped = true;
-                Animator anim = GetComponent<Animator>();
-                if (anim)
-                    anim.SetTrigger("LungeTrigger");
+
+                if (animator != null)
+                    animator.SetTrigger(LungeTriggerHash);
+
                 break;
 
             case ZombieState.Stunned:
