@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7091909866335770990}
-  - component: {fileID: 8263113248985906921}
   - component: {fileID: 7405812906495778118}
+  - component: {fileID: 8263113248985906921}
   - component: {fileID: 6764367962030155318}
   - component: {fileID: 5881243194224487902}
   - component: {fileID: 5077057533922258051}
@@ -40,6 +40,28 @@ Transform:
   - {fileID: 795342130291843697}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!195 &7405812906495778118
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1131232361969350571}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!136 &8263113248985906921
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -63,28 +85,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
---- !u!195 &7405812906495778118
-NavMeshAgent:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1131232361969350571}
-  m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 0.5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!114 &6764367962030155318
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -143,18 +143,23 @@ MonoBehaviour:
   attackRecoveryTime: 0.4
   attackCooldown: 1.2
   attackDamage: 20
+  normalAttackHitFallbackTime: 0.18
+  normalAttackRangeAllowance: 0.2
   lungeDistance: 3.5
   lungeSpeed: 12
   lungeCooldown: 4
   lungeDamage: 35
   minLungeRange: 2
   maxLungeRange: 6
+  lungeAnimationFallbackDuration: 0.5
+  lungeHitFallbackTime: 0.18
+  lungeHitRange: 2.25
   defaultStunTime: 0.2
   stunColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   attackColor: {r: 1, g: 0, b: 0, a: 1}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   visualRenderer: {fileID: 690214317320605922}
-  animator: {fileID: 0}
+  animator: {fileID: 8610607042553074475}
   moveAnimationDampTime: 0.1
   idleAudioSource: {fileID: 410577082451195112}
   idleLoopClip: {fileID: 8300000, guid: a1c107f53d168f24fb487147d5205742, type: 3}
@@ -212,13 +217,13 @@ MonoBehaviour:
   enemyType: Zombie
   maxHealth: 100
   deathForceMultiplier: 10
+  deathRagdollFallbackDelay: 0.65
   destroyDelay: 10
   healthOrbPrefab: {fileID: 1906950436779646774, guid: ba243559442fcf24bbe0cea757273f89, type: 3}
   healthOrbDropChance: 0.1
-  enemyRenderer: {fileID: 0}
-  hitColor: {r: 1, g: 1, b: 1, a: 1}
+  enemyRenderer: {fileID: 690214317320605922}
+  hitColor: {r: 1, g: 0, b: 0, a: 1}
   flashDuration: 0.1
-  hitStunDuration: 0.15
 --- !u!114 &6839049045574744321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -231,14 +236,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f47ef5253f67bc45a9612f2b958606e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHitReaction
-  animator: {fileID: 0}
-  zombieAI: {fileID: 0}
-  stumbleThreshold: 5
-  heavyHitThreshold: 10
-  lightStunDuration: 0.05
-  stumbleStunDuration: 0.2
-  heavyStunDuration: 0.4
-  debugReactions: 1
+  animator: {fileID: 8610607042553074475}
+  zombieAI: {fileID: 6764367962030155318}
+  hitThreshold: 10
+  flinchStunDuration: 0.05
+  hitStunDuration: 0.4
+  debugReactions: 0
 --- !u!114 &3371541968239391456
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -299,7 +302,7 @@ MonoBehaviour:
   torqueStrength: 8
   gibLifetime: 8
   gibLifetimeVariation: 1.5
-  debugLogs: 1
+  debugLogs: 0
 --- !u!82 &410577082451195112
 AudioSource:
   m_ObjectHideFlags: 0
@@ -461,6 +464,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6423268733560515579, guid: 711cc903c0c53794ba16cc6b8bd6db1d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8610607042553074475}
+    - targetCorrespondingSourceObject: {fileID: 6423268733560515579, guid: 711cc903c0c53794ba16cc6b8bd6db1d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7215872057546797112}
   m_SourcePrefab: {fileID: 100100000, guid: 711cc903c0c53794ba16cc6b8bd6db1d, type: 3}
 --- !u!1 &18665139813415115 stripped
 GameObject:
@@ -489,6 +495,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7215872057546797112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18665139813415115}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62f2b974103387e45a22e1cce2bd4993, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ZombieAnimationEvents
+  zombieAI: {fileID: 6764367962030155318}
+  enemyHealth: {fileID: 5077057533922258051}
 --- !u!137 &690214317320605922 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 5832836045786645458, guid: 711cc903c0c53794ba16cc6b8bd6db1d, type: 3}

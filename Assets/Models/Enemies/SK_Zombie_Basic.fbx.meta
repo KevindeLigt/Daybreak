@@ -112,11 +112,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Zombie_SKEL|StumbleFall
-      takeName: Zombie_SKEL|StumbleFall
+      name: Hit
+      takeName: Zombie_SKEL|HeavyHit
       internalID: -7459661702386903993
       firstFrame: 0
-      lastFrame: 29
+      lastFrame: 20
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

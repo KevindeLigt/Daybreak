@@ -9,8 +9,11 @@ public class EnemyHealth : MonoBehaviour
     public float maxHealth = 100f;
 
     [Header("Death Settings")]
-    [Tooltip("Multiplier applied to the final hit force on a normal ragdoll death.")]
+    [Tooltip("Multiplier applied to the final hit force when the death animation becomes a ragdoll.")]
     public float deathForceMultiplier = 2f;
+
+    [Tooltip("Safety delay used when the StumbleFall animation event is missing.")]
+    public float deathRagdollFallbackDelay = 0.65f;
 
     public float destroyDelay = 10f;
 
@@ -24,7 +27,6 @@ public class EnemyHealth : MonoBehaviour
     public Renderer enemyRenderer;
     public Color hitColor = Color.white;
     public float flashDuration = 0.1f;
-    public float hitStunDuration = 0.15f;
 
     private float currentHealth;
     private Color originalColor;
@@ -34,7 +36,11 @@ public class EnemyHealth : MonoBehaviour
     private ZombieAIHybrid zombieAI;
 
     private Coroutine flashRoutine;
+    private Coroutine deathFallbackRoutine;
+
     private bool isDead;
+    private bool deathRagdollStarted;
+    private Vector3 pendingDeathForce;
 
     public bool IsDead => isDead;
     public float CurrentHealth => currentHealth;
@@ -67,21 +73,14 @@ public class EnemyHealth : MonoBehaviour
             return;
         }
 
-        // Non-lethal damage stays animated.
-        if (zombieAI != null)
-            zombieAI.HitStun(hitStunDuration);
-
-        if (enemyRenderer != null)
-        {
-            if (flashRoutine != null)
-                StopCoroutine(flashRoutine);
-
-            flashRoutine = StartCoroutine(Flash());
-        }
+        // Flinch/Hit animation and hit stun are controlled by EnemyHitReaction.
+        // EnemyHealth only owns health, death, flash, and kill bookkeeping.
+        StartHitFlash();
     }
 
     /// <summary>
     /// Called by the shotgun's close-range evisceration check.
+    /// Evisceration bypasses StumbleFall and immediately replaces the body with gibs.
     /// </summary>
     public void Eviscerate(Vector3 force)
     {
@@ -99,52 +98,126 @@ public class EnemyHealth : MonoBehaviour
 
         isDead = true;
         currentHealth = 0f;
+        pendingDeathForce = force * deathForceMultiplier;
 
+        StopHitFlash();
+
+        // Shared kill bookkeeping: exactly once for both death presentations.
+        GameFlowManager.Instance?.EnemyDied();
+        KillComboSystem.Instance?.OnEnemyKilled();
+        PlayerStatsManager.Instance?.AddKill(enemyType);
+        TryDropHealthOrb();
+
+        // Stop navigation, attacks, and idle audio. Normal death keeps the
+        // Animator active long enough to play StumbleFall; evisceration
+        // disables it immediately in EnemyRagdollController.
+        if (zombieAI != null)
+            zombieAI.BeginDeathAnimation();
+
+        if (wasEviscerated &&
+            ragdoll != null &&
+            eviscerationController != null)
+        {
+            // This also stops AI, navigation, Animator, and the original colliders.
+            ragdoll.DisableBodyForEvisceration();
+            eviscerationController.Eviscerate(force);
+        }
+        else
+        {
+            BeginAnimatedDeath();
+        }
+
+        Destroy(gameObject, destroyDelay);
+    }
+
+    private void BeginAnimatedDeath()
+    {
+        if (zombieAI == null)
+        {
+            BeginDeathRagdoll();
+            return;
+        }
+
+        if (deathRagdollFallbackDelay > 0f)
+        {
+            deathFallbackRoutine = StartCoroutine(
+                DeathRagdollFallback()
+            );
+        }
+        else
+        {
+            BeginDeathRagdoll();
+        }
+    }
+
+    /// <summary>
+    /// Called by ZombieAnimationEvents at the chosen transition frame in StumbleFall.
+    /// </summary>
+    public void AnimationEvent_BeginDeathRagdoll()
+    {
+        if (!isDead)
+            return;
+
+        BeginDeathRagdoll();
+    }
+
+    private IEnumerator DeathRagdollFallback()
+    {
+        yield return new WaitForSeconds(deathRagdollFallbackDelay);
+        BeginDeathRagdoll();
+    }
+
+    private void BeginDeathRagdoll()
+    {
+        if (deathRagdollStarted)
+            return;
+
+        deathRagdollStarted = true;
+
+        if (deathFallbackRoutine != null)
+        {
+            StopCoroutine(deathFallbackRoutine);
+            deathFallbackRoutine = null;
+        }
+
+        if (ragdoll != null)
+        {
+            ragdoll.EnableRagdoll(pendingDeathForce);
+        }
+        else
+        {
+            Debug.LogWarning(
+                $"{name}: Cannot begin death ragdoll because EnemyRagdollController is missing.",
+                this
+            );
+        }
+    }
+
+    private void StartHitFlash()
+    {
+        if (enemyRenderer == null)
+            return;
+
+        if (flashRoutine != null)
+            StopCoroutine(flashRoutine);
+
+        flashRoutine = StartCoroutine(Flash());
+    }
+
+    private void StopHitFlash()
+    {
         if (flashRoutine != null)
         {
             StopCoroutine(flashRoutine);
             flashRoutine = null;
         }
 
-        // Cleans up the active attack slot and AI state.
-        if (zombieAI != null)
-            zombieAI.Die();
-
-        // Shared kill bookkeeping: exactly once.
-        GameFlowManager.Instance?.EnemyDied();
-        KillComboSystem.Instance?.OnEnemyKilled();
-        PlayerStatsManager.Instance?.AddKill(enemyType);
-        TryDropHealthOrb();
-
-        if (wasEviscerated && eviscerationController != null)
-        {
-            if (ragdoll != null)
-                ragdoll.DisableBodyForEvisceration();
-
-            eviscerationController.Eviscerate(force);
-        }
-        else if (ragdoll != null)
-        {
-            // Safe fallback: if no evisceration component is assigned,
-            // use a normal full-body death ragdoll.
-            ragdoll.EnableRagdoll(force * deathForceMultiplier);
-        }
-        else
-        {
-            Debug.LogWarning(
-                $"{name}: Enemy died without an EnemyRagdollController.",
-                this
-            );
-        }
-
-        Destroy(gameObject, destroyDelay);
+        if (enemyRenderer != null)
+            enemyRenderer.material.color = originalColor;
     }
 
     private IEnumerator Flash()
     {
-        if (enemyRenderer == null)
-            yield break;
-
         enemyRenderer.material.color = hitColor;
 
         yield return new WaitForSeconds(flashDuration);

@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.Serialization;
+using System.Collections;
 
 [RequireComponent(typeof(EnemyHealth))]
 public class EnemyHitReaction : MonoBehaviour
@@ -7,31 +9,34 @@ public class EnemyHitReaction : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private ZombieAIHybrid zombieAI;
 
-    [Header("Hit Strength Thresholds")]
-    [Tooltip("Hits below this value cause a light flinch.")]
-    public float stumbleThreshold = 5f;
-
-    [Tooltip("Hits at or above this value cause a heavy reaction.")]
-    public float heavyHitThreshold = 10f;
+    [Header("Hit Strength")]
+    [FormerlySerializedAs("heavyHitThreshold")]
+    [Tooltip("Accumulated force at or above this value triggers Hit instead of Flinch.")]
+    public float hitThreshold = 8f;
 
     [Header("Reaction Settings")]
-    public float lightStunDuration = 0.05f;
-    public float stumbleStunDuration = 0.2f;
-    public float heavyStunDuration = 0.4f;
+    [FormerlySerializedAs("lightStunDuration")]
+    public float flinchStunDuration = 0.08f;
+
+    [FormerlySerializedAs("heavyStunDuration")]
+    public float hitStunDuration = 0.28f;
 
     [Header("Debug")]
     public bool debugReactions = false;
 
     private EnemyHealth health;
+    private Coroutine bufferedReactionRoutine;
+    private float accumulatedHitStrength;
+    private Vector3 accumulatedHitDirection;
 
     private static readonly int FlinchHash =
         Animator.StringToHash("Flinch");
 
-    private static readonly int StumbleHash =
-        Animator.StringToHash("Stumble");
+    private static readonly int HitHash =
+        Animator.StringToHash("Hit");
 
-    private static readonly int HeavyHitHash =
-        Animator.StringToHash("HeavyHit");
+    private bool hasFlinchParameter;
+    private bool hasHitParameter;
 
     private void Awake()
     {
@@ -57,61 +62,125 @@ public class EnemyHitReaction : MonoBehaviour
                 animator
             );
         }
+        else
+        {
+            hasFlinchParameter = HasTriggerParameter(FlinchHash);
+            hasHitParameter = HasTriggerParameter(HitHash);
+        }
     }
 
+    /// <summary>
+    /// Multiple shotgun pellets arriving in one frame are combined into one reaction.
+    /// This prevents one blast from rapidly firing many Animator triggers.
+    /// </summary>
     public void OnHit(Vector3 hitDirection, float hitStrength)
     {
         if (health != null && health.IsDead)
             return;
 
-        if (hitStrength >= heavyHitThreshold)
+        accumulatedHitStrength += Mathf.Max(0f, hitStrength);
+        accumulatedHitDirection += hitDirection.normalized * Mathf.Max(0f, hitStrength);
+
+        if (bufferedReactionRoutine == null)
         {
-            PlayReaction(
-                HeavyHitHash,
-                "HeavyHit",
-                heavyStunDuration
+            bufferedReactionRoutine = StartCoroutine(
+                ProcessBufferedReaction()
             );
         }
-        else if (hitStrength >= stumbleThreshold)
+    }
+
+    private IEnumerator ProcessBufferedReaction()
+    {
+        // Gather every pellet that struck during this rendered frame.
+        yield return new WaitForEndOfFrame();
+
+        float totalStrength = accumulatedHitStrength;
+        Vector3 reactionDirection = accumulatedHitDirection.sqrMagnitude > 0.001f
+            ? accumulatedHitDirection.normalized
+            : -transform.forward;
+
+        accumulatedHitStrength = 0f;
+        accumulatedHitDirection = Vector3.zero;
+        bufferedReactionRoutine = null;
+
+        if (health != null && health.IsDead)
+            yield break;
+
+        if (totalStrength >= hitThreshold)
         {
             PlayReaction(
-                StumbleHash,
-                "Stumble",
-                stumbleStunDuration
+                HitHash,
+                FlinchHash,
+                "Hit",
+                hitStunDuration,
+                reactionDirection,
+                totalStrength
             );
         }
         else
         {
             PlayReaction(
                 FlinchHash,
+                HitHash,
                 "Flinch",
-                lightStunDuration
+                flinchStunDuration,
+                reactionDirection,
+                totalStrength
             );
         }
     }
 
     private void PlayReaction(
         int triggerHash,
+        int oppositeTriggerHash,
         string triggerName,
-        float stunDuration
-    )
+        float stunDuration,
+        Vector3 hitDirection,
+        float hitStrength)
     {
         if (animator != null && animator.enabled)
         {
-            animator.SetTrigger(triggerHash);
+            bool hasRequestedTrigger = triggerHash == HitHash
+                ? hasHitParameter
+                : hasFlinchParameter;
 
-            if (debugReactions)
-            {
-                Debug.Log(
-                    $"{name}: Triggered {triggerName}",
-                    this
-                );
-            }
+            bool hasOppositeTrigger = oppositeTriggerHash == HitHash
+                ? hasHitParameter
+                : hasFlinchParameter;
+
+            if (hasOppositeTrigger)
+                animator.ResetTrigger(oppositeTriggerHash);
+
+            if (hasRequestedTrigger)
+                animator.SetTrigger(triggerHash);
         }
 
         if (zombieAI != null && stunDuration > 0f)
-        {
             zombieAI.HitStun(stunDuration);
+
+        if (debugReactions)
+        {
+            Debug.Log(
+                $"{name}: {triggerName} from strength {hitStrength:0.00}, direction {hitDirection}",
+                this
+            );
         }
     }
+    private bool HasTriggerParameter(int parameterHash)
+    {
+        if (animator == null)
+            return false;
+
+        foreach (AnimatorControllerParameter parameter in animator.parameters)
+        {
+            if (parameter.nameHash == parameterHash &&
+                parameter.type == AnimatorControllerParameterType.Trigger)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }
