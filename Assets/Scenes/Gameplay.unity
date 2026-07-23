@@ -2816,7 +2816,7 @@ Light:
   serializedVersion: 11
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 283.92413
+  m_Intensity: 3134.7922
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -3018,7 +3018,7 @@ MonoBehaviour:
   m_ShadowVariant: 0
   m_ShadowPrecision: 0
   useOldInspector: 0
-  useVolumetric: 0
+  useVolumetric: 1
   featuresFoldout: 1
   m_AreaLightEmissiveMeshShadowCastingMode: 0
   m_AreaLightEmissiveMeshMotionVectorGenerationMode: 0
@@ -30472,7 +30472,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameFlowManager
   enemyPrefabs:
   - {fileID: 1131232361969350571, guid: 7bac36c2aec88d94db1561f41bd686d3, type: 3}
-  startingEnemiesPerWave: 7
+  startingEnemiesPerWave: 1
   maxWaves: 5
   timeBetweenWaves: 10
   spawnDelay: 0.3

@@ -100,9 +100,9 @@ MonoBehaviour:
   target: {fileID: 0}
   detectionRadius: 15
   loseInterestRadius: 20
-  wanderRadius: 12
+  wanderRadius: 8
   wanderPauseMin: 1.5
-  wanderPauseMax: 5
+  wanderPauseMax: 3.5
   walkSpeed: 2
   focusSpeed: 2.5
   surgeSpeed: 4.2
@@ -114,22 +114,22 @@ MonoBehaviour:
   driftFrequency: 0.7
   randomizePersonality: 1
   appendPersonalityToName: 1
-  speedMultiplierRange: {x: 0.2, y: 1.5}
-  attackWindupMultiplierRange: {x: 0.85, y: 2}
-  attackCooldownMultiplierRange: {x: 0.85, y: 2}
-  driftAmountMultiplierRange: {x: 0.55, y: 2}
-  driftFrequencyMultiplierRange: {x: 0.65, y: 2}
-  wanderPauseMultiplierRange: {x: 0.75, y: 2}
+  speedMultiplierRange: {x: 0.88, y: 1.12}
+  attackWindupMultiplierRange: {x: 0.85, y: 1.25}
+  attackCooldownMultiplierRange: {x: 0.85, y: 1.25}
+  driftAmountMultiplierRange: {x: 0.55, y: 1.55}
+  driftFrequencyMultiplierRange: {x: 0.65, y: 1.45}
+  wanderPauseMultiplierRange: {x: 0.75, y: 1.35}
   sideBiasStrength: 0.45
-  destinationUpdateIntervalRange: {x: 0.5, y: 1}
+  destinationUpdateIntervalRange: {x: 0.08, y: 0.22}
   enableApproachOffsets: 1
-  preferredApproachDistanceRange: {x: 1, y: 3}
+  preferredApproachDistanceRange: {x: 1.75, y: 2.75}
   sideApproachOffsetRange: {x: 0.55, y: 1.85}
   directApproachChance: 0.2
   closeOffsetFadeDistance: 3
   approachJitterAmount: 0.25
-  debugDrawApproachTarget: 1
-  lungeEnabledChance: 0.5
+  debugDrawApproachTarget: 0
+  lungeEnabledChance: 0.3
   enableChaseHesitation: 1
   baseHesitationChance: 0.12
   hesitationIntervalRange: {x: 2, y: 4.5}
@@ -138,34 +138,34 @@ MonoBehaviour:
   avoidancePriorityMax: 80
   agentAccelerationMultiplierRange: {x: 0.85, y: 1.2}
   agentAngularSpeedMultiplierRange: {x: 0.8, y: 1.25}
-  attackRange: 2
-  attackWindupTime: 1
+  attackRange: 1.6
+  attackWindupTime: 0.4
   attackRecoveryTime: 0.4
   attackCooldown: 1.2
   attackDamage: 20
-  normalAttackHitFallbackTime: 1
+  normalAttackHitFallbackTime: 0.18
   normalAttackRangeAllowance: 0.2
-  normalAttackHoldRange: {x: 0.65, y: 2}
-  lungeAttackHoldRange: {x: 0.9, y: 3}
+  normalAttackHoldRange: {x: 0.65, y: 0.85}
+  lungeAttackHoldRange: {x: 0.9, y: 1.2}
   preparePoseFallbackTime: 2
-  lungeDistance: 5
+  lungeDistance: 3.5
   lungeSpeed: 12
   lungeCooldown: 4
   lungeDamage: 35
   minLungeRange: 2
   maxLungeRange: 6
-  lungeAnimationFallbackDuration: 1
+  lungeAnimationFallbackDuration: 0.5
   lungeHitFallbackTime: 0.18
   lungeHitRange: 2.25
   defaultStunTime: 0.2
   stunColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   attackColor: {r: 1, g: 0, b: 0, a: 1}
-  normalColor: {r: 0, g: 1, b: 0.08161616, a: 1}
-  visualRenderer: {fileID: 690214317320605922}
-  animator: {fileID: 84392961728583446}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  visualRenderer: {fileID: 0}
+  animator: {fileID: 0}
   moveAnimationDampTime: 0.1
-  idleAudioSource: {fileID: 410577082451195112}
-  idleLoopClip: {fileID: 8300000, guid: a1c107f53d168f24fb487147d5205742, type: 3}
+  idleAudioSource: {fileID: 0}
+  idleLoopClip: {fileID: 0}
   shoveForce: 2
   shoveCooldown: 0.5
 --- !u!114 &5881243194224487902
