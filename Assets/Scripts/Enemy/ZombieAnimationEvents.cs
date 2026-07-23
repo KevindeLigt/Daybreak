@@ -34,10 +34,16 @@ public class ZombieAnimationEvents : MonoBehaviour
         }
     }
 
-    // Add this event at the final frame of PrepareAttack.
+    // Add this event when PrepareAttack reaches its final threatening pose.
+    public void PrepareAttackPoseReached()
+    {
+        zombieAI?.AnimationEvent_PrepareAttackPoseReached();
+    }
+
+    // Legacy compatibility. Remove the old event from the clip when possible.
     public void PrepareAttackComplete()
     {
-        zombieAI?.AnimationEvent_PrepareAttackComplete();
+        zombieAI?.AnimationEvent_PrepareAttackPoseReached();
     }
 
     // Add this event on the contact frame of Attack.

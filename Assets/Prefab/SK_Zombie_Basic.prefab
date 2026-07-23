@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7564039278558767252}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Zombie_Basic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -263,9 +263,12 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 7564039278558767252}
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2233973597351568299, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4159447233649824540}
+      addedObject: {fileID: 6362906545602004006}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5708881054326222858}
     - targetCorrespondingSourceObject: {fileID: 1925743485829178620, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3271451346226066067}
@@ -1270,33 +1273,6 @@ CharacterJoint:
   m_EnablePreprocessing: 0
   m_MassScale: 1
   m_ConnectedMassScale: 1
---- !u!1 &5396941928322282753 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2233973597351568299, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
-  m_PrefabInstance: {fileID: 6189460123769001642}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &4159447233649824540
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5396941928322282753}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
-  m_Controller: {fileID: 9100000, guid: 27aa777eb91d62746bb009a2deeb8507, type: 2}
-  m_CullingMode: 1
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &5718723043856790102 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1925743485829178620, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
@@ -1355,6 +1331,47 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
   m_PrefabInstance: {fileID: 6189460123769001642}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6423268733560515579 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+  m_PrefabInstance: {fileID: 6189460123769001642}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &6362906545602004006
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6423268733560515579}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}
+  m_Controller: {fileID: 9100000, guid: 27aa777eb91d62746bb009a2deeb8507, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5708881054326222858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6423268733560515579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62f2b974103387e45a22e1cce2bd4993, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ZombieAnimationEvents
+  zombieAI: {fileID: 0}
+  enemyHealth: {fileID: 0}
 --- !u!1 &7764922145492073759 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -4744565583026312267, guid: 32ce444ec18318f4c897aad9160aeb92, type: 3}

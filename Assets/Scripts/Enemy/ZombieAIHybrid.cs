@@ -174,6 +174,17 @@ public class ZombieAIHybrid : MonoBehaviour
     [Tooltip("Small range allowance added to the normal attack range at the impact frame.")]
     public float normalAttackRangeAllowance = 0.2f;
 
+    // ---------- ATTACK TELEGRAPH HOLD ----------
+    [Header("Attack Telegraph Hold")]
+    [Tooltip("How long a normal attack remains in PrepareAttackHold before release.")]
+    public Vector2 normalAttackHoldRange = new Vector2(0.65f, 0.85f);
+
+    [Tooltip("How long a lunge remains in PrepareAttackHold before release.")]
+    public Vector2 lungeAttackHoldRange = new Vector2(0.90f, 1.20f);
+
+    [Tooltip("Safety timeout used only if PrepareAttackPoseReached is missing from the animation clip.")]
+    public float preparePoseFallbackTime = 2.0f;
+
     // ---------- LUNGE ATTACK ----------
     [Header("Lunge Attack")]
     public float lungeDistance = 3.5f;
@@ -274,6 +285,11 @@ public class ZombieAIHybrid : MonoBehaviour
     private bool lungeAttackImpactResolved = false;
     private Vector3 lungeDirection = Vector3.forward;
     private Vector3 lungeStartPosition;
+
+    // prepare attack hold
+    private bool preparePoseReached = false;
+    private float prepareAttackReleaseTime = 0f;
+    private float currentPrepareHoldDuration = 0f;
 
     // surge
     private bool isSurging = false;
@@ -656,6 +672,9 @@ public class ZombieAIHybrid : MonoBehaviour
 
             case ZombieState.PrepareAttack:
                 isHesitating = false;
+                preparePoseReached = false;
+                prepareAttackReleaseTime = 0f;
+                currentPrepareHoldDuration = 0f;
                 SetAgentStopped(true, true);
                 FaceTarget();
 
@@ -739,6 +758,10 @@ public class ZombieAIHybrid : MonoBehaviour
         switch (oldState)
         {
             case ZombieState.PrepareAttack:
+                preparePoseReached = false;
+                prepareAttackReleaseTime = 0f;
+                currentPrepareHoldDuration = 0f;
+
                 if (visualRenderer != null)
                     visualRenderer.material.color = normalColor;
                 break;
@@ -950,11 +973,26 @@ public class ZombieAIHybrid : MonoBehaviour
 
     void UpdatePrepareAttack()
     {
+        // Stay planted during both PrepareAttack and PrepareAttackHold,
+        // but keep tracking the player so the warning remains readable.
+        SetAgentStopped(true);
         FaceTarget();
 
-        // AnimationEvent_PrepareAttackComplete should normally advance this state.
-        // This fallback prevents a missing event from freezing the enemy forever.
-        if (stateTimer >= pAttackWindupTime)
+        // The animation event should normally start the hold timer. This fallback
+        // prevents a missing or misspelled event from freezing the zombie forever.
+        float fallbackTime = Mathf.Max(preparePoseFallbackTime, pAttackWindupTime);
+
+        if (!preparePoseReached && stateTimer >= fallbackTime)
+        {
+            Debug.LogWarning(
+                $"{name}: PrepareAttackPoseReached event was missed. Starting the hold through fallback.",
+                this
+            );
+
+            BeginPrepareAttackHold();
+        }
+
+        if (preparePoseReached && Time.time >= prepareAttackReleaseTime)
             StartPendingAttack();
     }
 
@@ -977,6 +1015,51 @@ public class ZombieAIHybrid : MonoBehaviour
     {
         pendingAttack = attackType;
         SetState(ZombieState.PrepareAttack);
+    }
+
+    void BeginPrepareAttackHold()
+    {
+        if (state != ZombieState.PrepareAttack || preparePoseReached)
+            return;
+
+        preparePoseReached = true;
+
+        Vector2 holdRange = pendingAttack == PendingAttackType.Lunge
+            ? lungeAttackHoldRange
+            : normalAttackHoldRange;
+
+        float minimum = Mathf.Min(holdRange.x, holdRange.y);
+        float maximum = Mathf.Max(holdRange.x, holdRange.y);
+
+        currentPrepareHoldDuration =
+            Random.Range(minimum, maximum) * GetPrepareHoldPersonalityMultiplier();
+
+        currentPrepareHoldDuration = Mathf.Max(0.05f, currentPrepareHoldDuration);
+        prepareAttackReleaseTime = Time.time + currentPrepareHoldDuration;
+    }
+
+    float GetPrepareHoldPersonalityMultiplier()
+    {
+        switch (personality)
+        {
+            case ZombiePersonality.Hungry:
+                return 0.85f;
+
+            case ZombiePersonality.Shambler:
+                return 1.12f;
+
+            case ZombiePersonality.Clumsy:
+                return 1.18f;
+
+            case ZombiePersonality.Drifter:
+                return 1.05f;
+
+            case ZombiePersonality.Surger:
+                return 0.95f;
+
+            default:
+                return 1f;
+        }
     }
 
     void StartPendingAttack()
@@ -1057,9 +1140,16 @@ public class ZombieAIHybrid : MonoBehaviour
 
     // ===================== ANIMATION EVENTS =====================
 
+    public void AnimationEvent_PrepareAttackPoseReached()
+    {
+        BeginPrepareAttackHold();
+    }
+
+    // Legacy compatibility for an older event name. It now starts the hold
+    // instead of releasing the attack immediately.
     public void AnimationEvent_PrepareAttackComplete()
     {
-        StartPendingAttack();
+        AnimationEvent_PrepareAttackPoseReached();
     }
 
     public void AnimationEvent_NormalAttackHit()
