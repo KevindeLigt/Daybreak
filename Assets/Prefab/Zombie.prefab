@@ -129,7 +129,7 @@ MonoBehaviour:
   closeOffsetFadeDistance: 3
   approachJitterAmount: 0.25
   debugDrawApproachTarget: 0
-  lungeEnabledChance: 0.3
+  lungeEnabledChance: 1
   enableChaseHesitation: 1
   baseHesitationChance: 0.12
   hesitationIntervalRange: {x: 2, y: 4.5}
@@ -148,15 +148,15 @@ MonoBehaviour:
   normalAttackHoldRange: {x: 0.65, y: 0.85}
   lungeAttackHoldRange: {x: 0.9, y: 1.2}
   preparePoseFallbackTime: 2
-  lungeDistance: 3.5
+  lungeDistance: 5
   lungeSpeed: 12
   lungeCooldown: 4
-  lungeDamage: 35
+  lungeDamage: 50
   minLungeRange: 2
-  maxLungeRange: 6
+  maxLungeRange: 8
   lungeAnimationFallbackDuration: 0.5
   lungeHitFallbackTime: 0.18
-  lungeHitRange: 2.25
+  lungeHitRange: 5
   defaultStunTime: 0.2
   stunColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   attackColor: {r: 1, g: 0, b: 0, a: 1}
