@@ -112,11 +112,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: PrepareAttackHold
-      takeName: Zombie_SKEL|PrepareAttack
+      name: LungeImpact
+      takeName: Zombie_SKEL|LungeAttack
       internalID: -7459661702386903993
-      firstFrame: 10
-      lastFrame: 15
+      firstFrame: 72
+      lastFrame: 79
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
