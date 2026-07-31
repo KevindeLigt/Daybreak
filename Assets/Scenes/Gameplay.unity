@@ -1343,6 +1343,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (100)
@@ -1442,6 +1446,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (14)
@@ -3451,6 +3459,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (6)
@@ -3529,6 +3541,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (60)
@@ -4034,7 +4050,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4250,6 +4266,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (66)
@@ -5232,6 +5252,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -359.999
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (86)
@@ -6030,6 +6054,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90.089
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (58)
@@ -6212,7 +6240,7 @@ Transform:
   m_GameObject: {fileID: 209552334}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.5, y: 3, z: 40}
+  m_LocalPosition: {x: -1.5, y: 2.271, z: 36.387}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -6281,6 +6309,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (71)
@@ -6466,6 +6498,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (53)
@@ -6662,6 +6698,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -270.14398
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (90)
@@ -7295,6 +7335,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (11)
@@ -8870,6 +8914,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (38)
@@ -9147,6 +9195,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -359.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (85)
@@ -9801,7 +9853,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -10981,6 +11033,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (19)
@@ -11460,6 +11516,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (81)
@@ -12069,6 +12129,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -359.999
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (7)
@@ -13726,6 +13790,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (51)
@@ -13804,6 +13872,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 89.878
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (30)
@@ -13997,6 +14069,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (56)
@@ -14070,6 +14146,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (28)
@@ -14569,6 +14649,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (67)
@@ -14668,6 +14752,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -359.999
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (84)
@@ -15077,6 +15165,117 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 484364176}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &486880791
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 486880792}
+  - component: {fileID: 486880795}
+  - component: {fileID: 486880794}
+  - component: {fileID: 486880793}
+  m_Layer: 0
+  m_Name: SM_Tree_Base (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &486880792
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 486880791}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.072051495, y: -0.07988923, z: 0.34192294, w: 0.9335497}
+  m_LocalPosition: {x: -0.4461476, y: 1.8671526, z: 0.1398888}
+  m_LocalScale: {x: 0.81438, y: 1.159677, z: 0.81437993}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1397113337}
+  m_LocalEulerAnglesHint: {x: 10.904, y: -5.839, z: 39.674}
+--- !u!65 &486880793
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 486880791}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.0000001, y: 2, z: 1.0000002}
+  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+--- !u!23 &486880794
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 486880791}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &486880795
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 486880791}
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &487060776 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
@@ -15225,6 +15424,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -359.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (8)
@@ -15430,6 +15633,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (82)
@@ -15529,6 +15736,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (17)
@@ -16085,6 +16296,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (18)
@@ -16531,6 +16746,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -180
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (80)
@@ -16662,7 +16881,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -17062,6 +17281,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 89.878
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (31)
@@ -17422,7 +17645,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -17815,6 +18038,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (43)
@@ -18166,6 +18393,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (98)
@@ -18571,6 +18802,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (29)
@@ -18697,7 +18932,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -18776,6 +19011,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 89.878
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (26)
@@ -18849,6 +19088,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (64)
@@ -19530,6 +19773,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (65)
@@ -19870,6 +20117,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (77)
@@ -20697,6 +20948,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90.144
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (91)
@@ -20907,6 +21162,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -359.999
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (10)
@@ -21112,7 +21371,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -21420,6 +21679,117 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 682985719}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &685796810
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 685796811}
+  - component: {fileID: 685796814}
+  - component: {fileID: 685796813}
+  - component: {fileID: 685796812}
+  m_Layer: 0
+  m_Name: SM_Tree_Trunk
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &685796811
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 685796810}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.104422435, y: -0.025877845, z: -0.23914643, w: 0.96500534}
+  m_LocalPosition: {x: 0.1735365, y: 1.3895379, z: 0.11060201}
+  m_LocalScale: {x: 0.81438, y: 0.81438, z: 0.81437993}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1397113337}
+  m_LocalEulerAnglesHint: {x: 10.904, y: -5.839, z: -28.395}
+--- !u!65 &685796812
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 685796810}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.0000001, y: 2, z: 1.0000002}
+  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+--- !u!23 &685796813
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 685796810}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &685796814
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 685796810}
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &689398883
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21600,7 +21970,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -22076,7 +22446,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -22266,6 +22636,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (23)
@@ -22322,6 +22696,38 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.16, y: 0.010000009, z: 0.16}
   m_Center: {x: -1.4901123e-10, y: 0.004999998, z: 0.06999999}
+--- !u!1 &706425082
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 706425083}
+  m_Layer: 0
+  m_Name: ENV_Root_Tree
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &706425083
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 706425082}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 49.45}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1397113337}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &707295516
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22792,7 +23198,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -23508,6 +23914,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (1)
@@ -23712,6 +24122,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (62)
@@ -24602,6 +25016,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (22)
@@ -24996,6 +25414,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (97)
@@ -25127,7 +25549,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -25562,7 +25984,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -25673,7 +26095,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -26279,7 +26701,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -27281,7 +27703,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -27657,6 +28079,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -180
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (78)
@@ -27756,6 +28182,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (32)
@@ -27997,7 +28427,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -28220,7 +28650,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -28469,7 +28899,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -28692,7 +29122,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -28802,6 +29232,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (3)
@@ -29295,7 +29729,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -29374,6 +29808,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -180
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar
@@ -30130,7 +30568,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -30240,6 +30678,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (40)
@@ -30523,6 +30965,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (99)
@@ -30622,6 +31068,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (49)
@@ -30964,6 +31414,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (35)
@@ -31106,6 +31560,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (54)
@@ -31191,6 +31649,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -270.14398
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (92)
@@ -31400,7 +31862,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -32795,6 +33257,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (63)
@@ -34787,6 +35253,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (16)
@@ -35112,6 +35582,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (52)
@@ -35197,6 +35671,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (73)
@@ -35894,6 +36372,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (45)
@@ -36078,6 +36560,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (37)
@@ -37440,7 +37926,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -38200,6 +38686,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (13)
@@ -38861,6 +39351,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 89.878
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (36)
@@ -38938,6 +39432,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (57)
@@ -39593,6 +40091,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (15)
@@ -40199,6 +40701,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90.089
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (24)
@@ -40330,7 +40836,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -41438,6 +41944,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (55)
@@ -42021,6 +42531,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 89.878
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (33)
@@ -42608,6 +43122,119 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1396953736}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1397113336
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1397113337}
+  - component: {fileID: 1397113340}
+  - component: {fileID: 1397113339}
+  - component: {fileID: 1397113338}
+  m_Layer: 0
+  m_Name: SM_Tree_Base
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1397113337
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397113336}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.00000013171, y: 2.77, z: 0.00000026342}
+  m_LocalScale: {x: 3.2097, y: 3.2097, z: 3.2097}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 685796811}
+  - {fileID: 486880792}
+  m_Father: {fileID: 706425083}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1397113338
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397113336}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.0000001, y: 2, z: 1.0000002}
+  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+--- !u!23 &1397113339
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397113336}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1397113340
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397113336}
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &1397710432
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42946,6 +43573,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -180
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (74)
@@ -43927,7 +44558,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -44039,7 +44670,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -44118,6 +44749,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -269.999
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (101)
@@ -44749,7 +45384,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -45065,7 +45700,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -46202,6 +46837,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (20)
@@ -46308,7 +46947,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -47499,6 +48138,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90.144
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (89)
@@ -48689,6 +49332,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (21)
@@ -48814,6 +49461,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (96)
@@ -50370,6 +51021,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (46)
@@ -50490,6 +51145,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 89.878
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (42)
@@ -50630,7 +51289,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -51746,6 +52405,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (75)
@@ -52169,7 +52832,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -52484,6 +53147,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (79)
@@ -53418,6 +54085,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (50)
@@ -53623,6 +54294,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (59)
@@ -53995,6 +54670,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (48)
@@ -54865,6 +55544,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (68)
@@ -54964,6 +55647,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -359.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (9)
@@ -55298,6 +55985,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (2)
@@ -56382,6 +57073,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 89.878
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (93)
@@ -56834,6 +57529,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (4)
@@ -56981,6 +57680,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -359.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (87)
@@ -57445,6 +58148,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (44)
@@ -58208,6 +58915,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (95)
@@ -58529,6 +59240,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (5)
@@ -59283,7 +59998,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -59774,7 +60489,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -59853,6 +60568,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 89.878
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (94)
@@ -60415,7 +61134,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -60632,7 +61351,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -60743,7 +61462,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -61132,6 +61851,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (72)
@@ -61231,6 +61954,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (61)
@@ -61436,6 +62163,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (69)
@@ -61561,6 +62292,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (47)
@@ -62128,6 +62863,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (70)
@@ -63061,6 +63800,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (25)
@@ -64019,6 +64762,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (34)
@@ -64583,7 +65330,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f66b41ee5cce3d5479ca68ccdd95d43a, type: 2}
+  - {fileID: 2100000, guid: fec51b7c965154b4abde4d94bfa7b781, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -64662,6 +65409,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (12)
@@ -64898,6 +65649,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (39)
@@ -65161,6 +65916,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -180
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (76)
@@ -66154,6 +66913,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (41)
@@ -66248,6 +67011,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (27)
@@ -66411,6 +67178,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -179.97
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (83)
@@ -66510,6 +67281,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.122
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2298c4727ffd29c4399046a1ddcb8885, type: 2}
     - target: {fileID: 919132149155446097, guid: 5c1e2d7ddf945944b8683cbf0f72e1ee, type: 3}
       propertyPath: m_Name
       value: SM_Church_Pillar (88)
@@ -66893,3 +67668,4 @@ SceneRoots:
   - {fileID: 432432461}
   - {fileID: 1898772529}
   - {fileID: 1162612652}
+  - {fileID: 706425083}
