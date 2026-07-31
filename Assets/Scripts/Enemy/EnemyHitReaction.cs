@@ -75,8 +75,11 @@ public class EnemyHitReaction : MonoBehaviour
     /// </summary>
     public void OnHit(Vector3 hitDirection, float hitStrength)
     {
-        if (health != null && health.IsDead)
+        if ((health != null && health.IsDead) ||
+            (zombieAI != null && !zombieAI.CanReceiveHitReaction))
+        {
             return;
+        }
 
         accumulatedHitStrength += Mathf.Max(0f, hitStrength);
         accumulatedHitDirection += hitDirection.normalized * Mathf.Max(0f, hitStrength);
@@ -103,8 +106,11 @@ public class EnemyHitReaction : MonoBehaviour
         accumulatedHitDirection = Vector3.zero;
         bufferedReactionRoutine = null;
 
-        if (health != null && health.IsDead)
+        if ((health != null && health.IsDead) ||
+            (zombieAI != null && !zombieAI.CanReceiveHitReaction))
+        {
             yield break;
+        }
 
         if (totalStrength >= hitThreshold)
         {

@@ -15,6 +15,9 @@ public class EnemyHealth : MonoBehaviour
     [Tooltip("Safety delay used when the StumbleFall animation event is missing.")]
     public float deathRagdollFallbackDelay = 0.65f;
 
+    [Tooltip("Safety delay used when BeginLungeRagdoll is missing from LungeImpact.")]
+    public float lungeRagdollFallbackDelay = 0.55f;
+
     public float destroyDelay = 10f;
 
     [Header("Drop Settings")]
@@ -91,6 +94,43 @@ public class EnemyHealth : MonoBehaviour
         Kill(force, true);
     }
 
+    /// <summary>
+    /// Called by ZombieAIHybrid when a committed lunge reaches LungeImpact.
+    /// A hit or miss is terminal: the zombie is removed from the wave and
+    /// permanently becomes a ragdoll after the impact animation.
+    ///
+    /// This is intentionally not registered as a player weapon kill, so it
+    /// does not increase the current kill combo or persistent kill stats.
+    /// </summary>
+    public void BeginLungeCrashDeath(Vector3 ragdollImpulse)
+    {
+        if (isDead)
+            return;
+
+        isDead = true;
+        currentHealth = 0f;
+        pendingDeathForce = ragdollImpulse;
+
+        StopHitFlash();
+
+        // The zombie is no longer an active wave enemy, even though the
+        // impact animation still plays briefly before ragdoll takes over.
+        GameFlowManager.Instance?.EnemyDied();
+
+        if (lungeRagdollFallbackDelay > 0f)
+        {
+            deathFallbackRoutine = StartCoroutine(
+                LungeRagdollFallback()
+            );
+        }
+        else
+        {
+            BeginDeathRagdoll();
+        }
+
+        Destroy(gameObject, destroyDelay);
+    }
+
     private void Kill(Vector3 force, bool wasEviscerated)
     {
         if (isDead)
@@ -161,9 +201,26 @@ public class EnemyHealth : MonoBehaviour
         BeginDeathRagdoll();
     }
 
+    /// <summary>
+    /// Called from LungeImpact when the animated crash should hand off to physics.
+    /// </summary>
+    public void AnimationEvent_BeginLungeRagdoll()
+    {
+        if (!isDead)
+            return;
+
+        BeginDeathRagdoll();
+    }
+
     private IEnumerator DeathRagdollFallback()
     {
         yield return new WaitForSeconds(deathRagdollFallbackDelay);
+        BeginDeathRagdoll();
+    }
+
+    private IEnumerator LungeRagdollFallback()
+    {
+        yield return new WaitForSeconds(lungeRagdollFallbackDelay);
         BeginDeathRagdoll();
     }
 

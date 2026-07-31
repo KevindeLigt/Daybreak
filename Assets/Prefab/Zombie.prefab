@@ -154,9 +154,18 @@ MonoBehaviour:
   lungeDamage: 50
   minLungeRange: 2
   maxLungeRange: 8
-  lungeAnimationFallbackDuration: 0.5
-  lungeHitFallbackTime: 0.18
-  lungeHitRange: 5
+  lungeTargetOvershoot: 0.6
+  lungeArcHeight: 1.25
+  lungeTakeOffFallbackTime: 0.65
+  lungeFlightTimeout: 1.5
+  lungeLandingSampleRadius: 2
+  lungeCollisionMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  lungeCollisionRadius: 0.45
+  lungeCollisionHeightOffset: 1
+  lungeImpactForce: 12
+  lungeDownwardForce: 4
   defaultStunTime: 0.2
   stunColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   attackColor: {r: 1, g: 0, b: 0, a: 1}
@@ -164,8 +173,8 @@ MonoBehaviour:
   visualRenderer: {fileID: 0}
   animator: {fileID: 0}
   moveAnimationDampTime: 0.1
-  idleAudioSource: {fileID: 0}
-  idleLoopClip: {fileID: 0}
+  idleAudioSource: {fileID: 410577082451195112}
+  idleLoopClip: {fileID: 8300000, guid: a59b9afc90c92d143b952c109b5a2f9b, type: 3}
   shoveForce: 2
   shoveCooldown: 0.5
 --- !u!114 &5881243194224487902
@@ -221,6 +230,7 @@ MonoBehaviour:
   maxHealth: 100
   deathForceMultiplier: 10
   deathRagdollFallbackDelay: 0.65
+  lungeRagdollFallbackDelay: 0.55
   destroyDelay: 10
   healthOrbPrefab: {fileID: 1906950436779646774, guid: ba243559442fcf24bbe0cea757273f89, type: 3}
   healthOrbDropChance: 0.226
@@ -315,22 +325,22 @@ AudioSource:
   m_GameObject: {fileID: 1131232361969350571}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 4c05d2e3ce8448141bc0ddb47b475c06, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.2
   m_Pitch: 1
   Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
-  DopplerLevel: 1
+  DopplerLevel: 0
   MinDistance: 1
-  MaxDistance: 500
+  MaxDistance: 15
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 2
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -338,10 +348,19 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
+      time: 0.06666667
       value: 1
       inSlope: 0
       outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.49064088
+      value: 0.35051876
+      inSlope: -1.0714284
+      outSlope: -1.0714284
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
@@ -349,12 +368,12 @@ AudioSource:
     - serializedVersion: 3
       time: 1
       value: 0
-      inSlope: 0
-      outSlope: 0
+      inSlope: -1.0714285
+      outSlope: -1.0714285
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
+      inWeight: 0
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
@@ -363,7 +382,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -393,7 +412,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0.55
       inSlope: 0
       outSlope: 0
       tangentMode: 0

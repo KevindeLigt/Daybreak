@@ -186,22 +186,49 @@ public class ZombieAIHybrid : MonoBehaviour
     public float preparePoseFallbackTime = 2.0f;
 
     // ---------- LUNGE ATTACK ----------
-    [Header("Lunge Attack")]
-    public float lungeDistance = 3.5f;
-    public float lungeSpeed = 12f;
+    [Header("Terminal Lunge Attack")]
+    [Tooltip("Maximum horizontal distance covered during the airborne phase.")]
+    public float lungeDistance = 5.5f;
+
+    [Tooltip("Horizontal flight speed. The Animator supplies the pose; this script moves ZombieRoot.")]
+    public float lungeSpeed = 8f;
+
     public float lungeCooldown = 4f;
     public float lungeDamage = 35f;
     public float minLungeRange = 2f;
     public float maxLungeRange = 6f;
 
-    [Tooltip("Maximum time the lunge state may run if its completion event is missing.")]
-    public float lungeAnimationFallbackDuration = 0.5f;
+    [Tooltip("Extra distance beyond the player's captured launch position.")]
+    public float lungeTargetOvershoot = 0.6f;
 
-    [Tooltip("Fallback impact time when the lunge impact animation event is missing.")]
-    public float lungeHitFallbackTime = 0.18f;
+    [Tooltip("Maximum height added to the scripted flight arc.")]
+    public float lungeArcHeight = 1.25f;
 
-    [Tooltip("Player distance allowed when the lunge impact is evaluated.")]
-    public float lungeHitRange = 2.25f;
+    [Tooltip("Safety delay used if BeginLungeFlight is missing from LungeAir.")]
+    public float lungeTakeOffFallbackTime = 0.65f;
+
+    [Tooltip("Hard safety timeout for the airborne phase.")]
+    public float lungeFlightTimeout = 1.5f;
+
+    [Tooltip("Radius used to find a valid landing point near the intended destination.")]
+    public float lungeLandingSampleRadius = 2f;
+
+    [Header("Lunge Collision")]
+    [Tooltip("Collision layers checked while airborne. Recommended: Player + Environment.")]
+    public LayerMask lungeCollisionMask = ~0;
+
+    [Tooltip("Radius of the airborne collision sweep.")]
+    public float lungeCollisionRadius = 0.45f;
+
+    [Tooltip("Vertical offset of the collision sweep from ZombieRoot.")]
+    public float lungeCollisionHeightOffset = 1.0f;
+
+    [Header("Lunge Ragdoll")]
+    [Tooltip("Forward impulse applied when LungeImpact hands the body to ragdoll.")]
+    public float lungeImpactForce = 12f;
+
+    [Tooltip("Extra downward impulse applied on the ragdoll handoff.")]
+    public float lungeDownwardForce = 4f;
 
     private float lastLungeTime = -999f;
 
@@ -234,6 +261,9 @@ public class ZombieAIHybrid : MonoBehaviour
     private static readonly int LungeAttackHash =
         Animator.StringToHash("LungeAttack");
 
+    private static readonly int LungeImpactHash =
+        Animator.StringToHash("LungeImpact");
+
     private static readonly int StumbleFallHash =
         Animator.StringToHash("StumbleFall");
 
@@ -241,6 +271,7 @@ public class ZombieAIHybrid : MonoBehaviour
     private bool hasPrepareAttackParameter;
     private bool hasAttackParameter;
     private bool hasLungeAttackParameter;
+    private bool hasLungeImpactParameter;
     private bool hasStumbleFallParameter;
 
     // ---------- AUDIO ----------
@@ -249,6 +280,7 @@ public class ZombieAIHybrid : MonoBehaviour
     public AudioClip idleLoopClip;
 
     private NavMeshAgent agent;
+    private EnemyHealth enemyHealth;
 
     // ---------- STATE MACHINE ----------
     private enum ZombieState
@@ -258,7 +290,9 @@ public class ZombieAIHybrid : MonoBehaviour
         Chase,
         PrepareAttack,
         Attack,
-        LungeAttack,
+        LungeTakeOff,
+        LungeAir,
+        LungeImpact,
         Stunned,
         Dead
     }
@@ -282,9 +316,18 @@ public class ZombieAIHybrid : MonoBehaviour
     private float lastAttackTime = -999f;
     private PendingAttackType pendingAttack = PendingAttackType.None;
     private bool normalAttackImpactResolved = false;
-    private bool lungeAttackImpactResolved = false;
+
+    // terminal lunge runtime
+    private bool lungeFlightStarted = false;
+    private bool lungePlayerDamaged = false;
     private Vector3 lungeDirection = Vector3.forward;
     private Vector3 lungeStartPosition;
+    private Vector3 lungeLandingPosition;
+    private Vector3 lungePreviousPosition;
+    private Vector3 lungeFlightVelocity;
+    private float lungeFlightDuration = 0f;
+    private float lungeFlightElapsed = 0f;
+    private float lungeRootHeightOffset = 0f;
 
     // prepare attack hold
     private bool preparePoseReached = false;
@@ -313,6 +356,7 @@ public class ZombieAIHybrid : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        enemyHealth = GetComponent<EnemyHealth>();
         spawnPosition = transform.position;
 
         ApplyPersonality();
@@ -385,8 +429,16 @@ public class ZombieAIHybrid : MonoBehaviour
                     UpdateAttack();
                     break;
 
-                case ZombieState.LungeAttack:
-                    UpdateLungeAttack();
+                case ZombieState.LungeTakeOff:
+                    UpdateLungeTakeOff();
+                    break;
+
+                case ZombieState.LungeAir:
+                    UpdateLungeAir();
+                    break;
+
+                case ZombieState.LungeImpact:
+                    UpdateLungeImpact();
                     break;
 
                 case ZombieState.Stunned:
@@ -705,20 +757,37 @@ public class ZombieAIHybrid : MonoBehaviour
                 }
                 break;
 
-            case ZombieState.LungeAttack:
+            case ZombieState.LungeTakeOff:
                 isHesitating = false;
-                SetAgentStopped(false, true);
+                SetAgentStopped(true, true);
+                FaceTarget();
                 CaptureLungeDirection();
+
+                lungeFlightStarted = false;
+                lungePlayerDamaged = false;
+                lungeFlightElapsed = 0f;
+                lungeFlightDuration = 0f;
+                lungeFlightVelocity = Vector3.zero;
                 lungeStartPosition = transform.position;
-                lungeAttackImpactResolved = false;
+                lungePreviousPosition = transform.position;
                 lastLungeTime = Time.time;
 
-                if (animator != null &&
-                    animator.enabled &&
-                    hasLungeAttackParameter)
+                if (animator != null && animator.enabled)
                 {
-                    animator.SetTrigger(LungeAttackHash);
+                    if (hasLungeImpactParameter)
+                        animator.ResetTrigger(LungeImpactHash);
+
+                    if (hasLungeAttackParameter)
+                        animator.SetTrigger(LungeAttackHash);
                 }
+                break;
+
+            case ZombieState.LungeAir:
+                BeginLungeFlightRuntime();
+                break;
+
+            case ZombieState.LungeImpact:
+                EnterTerminalLungeImpact();
                 break;
 
             case ZombieState.Stunned:
@@ -771,8 +840,9 @@ public class ZombieAIHybrid : MonoBehaviour
                     visualRenderer.material.color = normalColor;
                 break;
 
-            case ZombieState.LungeAttack:
-                // The next state decides whether navigation should remain stopped.
+            case ZombieState.LungeTakeOff:
+            case ZombieState.LungeAir:
+                // LungeImpact owns the terminal handoff.
                 break;
         }
     }
@@ -911,31 +981,311 @@ public class ZombieAIHybrid : MonoBehaviour
         nextHesitationTime = Time.time + RandomRange(hesitationIntervalRange);
     }
 
-    // ===================== LUNGE ATTACK =====================
+    // ===================== TERMINAL LUNGE ATTACK =====================
 
-    void UpdateLungeAttack()
+    void UpdateLungeTakeOff()
     {
-        if (agent == null || !agent.enabled || !agent.isOnNavMesh)
+        // Remain planted while the takeoff animation plays.
+        SetAgentStopped(true);
+        FaceTarget();
+
+        // BeginLungeFlight on LungeAir should normally start flight.
+        if (!lungeFlightStarted && stateTimer >= lungeTakeOffFallbackTime)
         {
-            CompleteCurrentAttack();
+            Debug.LogWarning(
+                $"{name}: BeginLungeFlight event was missed. Starting flight through fallback.",
+                this
+            );
+
+            SetState(ZombieState.LungeAir);
+        }
+    }
+
+    void UpdateLungeAir()
+    {
+        if (!lungeFlightStarted)
+        {
+            BeginLungeFlightRuntime();
+
+            if (!lungeFlightStarted)
+            {
+                SetState(ZombieState.LungeImpact);
+                return;
+            }
+        }
+
+        float deltaTime = Mathf.Max(Time.deltaTime, 0.0001f);
+        lungeFlightElapsed += deltaTime;
+
+        float progress = lungeFlightDuration > 0f
+            ? Mathf.Clamp01(lungeFlightElapsed / lungeFlightDuration)
+            : 1f;
+
+        Vector3 groundPosition = Vector3.Lerp(
+            lungeStartPosition,
+            lungeLandingPosition,
+            progress
+        );
+
+        float arcOffset =
+            Mathf.Sin(progress * Mathf.PI) * Mathf.Max(0f, lungeArcHeight);
+
+        Vector3 nextPosition =
+            groundPosition + Vector3.up * arcOffset;
+
+        Vector3 movement = nextPosition - lungePreviousPosition;
+
+        if (TryGetLungeCollision(
+            lungePreviousPosition,
+            nextPosition,
+            out RaycastHit collisionHit,
+            out PlayerHealth playerHealth))
+        {
+            if (movement.sqrMagnitude > 0.0001f)
+            {
+                float travelledFraction = Mathf.Clamp01(
+                    collisionHit.distance / movement.magnitude
+                );
+
+                transform.position = Vector3.Lerp(
+                    lungePreviousPosition,
+                    nextPosition,
+                    travelledFraction
+                );
+            }
+
+            lungeFlightVelocity = movement / deltaTime;
+
+            if (playerHealth != null && !lungePlayerDamaged)
+            {
+                lungePlayerDamaged = true;
+                playerHealth.TakeDamage(pLungeDamage);
+            }
+
+            SetState(ZombieState.LungeImpact);
             return;
         }
 
-        float moveDistance = pLungeSpeed * Time.deltaTime;
-        agent.Move(lungeDirection * moveDistance);
+        transform.position = nextPosition;
+        lungeFlightVelocity = movement / deltaTime;
+        lungePreviousPosition = nextPosition;
 
-        if (!lungeAttackImpactResolved && stateTimer >= lungeHitFallbackTime)
-            ResolveLungeAttackImpact();
+        if (progress >= 1f ||
+            lungeFlightElapsed >= Mathf.Max(0.1f, lungeFlightTimeout))
+        {
+            SetState(ZombieState.LungeImpact);
+        }
+    }
 
-        float travelledDistance = Vector3.Distance(
-            lungeStartPosition,
-            transform.position
+    void UpdateLungeImpact()
+    {
+        // The Animator plays LungeImpact until BeginLungeRagdoll transfers
+        // control to physics. EnemyHealth owns the fallback timer.
+    }
+
+    void BeginLungeFlightRuntime()
+    {
+        if (lungeFlightStarted)
+            return;
+
+        lungeFlightStarted = true;
+
+        CaptureLungeDirection();
+
+        lungeStartPosition = transform.position;
+        lungePreviousPosition = transform.position;
+        lungeFlightElapsed = 0f;
+        lungeFlightVelocity = lungeDirection * pLungeSpeed;
+
+        float distanceToCapturedTarget = 0f;
+
+        if (target != null)
+        {
+            Vector3 horizontalTargetOffset =
+                target.position - lungeStartPosition;
+
+            horizontalTargetOffset.y = 0f;
+            distanceToCapturedTarget = horizontalTargetOffset.magnitude;
+        }
+
+        float desiredDistance = Mathf.Clamp(
+            distanceToCapturedTarget + Mathf.Max(0f, lungeTargetOvershoot),
+            Mathf.Max(0.1f, minLungeRange),
+            Mathf.Max(minLungeRange, lungeDistance)
         );
 
-        if (travelledDistance >= lungeDistance ||
-            stateTimer >= lungeAnimationFallbackDuration)
+        Vector3 desiredLanding =
+            lungeStartPosition + lungeDirection * desiredDistance;
+
+        int areaMask =
+            agent != null ? agent.areaMask : NavMesh.AllAreas;
+
+        // Preserve the working root-to-ground offset. This prevents the
+        // scripted arc from snapping the model down to raw NavMesh height.
+        if (NavMesh.SamplePosition(
+            lungeStartPosition,
+            out NavMeshHit startGroundHit,
+            Mathf.Max(0.1f, lungeLandingSampleRadius),
+            areaMask))
         {
-            CompleteCurrentAttack();
+            lungeRootHeightOffset =
+                lungeStartPosition.y - startGroundHit.position.y;
+        }
+        else
+        {
+            lungeRootHeightOffset = 0f;
+        }
+
+        if (NavMesh.SamplePosition(
+            desiredLanding,
+            out NavMeshHit landingHit,
+            Mathf.Max(0.1f, lungeLandingSampleRadius),
+            areaMask))
+        {
+            lungeLandingPosition =
+                landingHit.position + Vector3.up * lungeRootHeightOffset;
+        }
+        else
+        {
+            lungeLandingPosition = new Vector3(
+                desiredLanding.x,
+                lungeStartPosition.y,
+                desiredLanding.z
+            );
+        }
+
+        float actualDistance = Vector3.Distance(
+            new Vector3(lungeStartPosition.x, 0f, lungeStartPosition.z),
+            new Vector3(lungeLandingPosition.x, 0f, lungeLandingPosition.z)
+        );
+
+        lungeFlightDuration =
+            actualDistance / Mathf.Max(0.1f, pLungeSpeed);
+
+        lungeFlightDuration = Mathf.Max(0.15f, lungeFlightDuration);
+
+        DisableAgentForLungeFlight();
+    }
+
+    void DisableAgentForLungeFlight()
+    {
+        if (agent == null || !agent.enabled)
+            return;
+
+        if (agent.isOnNavMesh)
+        {
+            agent.isStopped = true;
+            agent.ResetPath();
+        }
+
+        agent.enabled = false;
+    }
+
+    bool TryGetLungeCollision(
+        Vector3 previousRootPosition,
+        Vector3 nextRootPosition,
+        out RaycastHit selectedHit,
+        out PlayerHealth playerHealth)
+    {
+        selectedHit = default;
+        playerHealth = null;
+
+        Vector3 probeOffset =
+            Vector3.up * Mathf.Max(0f, lungeCollisionHeightOffset);
+
+        Vector3 start = previousRootPosition + probeOffset;
+        Vector3 end = nextRootPosition + probeOffset;
+        Vector3 movement = end - start;
+        float distance = movement.magnitude;
+
+        if (distance <= 0.0001f)
+            return false;
+
+        RaycastHit[] hits = Physics.SphereCastAll(
+            start,
+            Mathf.Max(0.05f, lungeCollisionRadius),
+            movement.normalized,
+            distance,
+            lungeCollisionMask,
+            QueryTriggerInteraction.Ignore
+        );
+
+        if (hits == null || hits.Length == 0)
+            return false;
+
+        System.Array.Sort(
+            hits,
+            (a, b) => a.distance.CompareTo(b.distance)
+        );
+
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.collider == null)
+                continue;
+
+            if (hit.collider.transform == transform ||
+                hit.collider.transform.IsChildOf(transform))
+            {
+                continue;
+            }
+
+            ZombieAIHybrid otherZombie =
+                hit.collider.GetComponentInParent<ZombieAIHybrid>();
+
+            // Other zombies do not cancel this blockout lunge.
+            if (otherZombie != null && otherZombie != this)
+                continue;
+
+            PlayerHealth hitPlayer =
+                hit.collider.GetComponentInParent<PlayerHealth>();
+
+            selectedHit = hit;
+            playerHealth = hitPlayer;
+            return true;
+        }
+
+        return false;
+    }
+
+    void EnterTerminalLungeImpact()
+    {
+        lungeFlightStarted = false;
+        isHesitating = false;
+        pendingAttack = PendingAttackType.None;
+
+        if (idleAudioSource != null)
+            idleAudioSource.Stop();
+
+        if (animator != null &&
+            animator.enabled &&
+            hasLungeImpactParameter)
+        {
+            animator.SetTrigger(LungeImpactHash);
+        }
+
+        Vector3 momentumDirection =
+            lungeFlightVelocity.sqrMagnitude > 0.001f
+                ? lungeFlightVelocity.normalized
+                : lungeDirection;
+
+        Vector3 ragdollImpulse =
+            momentumDirection * Mathf.Max(0f, lungeImpactForce) +
+            Vector3.down * Mathf.Max(0f, lungeDownwardForce);
+
+        // From here onward the lunge is terminal. EnemyHealth removes this
+        // zombie from the wave and waits for BeginLungeRagdoll.
+        isDead = true;
+
+        if (enemyHealth != null)
+        {
+            enemyHealth.BeginLungeCrashDeath(ragdollImpulse);
+        }
+        else
+        {
+            Debug.LogError(
+                $"{name}: Terminal lunge could not find EnemyHealth.",
+                this
+            );
         }
     }
 
@@ -1068,18 +1418,15 @@ public class ZombieAIHybrid : MonoBehaviour
             return;
 
         if (pendingAttack == PendingAttackType.Lunge)
-            SetState(ZombieState.LungeAttack);
+            SetState(ZombieState.LungeTakeOff);
         else
             SetState(ZombieState.Attack);
     }
 
     void CompleteCurrentAttack()
     {
-        if (state != ZombieState.Attack &&
-            state != ZombieState.LungeAttack)
-        {
+        if (state != ZombieState.Attack)
             return;
-        }
 
         pendingAttack = PendingAttackType.None;
         SetState(ZombieState.Chase);
@@ -1101,25 +1448,6 @@ public class ZombieAIHybrid : MonoBehaviour
             target.TryGetComponent(out PlayerHealth playerHealth))
         {
             playerHealth.TakeDamage(attackDamage);
-        }
-    }
-
-    void ResolveLungeAttackImpact()
-    {
-        if (lungeAttackImpactResolved)
-            return;
-
-        lungeAttackImpactResolved = true;
-
-        if (target == null)
-            return;
-
-        float distance = Vector3.Distance(transform.position, target.position);
-
-        if (distance <= lungeHitRange &&
-            target.TryGetComponent(out PlayerHealth playerHealth))
-        {
-            playerHealth.TakeDamage(pLungeDamage);
         }
     }
 
@@ -1158,10 +1486,17 @@ public class ZombieAIHybrid : MonoBehaviour
             ResolveNormalAttackImpact();
     }
 
-    public void AnimationEvent_LungeAttackHit()
+    public void AnimationEvent_BeginLungeFlight()
     {
-        if (state == ZombieState.LungeAttack)
-            ResolveLungeAttackImpact();
+        if (state == ZombieState.LungeTakeOff)
+        {
+            SetState(ZombieState.LungeAir);
+            return;
+        }
+
+        // LungeAir loops, so repeated first-frame events are harmless.
+        if (state == ZombieState.LungeAir && !lungeFlightStarted)
+            BeginLungeFlightRuntime();
     }
 
     public void AnimationEvent_AttackComplete()
@@ -1183,8 +1518,13 @@ public class ZombieAIHybrid : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if (Time.time < lastShoveTime + shoveCooldown)
+        if (isDead ||
+            state == ZombieState.LungeAir ||
+            state == ZombieState.LungeImpact ||
+            Time.time < lastShoveTime + shoveCooldown)
+        {
             return;
+        }
 
         if (collision.collider.TryGetComponent(out ZombieAIHybrid other))
         {
@@ -1338,10 +1678,19 @@ public class ZombieAIHybrid : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 10f);
     }
 
+    public bool CanReceiveHitReaction =>
+        !isDead &&
+        state != ZombieState.LungeAir &&
+        state != ZombieState.LungeImpact;
+
     public void HitStun(float stunTime)
     {
-        if (isDead)
+        if (isDead ||
+            state == ZombieState.LungeAir ||
+            state == ZombieState.LungeImpact)
+        {
             return;
+        }
 
         currentStunDuration = stunTime > 0f
             ? stunTime
@@ -1389,6 +1738,9 @@ public class ZombieAIHybrid : MonoBehaviour
 
         if (hasLungeAttackParameter)
             animator.ResetTrigger(LungeAttackHash);
+
+        if (hasLungeImpactParameter)
+            animator.ResetTrigger(LungeImpactHash);
     }
 
     private void CacheAnimatorParameters()
@@ -1410,6 +1762,11 @@ public class ZombieAIHybrid : MonoBehaviour
 
         hasLungeAttackParameter = HasAnimatorParameter(
             LungeAttackHash,
+            AnimatorControllerParameterType.Trigger
+        );
+
+        hasLungeImpactParameter = HasAnimatorParameter(
+            LungeImpactHash,
             AnimatorControllerParameterType.Trigger
         );
 

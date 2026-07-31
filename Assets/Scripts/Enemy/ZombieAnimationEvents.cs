@@ -52,16 +52,22 @@ public class ZombieAnimationEvents : MonoBehaviour
         zombieAI?.AnimationEvent_NormalAttackHit();
     }
 
-    // Add this event on the contact frame of LungeAttack.
-    public void LungeAttackHit()
+    // Add this event on frame 1 or 2 of LungeAir.
+    public void BeginLungeFlight()
     {
-        zombieAI?.AnimationEvent_LungeAttackHit();
+        zombieAI?.AnimationEvent_BeginLungeFlight();
     }
 
-    // Add this event near the final frame of both Attack and LungeAttack.
+    // Add this event near the final frame of the normal Attack only.
     public void AttackComplete()
     {
         zombieAI?.AnimationEvent_AttackComplete();
+    }
+
+    // Add this event where LungeImpact should hand control to physics.
+    public void BeginLungeRagdoll()
+    {
+        enemyHealth?.AnimationEvent_BeginLungeRagdoll();
     }
 
     // Add this event where StumbleFall should hand control to physics.
