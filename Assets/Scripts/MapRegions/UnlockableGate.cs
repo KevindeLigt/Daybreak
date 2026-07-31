@@ -1,27 +1,36 @@
 using UnityEngine;
 
-public class UnlockableGate : MonoBehaviour
+public class UnlockableGate : MonoBehaviour, IInteractable
 {
     public MapRegion connectedRegion;
     public int cost = 0;
 
+    public string InteractionPrompt => "Press E to Unlock";
+    public bool CanInteract => connectedRegion != null;
+
+    public void Interact()
+    {
+        TryUnlock();
+    }
+
     public void TryUnlock()
     {
-        if (!connectedRegion) return;
+        if (!connectedRegion)
+            return;
 
         connectedRegion.Unlock();
         Destroy(gameObject);
     }
 
-    void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
-            InteractionManager.Instance.RegisterGate(this);
+            InteractionManager.Instance?.RegisterInteractable(this);
     }
 
-    void OnTriggerExit(Collider other)
+    private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Player"))
-            InteractionManager.Instance.UnregisterGate(this);
+            InteractionManager.Instance?.UnregisterInteractable(this);
     }
 }
