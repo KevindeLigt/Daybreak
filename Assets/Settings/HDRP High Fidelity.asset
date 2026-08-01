@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: HDRP High Fidelity
   m_EditorClassIdentifier: 
   m_RenderPipelineSettings:
-    supportShadowMask: 0
+    supportShadowMask: 1
     supportSSR: 1
     supportSSRTransparent: 0
     supportSSAO: 1
@@ -118,7 +118,7 @@ MonoBehaviour:
       maxLocalVolumetricFogSize: 32
       maxLocalVolumetricFogOnScreen: 64
     hdShadowInitParams:
-      maxShadowRequests: 128
+      maxShadowRequests: 256
       directionalShadowsDepthBits: 16
       punctualShadowFilteringQuality: 2
       directionalShadowFilteringQuality: 2
@@ -133,7 +133,7 @@ MonoBehaviour:
         useDynamicViewportRescale: 0
       cachedPunctualLightShadowAtlas: 4096
       cachedAreaLightShadowAtlas: 4096
-      allowDirectionalMixedCachedShadows: 0
+      allowDirectionalMixedCachedShadows: 1
       shadowResolutionDirectional:
         m_Values: 00020000000400000008000000100000
         m_SchemaId:
@@ -149,7 +149,7 @@ MonoBehaviour:
       maxDirectionalShadowMapResolution: 4096
       maxPunctualShadowMapResolution: 4096
       maxAreaShadowMapResolution: 4096
-      supportScreenSpaceShadows: 0
+      supportScreenSpaceShadows: 1
       maxScreenSpaceShadowSlots: 4
       screenSpaceShadowBufferFormat: 48
     decalSettings:
@@ -249,7 +249,7 @@ MonoBehaviour:
       AOMaximumRadiusPixels: 200000002800000050000000
       AOBilateralUpsample: 000101
       AODirectionCount: 010000000200000004000000
-      ContactShadowSampleCount: 060000000a00000010000000
+      ContactShadowSampleCount: 060000000a00000020000000
       SSRMaxRaySteps: 100000002000000040000000
       SSGIRaySteps: 200000004000000080000000
       SSGIDenoise: 010101
