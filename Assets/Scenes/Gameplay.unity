@@ -16251,6 +16251,8 @@ MonoBehaviour:
   - {fileID: 1041273858}
   - {fileID: 1089519320}
   - {fileID: 1693185379}
+  startingRegion: {fileID: 1041273858}
+  automaticallyActivateStartingRegion: 1
 --- !u!4 &466271742
 Transform:
   m_ObjectHideFlags: 0
@@ -37553,14 +37555,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c03b60c6c5bc87a4a868b262faf4d0cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapRegion
-  regionName: Spawn
+  regionName: Church
   isUnlocked: 1
+  isEncounterActive: 1
+  isCompleted: 0
   enableWhenUnlocked: []
   disableWhenUnlocked: []
+  encounterRuntimeObjects: []
+  enableWhenCompleted: []
+  disableWhenCompleted: []
   regionSpawners:
   - {fileID: 209552338}
   - {fileID: 1119904211}
   - {fileID: 2093466800}
+  onRegionUnlocked:
+    m_PersistentCalls:
+      m_Calls: []
+  onEncounterActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  onEncounterDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  onRegionCompleted:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &1041273859
 Transform:
   m_ObjectHideFlags: 0
@@ -39576,13 +39595,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MapRegion
   regionName: Graveyard
   isUnlocked: 0
+  isEncounterActive: 0
+  isCompleted: 0
   enableWhenUnlocked: []
   disableWhenUnlocked:
   - {fileID: 1575589804}
+  encounterRuntimeObjects: []
+  enableWhenCompleted: []
+  disableWhenCompleted: []
   regionSpawners:
   - {fileID: 5437704015387191212}
   - {fileID: 5437704015387191211}
   - {fileID: 5437704015387191210}
+  onRegionUnlocked:
+    m_PersistentCalls:
+      m_Calls: []
+  onEncounterActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  onEncounterDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  onRegionCompleted:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &1089519321
 Transform:
   m_ObjectHideFlags: 0
@@ -57602,7 +57638,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnlockableGate
   connectedRegion: {fileID: 1089519320}
-  cost: 0
+  startsUnlocked: 0
+  destroyOnOpen: 1
+  gateVisual: {fileID: 2006999133}
+  blockingCollider: {fileID: 1575589805}
+  unlockedPrompt: Press E to Open
+  lockedPrompt: The curse seals this gate
 --- !u!1001 &1575813986
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -62304,7 +62345,7 @@ GameObject:
   - component: {fileID: 1693185380}
   - component: {fileID: 1693185379}
   m_Layer: 0
-  m_Name: Region_OSSUARY
+  m_Name: Region_Ossuary
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -62322,14 +62363,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c03b60c6c5bc87a4a868b262faf4d0cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapRegion
-  regionName: Spawn
+  regionName: Ossuary
   isUnlocked: 0
+  isEncounterActive: 0
+  isCompleted: 0
   enableWhenUnlocked: []
   disableWhenUnlocked: []
+  encounterRuntimeObjects: []
+  enableWhenCompleted: []
+  disableWhenCompleted: []
   regionSpawners:
   - {fileID: 7022428415061823314}
   - {fileID: 7022428415061823313}
   - {fileID: 7022428415061823312}
+  onRegionUnlocked:
+    m_PersistentCalls:
+      m_Calls: []
+  onEncounterActivated:
+    m_PersistentCalls:
+      m_Calls: []
+  onEncounterDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  onRegionCompleted:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &1693185380
 Transform:
   m_ObjectHideFlags: 0
