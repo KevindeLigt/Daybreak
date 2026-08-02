@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d877ec3e844f2ca46830012e8e79319b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   rotation:
     m_OverrideState: 0
     m_Value: 0
@@ -47,8 +47,8 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 1
   atmosphericScattering:
-    m_OverrideState: 1
-    m_Value: 1
+    m_OverrideState: 0
+    m_Value: 0
   renderingMode:
     m_OverrideState: 0
     m_Value: 0
@@ -92,7 +92,7 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 30000
   groundTint:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: {r: 0.37721452, g: 0.37721452, b: 0.37721452, a: 1}
   groundColorTexture:
     m_OverrideState: 0
@@ -161,20 +161,20 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 5000
   directionalTransmissionMultiplier:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   cascadeShadowSplitCount:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 4
   cascadeShadowSplit0:
     m_OverrideState: 0
-    m_Value: 0.05
+    m_Value: 0.002
   cascadeShadowSplit1:
     m_OverrideState: 0
-    m_Value: 0.15
+    m_Value: 0.06770525
   cascadeShadowSplit2:
     m_OverrideState: 0
-    m_Value: 0.3
+    m_Value: 0.25075075
   cascadeShadowBorder0:
     m_OverrideState: 0
     m_Value: 0
@@ -207,10 +207,10 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 1
   colorMode:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 0
   color:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: {r: 0, g: 0.990566, b: 0.28545836, a: 1}
   tint:
     m_OverrideState: 0
@@ -598,7 +598,7 @@ MonoBehaviour:
   active: 1
   skyType:
     m_OverrideState: 1
-    m_Value: 4
+    m_Value: 3
   cloudType:
     m_OverrideState: 1
     m_Value: 1
@@ -642,7 +642,7 @@ MonoBehaviour:
   active: 1
   mode:
     m_OverrideState: 1
-    m_Value: 4
+    m_Value: 0
   meteringMode:
     m_OverrideState: 0
     m_Value: 2
@@ -650,10 +650,10 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 1
   fixedExposure:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 5
   compensation:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
   limitMin:
     m_OverrideState: 1
