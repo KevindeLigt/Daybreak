@@ -8,9 +8,24 @@ public class GameFlowManager : MonoBehaviour
     [Header("Wave Settings")]
     public GameObject[] enemyPrefabs;
     public int startingEnemiesPerWave = 5;
+
+    [Tooltip("Used only when the active region has no Curse Objective assigned.")]
     public int maxWaves = 5;
+
     public float timeBetweenWaves = 3f;
     public float spawnDelay = 0.3f;
+
+    [Header("Curse Objective Flow")]
+    [SerializeField] private bool useCurseObjectiveFlow = true;
+
+    [Tooltip("Pause after killing the final enemy before revealing the next Root Heart.")]
+    [SerializeField, Min(0f)] private float rootHeartReleaseDelay = 0.75f;
+
+    [Tooltip("Pause after depositing a Root Heart before the next wave begins.")]
+    [SerializeField, Min(0f)] private float nextWaveAfterDepositDelay = 1.5f;
+
+    [Tooltip("Pause after opening a gate and activating a new region before its first wave begins.")]
+    [SerializeField, Min(0f)] private float newRegionStartDelay = 1f;
 
     [Header("References")]
     public UIManager uiManager;
@@ -21,10 +36,18 @@ public class GameFlowManager : MonoBehaviour
     private bool gameActive;
     private bool isSpawningWave;
     private bool isWaitingForNextWave;
+    private bool isWaitingForHeartDeposit;
+    private bool hasStarted;
+
+    private MapRegion currentRegion;
+    private CurseObjectiveController currentObjective;
+    private RegionManager subscribedRegionManager;
+    private Coroutine progressionCoroutine;
 
     public int CurrentWave => currentWave;
     public int AliveEnemies => aliveEnemies;
     public bool GameActive => gameActive;
+    public bool IsWaitingForHeartDeposit => isWaitingForHeartDeposit;
 
     private void Awake()
     {
@@ -35,8 +58,6 @@ public class GameFlowManager : MonoBehaviour
         }
 
         Instance = this;
-
-        // Always reset time scale when entering the scene fresh.
         Time.timeScale = 1f;
     }
 
@@ -46,11 +67,18 @@ public class GameFlowManager : MonoBehaviour
             uiManager = FindObjectOfType<UIManager>();
 
         ResetGameState();
+        SubscribeToRegionManager();
         StartCoroutine(StartGameRoutine());
         FindObjectOfType<ShrineSpawnerManager>()?.SpawnShrinesForRun();
 
         UIManager.Instance?.ClearAllStatusEffects();
         PlayerWeaponStats.Instance?.ResetRunStats();
+    }
+
+    private void OnDestroy()
+    {
+        UnsubscribeFromRegionManager();
+        UnbindCurrentObjective();
     }
 
     private void ResetGameState()
@@ -61,23 +89,122 @@ public class GameFlowManager : MonoBehaviour
         gameActive = true;
         isSpawningWave = false;
         isWaitingForNextWave = false;
+        isWaitingForHeartDeposit = false;
+        hasStarted = false;
     }
 
     private IEnumerator StartGameRoutine()
     {
-        // Small delay so UI and region initialization are complete.
+        // Allows RegionManager, regional runtime objects, UI, and objectives to initialize.
         yield return new WaitForSeconds(0.2f);
+
+        SubscribeToRegionManager();
+        hasStarted = true;
+
+        MapRegion startingRegion = RegionManager.Instance != null
+            ? RegionManager.Instance.CurrentRegion
+            : null;
+
+        BeginRegionEncounter(startingRegion, 0f);
+    }
+
+    private void SubscribeToRegionManager()
+    {
+        RegionManager manager = RegionManager.Instance;
+        if (manager == subscribedRegionManager)
+            return;
+
+        UnsubscribeFromRegionManager();
+        subscribedRegionManager = manager;
+
+        if (subscribedRegionManager != null)
+            subscribedRegionManager.CurrentRegionChanged += HandleCurrentRegionChanged;
+    }
+
+    private void UnsubscribeFromRegionManager()
+    {
+        if (subscribedRegionManager != null)
+            subscribedRegionManager.CurrentRegionChanged -= HandleCurrentRegionChanged;
+
+        subscribedRegionManager = null;
+    }
+
+    private void HandleCurrentRegionChanged(MapRegion region)
+    {
+        if (!hasStarted || !gameActive)
+            return;
+
+        BeginRegionEncounter(region, newRegionStartDelay);
+    }
+
+    private void BeginRegionEncounter(MapRegion region, float delay)
+    {
+        StopProgressionCoroutine();
+        UnbindCurrentObjective();
+
+        currentRegion = region;
+        currentWave = 0;
+        aliveEnemies = 0;
+        enemiesThisWave = 0;
+        isSpawningWave = false;
+        isWaitingForNextWave = false;
+        isWaitingForHeartDeposit = false;
+
+        uiManager?.UpdateEnemyCount(0, 0);
+
+        if (currentRegion == null)
+        {
+            Debug.LogError("GameFlowManager cannot begin an encounter because RegionManager has no Current Region.");
+            return;
+        }
+
+        currentObjective = currentRegion.CurseObjective;
+        BindCurrentObjective();
+
+        if (currentRegion.IsCompleted)
+        {
+            Debug.LogWarning($"GameFlowManager was asked to begin completed region: {currentRegion.RegionName}");
+            return;
+        }
+
+        progressionCoroutine = StartCoroutine(BeginRegionAfterDelay(delay));
+    }
+
+    private IEnumerator BeginRegionAfterDelay(float delay)
+    {
+        if (delay > 0f)
+            yield return new WaitForSeconds(delay);
+
+        progressionCoroutine = null;
+
+        if (!gameActive)
+            yield break;
+
         StartNextWave();
+    }
+
+    private void BindCurrentObjective()
+    {
+        if (currentObjective != null)
+            currentObjective.HeartDepositedRuntime += HandleHeartDeposited;
+    }
+
+    private void UnbindCurrentObjective()
+    {
+        if (currentObjective != null)
+            currentObjective.HeartDepositedRuntime -= HandleHeartDeposited;
+
+        currentObjective = null;
     }
 
     private void StartNextWave()
     {
-        if (!gameActive)
+        if (!gameActive || isWaitingForHeartDeposit || isSpawningWave)
             return;
 
         if (!HasValidSpawnSetup())
         {
-            Debug.LogError("Wave could not start. Check RegionManager.CurrentRegion, the region spawner list, active spawner states, and enemy prefabs.");
+            Debug.LogError("Wave could not start. Check RegionManager.CurrentRegion, its active spawners, enemy prefabs, and encounter state.");
             return;
         }
 
@@ -196,9 +323,18 @@ public class GameFlowManager : MonoBehaviour
 
     private void HandleWaveCleared()
     {
-        if (!gameActive || isWaitingForNextWave)
+        if (!gameActive || isWaitingForNextWave || isWaitingForHeartDeposit)
             return;
 
+        if (useCurseObjectiveFlow && currentObjective != null && !currentObjective.IsCompleted)
+        {
+            isWaitingForNextWave = true;
+            isWaitingForHeartDeposit = true;
+            progressionCoroutine = StartCoroutine(ReleaseRootHeartAfterDelay());
+            return;
+        }
+
+        // Backwards-compatible fallback for a region that has no Curse Objective.
         if (currentWave >= maxWaves)
         {
             WinGame();
@@ -206,17 +342,100 @@ public class GameFlowManager : MonoBehaviour
         }
 
         isWaitingForNextWave = true;
-        StartCoroutine(NextWaveDelay());
+        progressionCoroutine = StartCoroutine(NextWaveDelay(timeBetweenWaves));
     }
 
-    private IEnumerator NextWaveDelay()
+    private IEnumerator ReleaseRootHeartAfterDelay()
     {
-        yield return new WaitForSeconds(timeBetweenWaves);
+        if (rootHeartReleaseDelay > 0f)
+            yield return new WaitForSeconds(rootHeartReleaseDelay);
+
+        progressionCoroutine = null;
+
+        if (!gameActive || currentObjective == null)
+            yield break;
+
+        if (!currentObjective.ReleaseNextHeart())
+        {
+            Debug.LogError(
+                "The wave was cleared, but the next Root Heart could not be released. " +
+                "Check Wave Controlled Pickups, Required Hearts, and the pickup array.");
+        }
+    }
+
+    private void HandleHeartDeposited(CurseObjectiveController objective)
+    {
+        if (!gameActive || objective == null || objective != currentObjective)
+            return;
+
+        if (!isWaitingForHeartDeposit)
+        {
+            Debug.LogWarning("A Root Heart was deposited while GameFlowManager was not waiting for one.");
+            return;
+        }
+
+        isWaitingForHeartDeposit = false;
+        isWaitingForNextWave = false;
+
+        if (objective.IsCompleted)
+        {
+            CompleteCurrentRegionalEncounter();
+            return;
+        }
+
+        progressionCoroutine = StartCoroutine(NextWaveDelay(nextWaveAfterDepositDelay));
+    }
+
+    private IEnumerator NextWaveDelay(float delay)
+    {
+        if (delay > 0f)
+            yield return new WaitForSeconds(delay);
+
+        progressionCoroutine = null;
 
         if (!gameActive)
             yield break;
 
         StartNextWave();
+    }
+
+    private void CompleteCurrentRegionalEncounter()
+    {
+        StopProgressionCoroutine();
+        aliveEnemies = 0;
+        enemiesThisWave = 0;
+        isSpawningWave = false;
+        isWaitingForHeartDeposit = false;
+        isWaitingForNextWave = false;
+
+        uiManager?.UpdateEnemyCount(0, 0);
+
+        MapRegion completedRegion = currentRegion;
+
+        if (RegionManager.Instance == null || !RegionManager.Instance.CompleteCurrentRegion())
+        {
+            Debug.LogError("The Curse Objective completed, but the current MapRegion could not be completed.");
+            return;
+        }
+
+        if (completedRegion != null && completedRegion.CompleteRunWhenFinished)
+        {
+            WinGame();
+            return;
+        }
+
+        Debug.Log(
+            $"Regional encounter completed: {completedRegion?.RegionName}. " +
+            "Its spawners are disabled and its exit gate is now unlocked.");
+    }
+
+    private void StopProgressionCoroutine()
+    {
+        if (progressionCoroutine == null)
+            return;
+
+        StopCoroutine(progressionCoroutine);
+        progressionCoroutine = null;
     }
 
     public void PlayerDied()

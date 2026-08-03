@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class RegionManager : MonoBehaviour
@@ -13,6 +14,12 @@ public class RegionManager : MonoBehaviour
     [SerializeField] private bool automaticallyActivateStartingRegion = true;
 
     public MapRegion CurrentRegion { get; private set; }
+
+    /// <summary>
+    /// GameFlowManager listens to this so a newly activated region can begin
+    /// its own wave/objective sequence.
+    /// </summary>
+    public event Action<MapRegion> CurrentRegionChanged;
 
     private void Awake()
     {
@@ -31,7 +38,7 @@ public class RegionManager : MonoBehaviour
     private void InitializeRegions()
     {
         if (allRegions == null)
-            allRegions = new MapRegion[0];
+            allRegions = Array.Empty<MapRegion>();
 
         foreach (MapRegion region in allRegions)
         {
@@ -104,12 +111,14 @@ public class RegionManager : MonoBehaviour
             return false;
 
         CurrentRegion = region;
+        CurrentRegionChanged?.Invoke(CurrentRegion);
+
         Debug.Log($"Current combat region: {region.RegionName}");
         return true;
     }
 
     /// <summary>
-    /// Used by gates or progression logic to move combat ownership to another region.
+    /// Used by gates to move combat ownership to another region.
     /// </summary>
     public bool TransitionToRegion(MapRegion nextRegion)
     {
@@ -158,7 +167,7 @@ public class RegionManager : MonoBehaviour
     public EnemySpawner[] GetCurrentRegionSpawners()
     {
         if (CurrentRegion == null)
-            return new EnemySpawner[0];
+            return Array.Empty<EnemySpawner>();
 
         return CurrentRegion.GetActiveSpawners();
     }

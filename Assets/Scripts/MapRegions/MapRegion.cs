@@ -7,6 +7,9 @@ public class MapRegion : MonoBehaviour
     [Header("Region Identity")]
     public string regionName = "Region";
 
+    [Tooltip("Enable this only on the final region if cleansing it should end the complete run.")]
+    [SerializeField] private bool completeRunWhenFinished = false;
+
     [Header("Runtime State")]
     [Tooltip("The player may enter and explore this region.")]
     public bool isUnlocked = false;
@@ -16,6 +19,15 @@ public class MapRegion : MonoBehaviour
 
     [Tooltip("The region's curse/encounter has been completed.")]
     public bool isCompleted = false;
+
+    [Header("Regional Progression References")]
+    [Tooltip("The Curse Objective belonging only to this region.")]
+    [SerializeField] private CurseObjectiveController curseObjective;
+
+    [Tooltip("The gate that leads out of this region. It is unlocked when this encounter is completed.")]
+    [SerializeField] private UnlockableGate exitGate;
+
+    [SerializeField] private bool unlockExitGateOnCompletion = true;
 
     [Header("Access Content")]
     [Tooltip("Objects enabled when this region becomes accessible.")]
@@ -48,6 +60,9 @@ public class MapRegion : MonoBehaviour
     public bool IsUnlocked => isUnlocked;
     public bool IsEncounterActive => isEncounterActive;
     public bool IsCompleted => isCompleted;
+    public bool CompleteRunWhenFinished => completeRunWhenFinished;
+    public CurseObjectiveController CurseObjective => curseObjective;
+    public UnlockableGate ExitGate => exitGate;
 
     /// <summary>
     /// Applies the Inspector state when the scene starts.
@@ -138,7 +153,8 @@ public class MapRegion : MonoBehaviour
     }
 
     /// <summary>
-    /// Permanently completes this regional encounter and disables its spawners.
+    /// Permanently completes this regional encounter, disables its spawners,
+    /// and optionally unlocks the regional exit gate.
     /// </summary>
     public bool CompleteEncounter()
     {
@@ -152,6 +168,14 @@ public class MapRegion : MonoBehaviour
         ApplyUnlockState();
         ApplyEncounterState();
         ApplyCompletionState();
+
+        if (unlockExitGateOnCompletion)
+        {
+            if (exitGate != null)
+                exitGate.UnlockGate();
+            else if (!completeRunWhenFinished)
+                Debug.LogWarning($"Region {regionName} completed, but it has no Exit Gate assigned.");
+        }
 
         onRegionCompleted?.Invoke();
         Debug.Log($"Region completed: {regionName}");
