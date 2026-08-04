@@ -30,7 +30,12 @@ public class GameFlowManager : MonoBehaviour
     [Header("References")]
     public UIManager uiManager;
 
+    // Run-wide wave number. This never resets when moving between regions.
     private int currentWave;
+
+    // Wave number inside the currently active region. This resets on region transition.
+    private int currentRegionWave;
+
     private int aliveEnemies;
     private int enemiesThisWave;
     private bool gameActive;
@@ -45,6 +50,7 @@ public class GameFlowManager : MonoBehaviour
     private Coroutine progressionCoroutine;
 
     public int CurrentWave => currentWave;
+    public int CurrentRegionWave => currentRegionWave;
     public int AliveEnemies => aliveEnemies;
     public bool GameActive => gameActive;
     public bool IsWaitingForHeartDeposit => isWaitingForHeartDeposit;
@@ -84,6 +90,7 @@ public class GameFlowManager : MonoBehaviour
     private void ResetGameState()
     {
         currentWave = 0;
+        currentRegionWave = 0;
         aliveEnemies = 0;
         enemiesThisWave = 0;
         gameActive = true;
@@ -143,7 +150,7 @@ public class GameFlowManager : MonoBehaviour
         UnbindCurrentObjective();
 
         currentRegion = region;
-        currentWave = 0;
+        currentRegionWave = 0;
         aliveEnemies = 0;
         enemiesThisWave = 0;
         isSpawningWave = false;
@@ -209,6 +216,10 @@ public class GameFlowManager : MonoBehaviour
         }
 
         currentWave++;
+        currentRegionWave++;
+
+        // Enemy pressure scales across the whole run instead of restarting
+        // when the player enters a new region.
         enemiesThisWave = startingEnemiesPerWave + (currentWave - 1) * 2;
         aliveEnemies = enemiesThisWave;
         isSpawningWave = true;
@@ -335,7 +346,7 @@ public class GameFlowManager : MonoBehaviour
         }
 
         // Backwards-compatible fallback for a region that has no Curse Objective.
-        if (currentWave >= maxWaves)
+        if (currentRegionWave >= maxWaves)
         {
             WinGame();
             return;

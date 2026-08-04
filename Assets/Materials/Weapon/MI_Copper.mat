@@ -30,6 +30,7 @@ Material:
   m_ValidKeywords:
   - _DISABLE_SSR_TRANSPARENT
   - _MATERIAL_FEATURE_CLEAR_COAT
+  - _MATERIAL_FEATURE_IRIDESCENCE
   - _NORMALMAP_TANGENT_SPACE
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -199,9 +200,9 @@ Material:
     - _InvTilingScale: 1
     - _Ior: 1.5
     - _IridescenceMask: 1
-    - _IridescenceThickness: 1
+    - _IridescenceThickness: 0.748
     - _LinkDetailsWithBase: 1
-    - _MaterialID: 1
+    - _MaterialID: 3
     - _Metallic: 1
     - _MetallicRemapMax: 1
     - _MetallicRemapMin: 0
@@ -220,7 +221,7 @@ Material:
     - _ReceivesSSR: 1
     - _ReceivesSSRTransparent: 0
     - _RefractionModel: 0
-    - _Smoothness: 0.852
+    - _Smoothness: 0.884
     - _SmoothnessRemapMax: 1
     - _SmoothnessRemapMin: 0
     - _SpecularAAScreenSpaceVariance: 0.1
