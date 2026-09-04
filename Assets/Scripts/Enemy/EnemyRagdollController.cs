@@ -40,7 +40,6 @@ public class EnemyRagdollController : MonoBehaviour
             .ToArray();
 
         ConfigureJointStability();
-        DisableRagdoll();
     }
 
     private void OnEnable()
@@ -67,6 +66,28 @@ public class EnemyRagdollController : MonoBehaviour
     }
 
     /// <summary>
+    /// Clears motion only while Unity still considers the body dynamic, then
+    /// returns it to the non-physical animated state. Assigning velocity to an
+    /// already-kinematic Rigidbody is unsupported and produces one warning per
+    /// ragdoll bone.
+    /// </summary>
+    private static void MakeKinematicAndDisablePhysics(Rigidbody rb)
+    {
+        if (rb == null)
+            return;
+
+        if (!rb.isKinematic)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        rb.isKinematic = true;
+        rb.useGravity = false;
+        rb.detectCollisions = false;
+    }
+
+    /// <summary>
     /// Animated living state. Ragdoll physics are disabled.
     /// </summary>
     public void DisableRagdoll()
@@ -76,14 +97,7 @@ public class EnemyRagdollController : MonoBehaviour
 
         foreach (Rigidbody rb in ragdollBodies)
         {
-            if (rb == null)
-                continue;
-
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            rb.isKinematic = true;
-            rb.useGravity = false;
-            rb.detectCollisions = false;
+            MakeKinematicAndDisablePhysics(rb);
         }
 
         foreach (Collider col in ragdollColliders)
@@ -92,14 +106,7 @@ public class EnemyRagdollController : MonoBehaviour
                 col.enabled = false;
         }
 
-        if (rootRigidbody != null)
-        {
-            rootRigidbody.linearVelocity = Vector3.zero;
-            rootRigidbody.angularVelocity = Vector3.zero;
-            rootRigidbody.isKinematic = true;
-            rootRigidbody.useGravity = false;
-            rootRigidbody.detectCollisions = false;
-        }
+        MakeKinematicAndDisablePhysics(rootRigidbody);
 
         if (mainCollider != null)
             mainCollider.enabled = true;
@@ -173,25 +180,11 @@ public class EnemyRagdollController : MonoBehaviour
         StopAllCoroutines();
         StopLivingSystems();
 
-        if (rootRigidbody != null)
-        {
-            rootRigidbody.linearVelocity = Vector3.zero;
-            rootRigidbody.angularVelocity = Vector3.zero;
-            rootRigidbody.isKinematic = true;
-            rootRigidbody.useGravity = false;
-            rootRigidbody.detectCollisions = false;
-        }
+        MakeKinematicAndDisablePhysics(rootRigidbody);
 
         foreach (Rigidbody rb in ragdollBodies)
         {
-            if (rb == null)
-                continue;
-
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            rb.isKinematic = true;
-            rb.useGravity = false;
-            rb.detectCollisions = false;
+            MakeKinematicAndDisablePhysics(rb);
         }
 
         foreach (Collider col in ragdollColliders)
