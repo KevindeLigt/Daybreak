@@ -8,6 +8,65 @@ public class EnemyHealth : MonoBehaviour
     public string enemyType = "Unknown";
     public float maxHealth = 100f;
 
+    [Header("Training Dummy (test scene only)")]
+    [Tooltip("Set before Play. Stays standing, simulates defeat, then resets. Disable for normal enemies.")]
+    [SerializeField] private bool trainingDummy = false;
+    [SerializeField, Min(0.1f)] private float trainingResetDelay = 1.5f;
+
+    public bool IsTrainingDummy => trainingDummy;
+    public bool TrainingDefeated { get; private set; }
+    public int TrainingShotsHit { get; private set; }
+    public float TrainingLastShotDamage { get; private set; }
+    public float TrainingLastHealthLost { get; private set; }
+    public int TrainingRevision { get; private set; }
+    public bool TrainingHasOtherDamage { get; private set; }
+    private float trainingResetAt;
+
+    private void Update()
+    {
+        if (trainingDummy && TrainingDefeated && Time.time >= trainingResetAt)
+            ResetTrainingHealth();
+    }
+
+    // Called once per target AFTER all shotgun pellets have been traced.
+    // Misses do not count. Keeping colliders alive includes overkill pellets.
+    public void ReceiveTrainingShot(float rawDamage)
+    {
+        if (!trainingDummy || TrainingDefeated || rawDamage <= 0f)
+            return;
+
+        TrainingShotsHit++;
+        ApplyTrainingDamage(rawDamage);
+    }
+
+    private void ApplyTrainingDamage(float rawDamage)
+    {
+        TrainingLastShotDamage = rawDamage;
+        TrainingLastHealthLost = Mathf.Min(currentHealth, rawDamage);
+        currentHealth = Mathf.Max(0f, currentHealth - rawDamage);
+        TrainingRevision++;
+        if (enemyRenderer != null)
+            StartHitFlash();
+
+        if (currentHealth <= 0f)
+        {
+            TrainingDefeated = true;
+            trainingResetAt = Time.time + Mathf.Max(0.1f, trainingResetDelay);
+        }
+    }
+
+    private void ResetTrainingHealth()
+    {
+        StopHitFlash();
+        currentHealth = Mathf.Max(1f, maxHealth);
+        TrainingDefeated = false;
+        TrainingShotsHit = 0;
+        TrainingLastShotDamage = 0f;
+        TrainingLastHealthLost = 0f;
+        TrainingHasOtherDamage = false;
+        TrainingRevision++;
+    }
+
     [Header("Death Settings")]
     [Tooltip("Multiplier applied to the final hit force when the death animation becomes a ragdoll.")]
     public float deathForceMultiplier = 2f;
@@ -50,6 +109,8 @@ public class EnemyHealth : MonoBehaviour
 
     private void Awake()
     {
+        if (trainingDummy)
+            maxHealth = Mathf.Max(1f, maxHealth);
         currentHealth = maxHealth;
 
         ragdoll = GetComponent<EnemyRagdollController>();
@@ -65,6 +126,17 @@ public class EnemyHealth : MonoBehaviour
 
     public void TakeDamage(float damage, Vector3 force)
     {
+        if (trainingDummy)
+        {
+            if (!TrainingDefeated && damage > 0f)
+            {
+                // Other weapons can deplete virtual HP, but have no shot grouping.
+                TrainingHasOtherDamage = true;
+                ApplyTrainingDamage(damage);
+            }
+            return;
+        }
+
         if (isDead || damage <= 0f)
             return;
 
@@ -87,6 +159,7 @@ public class EnemyHealth : MonoBehaviour
     /// </summary>
     public void Eviscerate(Vector3 force)
     {
+        if (trainingDummy) return;
         if (isDead)
             return;
 
@@ -104,6 +177,7 @@ public class EnemyHealth : MonoBehaviour
     /// </summary>
     public void BeginLungeCrashDeath(Vector3 ragdollImpulse)
     {
+        if (trainingDummy) return;
         if (isDead)
             return;
 

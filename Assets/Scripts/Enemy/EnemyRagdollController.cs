@@ -117,11 +117,26 @@ public class EnemyRagdollController : MonoBehaviour
             animator.speed = 1f;
         }
 
+        // Read the serialized mode even if EnemyHealth.Awake has not run yet.
+        // Prevent the reset path from re-enabling AI on a stationary dummy.
+        EnemyHealth health = GetComponent<EnemyHealth>();
+        bool isTrainingDummy = health != null && health.IsTrainingDummy;
         if (agent != null)
-            agent.enabled = true;
+            agent.enabled = !isTrainingDummy;
 
         if (zombieAI != null)
-            zombieAI.enabled = true;
+            zombieAI.enabled = !isTrainingDummy;
+
+        if (isTrainingDummy && animator != null)
+        {
+            animator.applyRootMotion = false;
+            foreach (AnimatorControllerParameter parameter in animator.parameters)
+            {
+                if (parameter.name == "MoveSpeed" &&
+                    parameter.type == AnimatorControllerParameterType.Float)
+                    animator.SetFloat("MoveSpeed", 0f);
+            }
+        }
     }
 
     /// <summary>

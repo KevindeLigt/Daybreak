@@ -179,6 +179,10 @@ public class DoubleBarrelShotgunController : WeaponBase
             if (health == null || health.IsDead)
                 continue;
 
+            // Training measures pellet damage even inside the instant-kill cone.
+            if (health.IsTrainingDummy)
+                continue;
+
             if (candidates.Contains(health))
                 continue;
 
@@ -227,6 +231,7 @@ public class DoubleBarrelShotgunController : WeaponBase
 
     private void FirePellets(Transform muzzle)
     {
+        var trainingDamage = new System.Collections.Generic.Dictionary<EnemyHealth, float>();
         for (int i = 0; i < pelletsPerShot; i++)
         {
             Vector3 direction = GetSpreadDirection();
@@ -240,6 +245,15 @@ public class DoubleBarrelShotgunController : WeaponBase
                 {
                     float finalDamage = PlayerWeaponStats.Instance.CalculatePelletDamage(damagePerPellet);
                     Vector3 force = direction.normalized * forcePerPellet;
+                    if (health.IsTrainingDummy)
+                    {
+                        if (!health.TrainingDefeated && finalDamage > 0f)
+                        {
+                            trainingDamage.TryGetValue(health, out float accumulated);
+                            trainingDamage[health] = accumulated + finalDamage;
+                        }
+                        continue;
+                    }
                     health.TakeDamage(finalDamage, force);
                     PlayerStatsManager.Instance.AddDamageDealt(finalDamage);
 
@@ -258,6 +272,12 @@ public class DoubleBarrelShotgunController : WeaponBase
             {
                 SpawnTracer(muzzle.position, fpsCamera.transform.position + direction * range);
             }
+        }
+
+        foreach (var entry in trainingDamage)
+        {
+            if (entry.Key != null)
+                entry.Key.ReceiveTrainingShot(entry.Value);
         }
     }
 
