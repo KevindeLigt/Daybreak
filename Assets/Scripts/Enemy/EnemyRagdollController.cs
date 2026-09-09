@@ -6,7 +6,7 @@ public class EnemyRagdollController : MonoBehaviour
 {
     private NavMeshAgent agent;
     private Animator animator;
-    private ZombieAIHybrid zombieAI;
+    private ZombieShamblerAI zombieAI;
 
     private Collider mainCollider;
     private Rigidbody rootRigidbody;
@@ -24,7 +24,7 @@ public class EnemyRagdollController : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponentInChildren<Animator>(true);
-        zombieAI = GetComponent<ZombieAIHybrid>();
+        zombieAI = GetComponent<ZombieShamblerAI>();
 
         mainCollider = GetComponent<Collider>();
         rootRigidbody = GetComponent<Rigidbody>();

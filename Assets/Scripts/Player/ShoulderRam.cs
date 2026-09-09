@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
@@ -271,7 +271,7 @@ public class ShoulderRam : MonoBehaviour
 
             health.TakeDamage(ramDamage, force);
 
-            ZombieAIHybrid ai = hit.GetComponentInParent<ZombieAIHybrid>();
+            ZombieShamblerAI ai = hit.GetComponentInParent<ZombieShamblerAI>();
             if (ai != null)
             {
                 ai.HitStun(enemyStunTime);

@@ -95,7 +95,7 @@ public class EnemyHealth : MonoBehaviour
 
     private EnemyRagdollController ragdoll;
     private EnemyEviscerationController eviscerationController;
-    private ZombieAIHybrid zombieAI;
+    private ZombieShamblerAI zombieAI;
 
     private Coroutine flashRoutine;
     private Coroutine deathFallbackRoutine;
@@ -115,7 +115,7 @@ public class EnemyHealth : MonoBehaviour
 
         ragdoll = GetComponent<EnemyRagdollController>();
         eviscerationController = GetComponent<EnemyEviscerationController>();
-        zombieAI = GetComponent<ZombieAIHybrid>();
+        zombieAI = GetComponent<ZombieShamblerAI>();
 
         if (enemyRenderer == null)
             enemyRenderer = GetComponentInChildren<Renderer>();
@@ -168,7 +168,7 @@ public class EnemyHealth : MonoBehaviour
     }
 
     /// <summary>
-    /// Called by ZombieAIHybrid when a committed lunge reaches LungeImpact.
+    /// Legacy terminal-lunge handoff; not used by ZombieShamblerAI.
     /// A hit or miss is terminal: the zombie is removed from the wave and
     /// permanently becomes a ragdoll after the impact animation.
     ///

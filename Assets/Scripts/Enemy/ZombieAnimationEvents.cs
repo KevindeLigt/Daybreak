@@ -6,13 +6,13 @@ using UnityEngine;
 /// </summary>
 public class ZombieAnimationEvents : MonoBehaviour
 {
-    [SerializeField] private ZombieAIHybrid zombieAI;
+    [SerializeField] private ZombieShamblerAI zombieAI;
     [SerializeField] private EnemyHealth enemyHealth;
 
     private void Awake()
     {
         if (zombieAI == null)
-            zombieAI = GetComponentInParent<ZombieAIHybrid>();
+            zombieAI = GetComponentInParent<ZombieShamblerAI>();
 
         if (enemyHealth == null)
             enemyHealth = GetComponentInParent<EnemyHealth>();
@@ -20,7 +20,7 @@ public class ZombieAnimationEvents : MonoBehaviour
         if (zombieAI == null)
         {
             Debug.LogError(
-                $"{name}: ZombieAnimationEvents could not find ZombieAIHybrid in a parent.",
+                $"{name}: ZombieAnimationEvents could not find ZombieShamblerAI in a parent.",
                 this
             );
         }
