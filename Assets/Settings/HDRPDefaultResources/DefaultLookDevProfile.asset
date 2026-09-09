@@ -86,7 +86,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46a79c9cffef5cc469553b1341c2ecdf, type: 3}
   m_Name: RecursiveRendering
   m_EditorClassIdentifier: Unity.RenderPipelines.HighDefinition.Runtime::UnityEngine.Rendering.HighDefinition.RecursiveRendering
-  active: 1
+  active: 0
   enable:
     m_OverrideState: 1
     m_Value: 0
@@ -1877,7 +1877,7 @@ MonoBehaviour:
   active: 1
   mode:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 4
   meteringMode:
     m_OverrideState: 1
     m_Value: 2
@@ -1892,10 +1892,10 @@ MonoBehaviour:
     m_Value: 0
   limitMin:
     m_OverrideState: 1
-    m_Value: -5
+    m_Value: 10
   limitMax:
     m_OverrideState: 1
-    m_Value: 14
+    m_Value: 13
   curveMap:
     m_OverrideState: 1
     m_Value:
@@ -1988,7 +1988,7 @@ MonoBehaviour:
     m_Value: {fileID: 0}
   histogramPercentages:
     m_OverrideState: 1
-    m_Value: {x: 38.225254, y: 88.225235}
+    m_Value: {x: 0, y: 49.999992}
   histogramUseCurveRemapping:
     m_OverrideState: 1
     m_Value: 0

@@ -2,41 +2,88 @@ using UnityEngine;
 
 public class Tracer3D : MonoBehaviour
 {
-    public float baseLifetime = 0.06f;   // short shotgun burst
+    public float baseLifetime = 0.06f;
     public float lifetimePerMeter = 0.002f;
 
-    private float totalLifetime;
-    private float t = 0f;
+    private static readonly int UnlitColorId = Shader.PropertyToID("_UnlitColor");
+    private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+    private static readonly int ColorId = Shader.PropertyToID("_Color");
 
-    private Renderer rend;
+    private float totalLifetime;
+    private float elapsed;
+    private Renderer tracerRenderer;
+    private MaterialPropertyBlock properties;
     private Color originalColor;
+    private int colorPropertyId;
+    private bool canFade;
+    private bool initialized;
 
     public void Initialize(float distance)
     {
-        rend = GetComponentInChildren<Renderer>();
-        if (rend)
+        elapsed = 0f;
+        totalLifetime = Mathf.Max(0.001f,
+            baseLifetime + Mathf.Max(0f, distance) * lifetimePerMeter);
+
+        tracerRenderer = GetComponentInChildren<Renderer>();
+        canFade = false;
+
+        if (tracerRenderer != null)
         {
-            originalColor = rend.material.GetColor("_BaseColor");
+            // Read the asset without creating a separate material instance.
+            Material material = tracerRenderer.sharedMaterial;
+            if (material != null && TryGetColorProperty(material, out colorPropertyId))
+            {
+                originalColor = material.GetColor(colorPropertyId);
+                if (properties == null)
+                    properties = new MaterialPropertyBlock();
+                canFade = true;
+                ApplyFade(1f);
+            }
         }
 
-        // Lifetime scales with distance
-        totalLifetime = baseLifetime + distance * lifetimePerMeter;
+        // Even a renderer with an unsupported shader still expires normally.
+        initialized = true;
     }
 
-    void Update()
+    private static bool TryGetColorProperty(Material material, out int propertyId)
     {
-        t += Time.deltaTime;
-
-        if (rend)
+        if (material.HasProperty(UnlitColorId))
+            propertyId = UnlitColorId; // HDRP/Unlit
+        else if (material.HasProperty(BaseColorId))
+            propertyId = BaseColorId;  // HDRP/Lit and many URP shaders
+        else if (material.HasProperty(ColorId))
+            propertyId = ColorId;      // Built-in shaders
+        else
         {
-            float fade = 1f - (t / totalLifetime);
-
-            Color c = originalColor;
-            c.a = fade;
-            rend.material.SetColor("_BaseColor", c);
+            propertyId = 0;
+            return false;
         }
 
-        if (t >= totalLifetime)
+        return true;
+    }
+
+    private void Update()
+    {
+        if (!initialized)
+            return;
+
+        elapsed += Time.deltaTime;
+        ApplyFade(Mathf.Clamp01(1f - elapsed / totalLifetime));
+
+        if (elapsed >= totalLifetime)
             Destroy(gameObject);
+    }
+
+    private void ApplyFade(float fade)
+    {
+        if (!canFade || tracerRenderer == null)
+            return;
+
+        // Use a Transparent material with Alpha blending for a visible fade.
+        Color color = originalColor;
+        color.a *= fade;
+        tracerRenderer.GetPropertyBlock(properties);
+        properties.SetColor(colorPropertyId, color);
+        tracerRenderer.SetPropertyBlock(properties);
     }
 }

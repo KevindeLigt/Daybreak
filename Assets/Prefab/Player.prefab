@@ -1058,6 +1058,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8300000, guid: aa58376dc0eecde48907e537f3d4c7ba, type: 3}
     - target: {fileID: 7235631892856808707, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: spreadAngle
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7235631892856808707, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: tracerPrefab
       value: 
       objectReference: {fileID: 7523358957666567661, guid: 9262c7834195e5f4b9da42d1b3594fe9, type: 3}
