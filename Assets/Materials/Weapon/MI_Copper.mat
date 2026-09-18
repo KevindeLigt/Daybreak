@@ -203,7 +203,7 @@ Material:
     - _IridescenceThickness: 0.748
     - _LinkDetailsWithBase: 1
     - _MaterialID: 3
-    - _Metallic: 1
+    - _Metallic: 0.924
     - _MetallicRemapMax: 1
     - _MetallicRemapMin: 0
     - _NormalMapSpace: 0
@@ -221,7 +221,7 @@ Material:
     - _ReceivesSSR: 1
     - _ReceivesSSRTransparent: 0
     - _RefractionModel: 0
-    - _Smoothness: 0.884
+    - _Smoothness: 0.495
     - _SmoothnessRemapMax: 1
     - _SmoothnessRemapMin: 0
     - _SpecularAAScreenSpaceVariance: 0.1

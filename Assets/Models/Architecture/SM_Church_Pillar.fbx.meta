@@ -9,6 +9,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: MI_Wall
     second: {fileID: 2100000, guid: 69512b6a08612c245ae9c6b5c058120e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: T_Trim_Tileable
+    second: {fileID: 2100000, guid: bd05a25bea67c304983756622cf322af, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

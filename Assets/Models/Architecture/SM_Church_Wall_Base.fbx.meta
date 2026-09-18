@@ -9,6 +9,16 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: MI_Wall
     second: {fileID: 2100000, guid: 706a79244cdf6554ab0134726302a715, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: T_Trim_Tileable
+    second: {fileID: 2100000, guid: bd05a25bea67c304983756622cf322af, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: T_Wall_Tileable
+    second: {fileID: 2100000, guid: 1e632c678bb9df143a841afb4206d493, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -84,7 +94,7 @@ ModelImporter:
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
   referencedClips: []
-  importAnimation: 1
+  importAnimation: 0
   humanDescription:
     serializedVersion: 3
     human: []
