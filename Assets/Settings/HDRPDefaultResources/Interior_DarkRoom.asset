@@ -1671,7 +1671,7 @@ MonoBehaviour:
     m_Value: 2
   cascadeShadowSplit0:
     m_OverrideState: 1
-    m_Value: 0.013333334
+    m_Value: 0.00040000002
   cascadeShadowSplit1:
     m_OverrideState: 1
     m_Value: 0.15
@@ -1680,10 +1680,10 @@ MonoBehaviour:
     m_Value: 0.3
   cascadeShadowBorder0:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0
   cascadeShadowBorder1:
     m_OverrideState: 1
-    m_Value: 0.33783785
+    m_Value: 0.5602241
   cascadeShadowBorder2:
     m_OverrideState: 1
     m_Value: 0
@@ -1877,7 +1877,7 @@ MonoBehaviour:
   active: 1
   mode:
     m_OverrideState: 1
-    m_Value: 4
+    m_Value: 0
   meteringMode:
     m_OverrideState: 1
     m_Value: 2
@@ -1886,7 +1886,7 @@ MonoBehaviour:
     m_Value: 1
   fixedExposure:
     m_OverrideState: 1
-    m_Value: 5
+    m_Value: 4
   compensation:
     m_OverrideState: 1
     m_Value: 0

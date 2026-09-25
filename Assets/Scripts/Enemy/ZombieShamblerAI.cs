@@ -7,7 +7,7 @@ using UnityEngine.AI;
 /// EnemyHealth owns damage bookkeeping, kill rewards and ragdoll handoff.
 /// </summary>
 [RequireComponent(typeof(NavMeshAgent))]
-public class ZombieShamblerAI : MonoBehaviour
+public class ZombieShamblerAI : ZombieAIController
 {
     [Header("References")]
     public Transform target;
@@ -109,7 +109,7 @@ public class ZombieShamblerAI : MonoBehaviour
     private bool CanNavigate => agent != null && agent.enabled && agent.isOnNavMesh;
     private float StateAge => Time.time - stateStartedAt;
     private bool AttackInProgress => state == State.PrepareAttack || state == State.Attack || state == State.Recovery;
-    public bool CanReceiveHitReaction => !isDead && (health == null || !health.IsDead);
+    public override bool CanReceiveHitReaction => !isDead && (health == null || !health.IsDead);
 
     private void Start()
     {
@@ -391,7 +391,7 @@ public class ZombieShamblerAI : MonoBehaviour
             if (hit.collider.GetComponentInParent<PlayerHealth>() == player) continue;
             // Living Shamblers retain body separation, but do not act as invisible
             // shields against an adjacent Shambler's reach. Walls still block hits.
-            ZombieShamblerAI other = hit.collider.GetComponentInParent<ZombieShamblerAI>();
+            ZombieAIController other = hit.collider.GetComponentInParent<ZombieAIController>();
             if (other != null && other.CanReceiveHitReaction) continue;
             return true;
         }
@@ -430,7 +430,7 @@ public class ZombieShamblerAI : MonoBehaviour
 
     // Entry points retained for EnemyHitReaction, ShoulderRam, EnemyHealth,
     // and the existing ZombieAnimationEvents component.
-    public void HitStun(float duration)
+    public override void HitStun(float duration)
     {
         if (!isActiveAndEnabled || !CanReceiveHitReaction) return;
         stunEndsAt = Mathf.Max(Time.time + Mathf.Max(0f, duration > 0f ? duration : defaultStunTime),
@@ -440,7 +440,7 @@ public class ZombieShamblerAI : MonoBehaviour
         ChangeState(State.Stunned);
     }
 
-    public void BeginDeathAnimation()
+    public override void BeginDeathAnimation()
     {
         if (isDead) return;
         isDead = true;
@@ -449,21 +449,21 @@ public class ZombieShamblerAI : MonoBehaviour
         if (animator != null && animator.enabled && hasDeath) animator.SetTrigger(DeathHash);
     }
 
-    public void Die() => BeginDeathAnimation();
-    public void AnimationEvent_NormalAttackHit()
+    public override void Die() => BeginDeathAnimation();
+    public override void AnimationEvent_NormalAttackHit()
     {
         // Timing-only mode intentionally ignores animation contact events.
         if (normalAttackUseAnimationEvents) ResolveContact();
     }
-    public void AnimationEvent_AttackComplete()
+    public override void AnimationEvent_AttackComplete()
     {
         if (isActiveAndEnabled && !isDead && state == State.Attack) completionReceived = true;
     }
     // Safe compatibility receivers: old clips/bridge compile, but cannot start
     // another preparation timer or re-enable the removed terminal lunge.
-    public void AnimationEvent_PrepareAttackPoseReached() { }
-    public void AnimationEvent_PrepareAttackComplete() { }
-    public void AnimationEvent_BeginLungeFlight() { }
+    public override void AnimationEvent_PrepareAttackPoseReached() { }
+    public override void AnimationEvent_PrepareAttackComplete() { }
+    public override void AnimationEvent_BeginLungeFlight() { }
 
     private void FindTarget()
     {

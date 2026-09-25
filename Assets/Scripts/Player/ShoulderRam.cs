@@ -271,7 +271,7 @@ public class ShoulderRam : MonoBehaviour
 
             health.TakeDamage(ramDamage, force);
 
-            ZombieShamblerAI ai = hit.GetComponentInParent<ZombieShamblerAI>();
+            ZombieAIController ai = hit.GetComponentInParent<ZombieAIController>();
             if (ai != null)
             {
                 ai.HitStun(enemyStunTime);

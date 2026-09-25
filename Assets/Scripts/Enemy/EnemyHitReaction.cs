@@ -7,7 +7,7 @@ public class EnemyHitReaction : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Animator animator;
-    [SerializeField] private ZombieShamblerAI zombieAI;
+    [SerializeField] private ZombieAIController zombieAI;
 
     [Header("Hit Strength")]
     [FormerlySerializedAs("heavyHitThreshold")]
@@ -46,7 +46,7 @@ public class EnemyHitReaction : MonoBehaviour
             animator = GetComponentInChildren<Animator>(true);
 
         if (zombieAI == null)
-            zombieAI = GetComponent<ZombieShamblerAI>();
+            zombieAI = GetComponent<ZombieAIController>();
 
         if (animator == null)
         {

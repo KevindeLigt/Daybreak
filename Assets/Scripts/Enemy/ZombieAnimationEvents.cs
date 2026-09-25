@@ -6,13 +6,13 @@ using UnityEngine;
 /// </summary>
 public class ZombieAnimationEvents : MonoBehaviour
 {
-    [SerializeField] private ZombieShamblerAI zombieAI;
+    [SerializeField] private ZombieAIController zombieAI;
     [SerializeField] private EnemyHealth enemyHealth;
 
     private void Awake()
     {
         if (zombieAI == null)
-            zombieAI = GetComponentInParent<ZombieShamblerAI>();
+            zombieAI = GetComponentInParent<ZombieAIController>();
 
         if (enemyHealth == null)
             enemyHealth = GetComponentInParent<EnemyHealth>();
@@ -20,7 +20,7 @@ public class ZombieAnimationEvents : MonoBehaviour
         if (zombieAI == null)
         {
             Debug.LogError(
-                $"{name}: ZombieAnimationEvents could not find ZombieShamblerAI in a parent.",
+                $"{name}: ZombieAnimationEvents could not find ZombieAIController in a parent.",
                 this
             );
         }
@@ -47,9 +47,9 @@ public class ZombieAnimationEvents : MonoBehaviour
     }
 
     // Add this event on the contact frame of Attack.
-    public void NormalAttackHit()
+    public void NormalAttackHit(AnimationEvent animationEvent)
     {
-        zombieAI?.AnimationEvent_NormalAttackHit();
+        zombieAI?.ReceiveNormalAttackHit(animationEvent);
     }
 
     // Add this event on frame 1 or 2 of LungeAir.
@@ -59,9 +59,15 @@ public class ZombieAnimationEvents : MonoBehaviour
     }
 
     // Add this event near the final frame of the normal Attack only.
-    public void AttackComplete()
+    public void AttackComplete(AnimationEvent animationEvent)
     {
-        zombieAI?.AnimationEvent_AttackComplete();
+        zombieAI?.ReceiveAttackComplete(animationEvent);
+    }
+
+    // Added only to the Pursuer's private Attack clip by the setup command.
+    public void PursuerStepStart(AnimationEvent animationEvent)
+    {
+        zombieAI?.ReceivePursuerStepStart(animationEvent);
     }
 
     // Add this event where LungeImpact should hand control to physics.
