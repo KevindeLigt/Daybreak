@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameFlowManager : MonoBehaviour
@@ -30,6 +31,16 @@ public class GameFlowManager : MonoBehaviour
     [Header("References")]
     public UIManager uiManager;
 
+    [Header("Heart Encounter Prototype")]
+    [Tooltip("Wave enemies gather near the next heart when they cannot detect the player. The last few pursue the player regardless of detection range.")]
+    [SerializeField] private bool useHeartEncounterFocus = true;
+    [SerializeField, Min(0f)] private float heartGatherRadius = 3f;
+    [SerializeField, Min(1)] private int finalEnemiesHuntPlayer = 3;
+    [Tooltip("Temporary screen marker: previews the heart, announces its release, then points back to the Curse Anchor.")]
+    [SerializeField] private bool showHeartEncounterGuide = true;
+    [Tooltip("Optional. Leave empty to use the camera tagged MainCamera.")]
+    [SerializeField] private Camera heartGuideCamera;
+
     // Run-wide wave number. This never resets when moving between regions.
     private int currentWave;
 
@@ -48,6 +59,11 @@ public class GameFlowManager : MonoBehaviour
     private CurseObjectiveController currentObjective;
     private RegionManager subscribedRegionManager;
     private Coroutine progressionCoroutine;
+    private readonly List<ZombieAIController> waveControllers = new List<ZombieAIController>();
+    private Transform heartGatheringPoint;
+    private RootHeartEncounterGuide heartGuide;
+    private bool finalHuntOrdered;
+    private int encounterVersion;
 
     public int CurrentWave => currentWave;
     public int CurrentRegionWave => currentRegionWave;
@@ -83,6 +99,7 @@ public class GameFlowManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        ClearWaveOrders();
         UnsubscribeFromRegionManager();
         UnbindCurrentObjective();
     }
@@ -146,6 +163,9 @@ public class GameFlowManager : MonoBehaviour
 
     private void BeginRegionEncounter(MapRegion region, float delay)
     {
+        encounterVersion++;
+        ClearWaveOrders();
+        heartGuide?.ClearGuide();
         StopProgressionCoroutine();
         UnbindCurrentObjective();
 
@@ -215,6 +235,7 @@ public class GameFlowManager : MonoBehaviour
             return;
         }
 
+        PrepareHeartEncounter();
         currentWave++;
         currentRegionWave++;
 
@@ -228,16 +249,17 @@ public class GameFlowManager : MonoBehaviour
         uiManager?.UpdateWave(currentWave);
         uiManager?.UpdateEnemyCount(aliveEnemies, enemiesThisWave);
 
-        StartCoroutine(SpawnWaveRoutine());
+        StartCoroutine(SpawnWaveRoutine(encounterVersion));
     }
 
-    private IEnumerator SpawnWaveRoutine()
+    private IEnumerator SpawnWaveRoutine(int version)
     {
         int failedSpawns = 0;
+        int plannedSpawns = enemiesThisWave;
 
-        for (int i = 0; i < enemiesThisWave; i++)
+        for (int i = 0; i < plannedSpawns; i++)
         {
-            if (!gameActive)
+            if (!gameActive || version != encounterVersion)
                 yield break;
 
             if (!SpawnEnemy())
@@ -245,6 +267,9 @@ public class GameFlowManager : MonoBehaviour
 
             yield return new WaitForSeconds(spawnDelay);
         }
+
+        if (!gameActive || version != encounterVersion)
+            yield break;
 
         if (failedSpawns > 0)
         {
@@ -254,6 +279,7 @@ public class GameFlowManager : MonoBehaviour
         }
 
         isSpawningWave = false;
+        CheckFinalEnemies();
 
         if (aliveEnemies <= 0)
         {
@@ -297,10 +323,28 @@ public class GameFlowManager : MonoBehaviour
             return false;
         }
 
-        Instantiate(
+        EnemyHealth prefabHealth = chosenPrefab.GetComponent<EnemyHealth>();
+        if (prefabHealth != null && prefabHealth.IsTrainingDummy)
+        {
+            Debug.LogWarning("A training dummy was selected as a wave enemy. Use a combat prefab; this spawn will not count toward the wave.");
+            return false;
+        }
+
+        GameObject spawned = Instantiate(
             chosenPrefab,
             chosenSpawner.spawnPoint.position,
             chosenSpawner.spawnPoint.rotation);
+
+        if (heartGatheringPoint != null)
+        {
+            ZombieAIController controller = spawned.GetComponent<ZombieAIController>();
+            if (controller != null)
+            {
+                Vector2 offset = Random.insideUnitCircle * Mathf.Max(0f, heartGatherRadius);
+                controller.AssignEncounterFocus(heartGatheringPoint, new Vector3(offset.x, 0f, offset.y));
+                waveControllers.Add(controller);
+            }
+        }
 
         return true;
     }
@@ -326,6 +370,8 @@ public class GameFlowManager : MonoBehaviour
 
         aliveEnemies = Mathf.Max(0, aliveEnemies - 1);
         uiManager?.UpdateEnemyCount(aliveEnemies, enemiesThisWave);
+
+        CheckFinalEnemies();
 
         // Do not complete the wave while more enemies are still waiting to spawn.
         if (aliveEnemies <= 0 && !isSpawningWave)
@@ -387,6 +433,7 @@ public class GameFlowManager : MonoBehaviour
 
         isWaitingForHeartDeposit = false;
         isWaitingForNextWave = false;
+        heartGuide?.ClearGuide();
 
         if (objective.IsCompleted)
         {
@@ -412,6 +459,9 @@ public class GameFlowManager : MonoBehaviour
 
     private void CompleteCurrentRegionalEncounter()
     {
+        encounterVersion++;
+        ClearWaveOrders();
+        heartGuide?.ClearGuide();
         StopProgressionCoroutine();
         aliveEnemies = 0;
         enemiesThisWave = 0;
@@ -449,6 +499,45 @@ public class GameFlowManager : MonoBehaviour
         progressionCoroutine = null;
     }
 
+    private void PrepareHeartEncounter()
+    {
+        ClearWaveOrders();
+        heartGuide?.ClearGuide();
+        if (!useHeartEncounterFocus || !useCurseObjectiveFlow || currentObjective == null ||
+            !currentObjective.WaveControlledPickups) return;
+
+        RootHeartPickup pickup = currentObjective.NextHeartPickup;
+        heartGatheringPoint = currentObjective.NextHeartGatheringPoint;
+        if (pickup == null || heartGatheringPoint == null)
+        {
+            Debug.LogWarning("No next Root Heart is assigned for this wave. Check the objective's pickup array.");
+            return;
+        }
+        if (showHeartEncounterGuide)
+        {
+            if (heartGuide == null) heartGuide = gameObject.AddComponent<RootHeartEncounterGuide>();
+            heartGuide.Bind(this, currentObjective, pickup.transform, heartGuideCamera);
+        }
+    }
+
+    private void CheckFinalEnemies()
+    {
+        if (!gameActive || isSpawningWave || finalHuntOrdered || heartGatheringPoint == null ||
+            aliveEnemies <= 0 || aliveEnemies > Mathf.Max(1, finalEnemiesHuntPlayer)) return;
+        finalHuntOrdered = true;
+        foreach (ZombieAIController controller in waveControllers)
+            if (controller != null) controller.PursuePlayerForEncounter();
+    }
+
+    private void ClearWaveOrders()
+    {
+        foreach (ZombieAIController controller in waveControllers)
+            if (controller != null) controller.ClearEncounterOrders();
+        waveControllers.Clear();
+        heartGatheringPoint = null;
+        finalHuntOrdered = false;
+    }
+
     public void PlayerDied()
     {
         LoseGame();
@@ -460,6 +549,7 @@ public class GameFlowManager : MonoBehaviour
             return;
 
         gameActive = false;
+        heartGuide?.ClearGuide();
         Time.timeScale = 0f;
         uiManager?.ShowGameOver(true);
     }
@@ -470,6 +560,7 @@ public class GameFlowManager : MonoBehaviour
             return;
 
         gameActive = false;
+        heartGuide?.ClearGuide();
         Time.timeScale = 0f;
         uiManager?.ShowGameOver(false);
     }

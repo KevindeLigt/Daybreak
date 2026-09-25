@@ -241,11 +241,12 @@ public class ZombieShamblerAI : ZombieAIController
 
     private void UpdateWander()
     {
-        if (TargetDistance() <= Mathf.Max(0f, detectionRadius))
+        if (EncounterMustHunt || TargetDistance() <= Mathf.Max(0f, detectionRadius))
         {
             ChangeState(State.Chase);
             return;
         }
+        if (GatherAtEncounterFocus(agent, Mathf.Max(0f, walkSpeed) * speedMultiplier)) return;
         if (agent.pathPending) return;
         if (agent.hasPath && agent.remainingDistance > agent.stoppingDistance + 0.15f) return;
         if (wanderResumeAt < 0f)
@@ -271,7 +272,7 @@ public class ZombieShamblerAI : ZombieAIController
     private void UpdateChase()
     {
         float distance = TargetDistance();
-        if (distance > Mathf.Max(detectionRadius, loseInterestRadius))
+        if (!EncounterMustHunt && distance > Mathf.Max(detectionRadius, loseInterestRadius))
         {
             ChangeState(State.Wander);
             return;

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7091909866335770990}
   - component: {fileID: 7405812906495778118}
   - component: {fileID: 8263113248985906921}
-  - component: {fileID: 6764367962030155318}
+  - component: {fileID: 2218700758310320551}
   - component: {fileID: 5881243194224487902}
   - component: {fileID: 5077057533922258051}
   - component: {fileID: 6839049045574744321}
@@ -34,7 +34,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 795342130291843697}
@@ -85,7 +85,7 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
---- !u!114 &6764367962030155318
+--- !u!114 &2218700758310320551
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -94,44 +94,39 @@ MonoBehaviour:
   m_GameObject: {fileID: 1131232361969350571}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1423e21a6a4644047a17cedc3306c321, type: 3}
+  m_Script: {fileID: 11500000, guid: 48feaa82ea80fcb4499f82502ab077de, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ZombieAIHybrid
+  m_EditorClassIdentifier: Assembly-CSharp::ZombiePursuerAI
   target: {fileID: 0}
-  animator: {fileID: 0}
-  idleAudioSource: {fileID: 410577082451195112}
-  idleLoopClip: {fileID: 8300000, guid: a59b9afc90c92d143b952c109b5a2f9b, type: 3}
-  detectionRadius: 15
-  loseInterestRadius: 20
-  wanderRadius: 8
-  wanderPauseMin: 1.5
-  wanderPauseMax: 3.5
-  walkSpeed: 2
-  focusSpeed: 2.5
-  focusDistance: 3.5
-  speedMultiplierRange: {x: 0.88, y: 1.12}
-  pathUpdateInterval: 0.15
-  moveAnimationDampTime: 0.1
-  attackRange: 2
-  attackDamage: 20
-  attackCooldown: 1.2
-  normalAttackPrepareDuration: 0.6
-  normalAttackPrepareSpeed: 3.5
-  normalAttackPrepareStopDistance: 1
-  normalAttackStepDistance: 1
-  normalAttackStepDuration: 0.2
-  normalAttackRecoveryDuration: 0.35
-  normalAttackHalfAngle: 55
-  normalAttackVerticalTolerance: 1.5
-  normalAttackRangeAllowance: 0.5
-  normalAttackObstacleMask:
+  animator: {fileID: 84392961728583446}
+  audioSource: {fileID: 410577082451195112}
+  preparationSound: {fileID: 8300000, guid: 2586c539512374c429f28084c8fe7a88, type: 3}
+  detectionRadius: 50
+  loseInterestRadius: 100
+  chaseSpeed: 6
+  acceleration: 20
+  turnSpeed: 360
+  pathUpdateInterval: 0.1
+  preparationRange: 5
+  commitmentRange: 4
+  preparationSpeed: 5.2
+  minimumPreparationTime: 0.45
+  maximumPreparationTime: 1.4
+  commitmentHalfAngle: 30
+  attackDamage: 75
+  strikeDistance: 1.5
+  hitReach: 1.6
+  hitHalfAngle: 50
+  verticalTolerance: 1.25
+  recoveryTime: 0.6
+  attackCooldown: 1.4
+  animationEventTimeout: 2
+  obstacleMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  normalAttackUseAnimationEvents: 1
-  normalAttackHitFallbackTime: 0.18
-  normalAttackEventTimeout: 2
   defaultStunTime: 0.2
   debugAttackLogs: 0
+  phase: 0
 --- !u!114 &5881243194224487902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -207,7 +202,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHitReaction
   animator: {fileID: 84392961728583446}
-  zombieAI: {fileID: 6764367962030155318}
+  zombieAI: {fileID: 0}
   hitThreshold: 10
   flinchStunDuration: 0.1
   hitStunDuration: 1
@@ -406,8 +401,8 @@ Transform:
   m_GameObject: {fileID: 3515542479959553119}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7706899, y: -0.07294892, z: -0.096486926, w: 0.6256244}
-  m_LocalPosition: {x: 0.028, y: 0.204, z: -0.138}
-  m_LocalScale: {x: 0.4, y: 0.4, z: 0.1575}
+  m_LocalPosition: {x: 0.015, y: 0.261, z: -0.153}
+  m_LocalScale: {x: 0.056355197, y: 0.051062696, z: 0.1575}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5298529894648392043}
@@ -419,7 +414,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3515542479959553119}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: -5495902117074765545, guid: 721704fa59cdbf641acc352d994a1e99, type: 3}
 --- !u!23 &2224132169959317810
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -445,7 +440,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 73c176f402d2c2f4d929aa5da7585d17, type: 2}
+  - {fileID: 2100000, guid: 4beb39ea317c4bb45aafec180816399a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -479,7 +474,7 @@ PrefabInstance:
     - target: {fileID: 5708881054326222858, guid: 711cc903c0c53794ba16cc6b8bd6db1d, type: 3}
       propertyPath: zombieAI
       value: 
-      objectReference: {fileID: 6764367962030155318}
+      objectReference: {fileID: 2218700758310320551}
     - target: {fileID: 5708881054326222858, guid: 711cc903c0c53794ba16cc6b8bd6db1d, type: 3}
       propertyPath: enemyHealth
       value: 
@@ -532,6 +527,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6362906545602004006, guid: 711cc903c0c53794ba16cc6b8bd6db1d, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: c1a65d3622a10a34aa5adc91182d2d5a, type: 2}
     - target: {fileID: 6423268733560515579, guid: 711cc903c0c53794ba16cc6b8bd6db1d, type: 3}
       propertyPath: m_Name
       value: SK_Zombie_Basic

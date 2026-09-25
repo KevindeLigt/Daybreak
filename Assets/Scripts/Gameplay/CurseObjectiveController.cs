@@ -8,6 +8,10 @@ public class CurseObjectiveController : MonoBehaviour
     [SerializeField] private CurseAnchor curseAnchor;
     [SerializeField] private RootHeartPickup[] rootHeartPickups;
 
+    [Header("Heart Encounter Gathering (optional)")]
+    [Tooltip("One walkable gathering centre per heart, in the same order as Root Heart Pickups. Empty entries use the heart's position. Put these beside raised or wall-mounted hearts.")]
+    [SerializeField] private Transform[] heartGatheringPoints;
+
     [Tooltip("Optional visual attached to the player or camera while a heart is carried.")]
     [SerializeField] private GameObject carriedHeartVisual;
 
@@ -47,6 +51,33 @@ public class CurseObjectiveController : MonoBehaviour
     public bool WaveControlledPickups => waveControlledPickups;
     public int HeartsDeposited => heartsDeposited;
     public int RequiredHearts => requiredHearts;
+    public Transform AnchorTransform => curseAnchor != null ? curseAnchor.transform : null;
+
+    // Transforms remain readable while the pickups themselves are inactive.
+    // Previewing an area never enables the pickup or bypasses the cleared wave.
+    public RootHeartPickup NextHeartPickup
+    {
+        get
+        {
+            if (isCompleted || hasRootHeart || rootHeartPickups == null ||
+                heartsDeposited >= requiredHearts || heartsDeposited >= rootHeartPickups.Length)
+                return null;
+            return rootHeartPickups[heartsDeposited];
+        }
+    }
+
+    public Transform NextHeartGatheringPoint
+    {
+        get
+        {
+            RootHeartPickup pickup = NextHeartPickup;
+            if (pickup == null) return null;
+            if (heartGatheringPoints != null && heartsDeposited < heartGatheringPoints.Length &&
+                heartGatheringPoints[heartsDeposited] != null)
+                return heartGatheringPoints[heartsDeposited];
+            return pickup.transform;
+        }
+    }
 
     private void Start()
     {

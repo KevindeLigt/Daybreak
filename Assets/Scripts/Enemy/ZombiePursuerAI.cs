@@ -59,7 +59,10 @@ public class ZombiePursuerAI : ZombieAIController
     private enum Phase { Idle, Approach, Prepare, Strike, Recovery, Stunned, Dead }
     [SerializeField] private Phase phase = Phase.Idle;
     public string CurrentPhase => phase.ToString();
-    public override bool CanReceiveHitReaction => !dead && (health == null || !health.IsDead);
+    // Training mode must also reject animation events that arrive between
+    // Updates, even if a component was accidentally left enabled.
+    public override bool CanReceiveHitReaction => !dead &&
+        (health == null || (!health.IsDead && !health.IsTrainingDummy));
 
     private NavMeshAgent agent;
     private EnemyHealth health;
@@ -112,7 +115,7 @@ public class ZombiePursuerAI : ZombieAIController
             configuredAnimator = hasMove && hasPrepare && hasAttack && hasCancel && animator.HasState(0, AttackStateHash);
         }
         initialized = true;
-        if (!configuredAnimator)
+        if (!configuredAnimator && (health == null || !health.IsTrainingDummy))
             Debug.LogWarning($"{name}: Configure the Pursuer Animator using the ZombiePursuerAI component menu before testing attacks.", this);
     }
 
@@ -160,7 +163,10 @@ public class ZombiePursuerAI : ZombieAIController
         switch (phase)
         {
             case Phase.Idle:
-                if (DistanceToTarget() <= Mathf.Max(0f, detectionRadius) && !HasCover()) Enter(Phase.Approach);
+                if (EncounterMustHunt || (DistanceToTarget() <= Mathf.Max(0f, detectionRadius) && !HasCover()))
+                    Enter(Phase.Approach);
+                else if (GatherAtEncounterFocus(agent, chaseSpeed))
+                    FaceDirection(agent.desiredVelocity);
                 break;
             case Phase.Approach: UpdateApproach(); break;
             case Phase.Prepare: UpdatePreparation(); break;
@@ -233,7 +239,7 @@ public class ZombiePursuerAI : ZombieAIController
     private void UpdateApproach()
     {
         float distance = DistanceToTarget();
-        if (distance > Mathf.Max(detectionRadius, loseInterestRadius)) { Enter(Phase.Idle); return; }
+        if (!EncounterMustHunt && distance > Mathf.Max(detectionRadius, loseInterestRadius)) { Enter(Phase.Idle); return; }
         FollowTarget(chaseSpeed);
         // Face along the path around corners instead of sliding sideways while
         // staring through a wall. Preparation uses direct, visible facing.
@@ -400,6 +406,7 @@ public class ZombiePursuerAI : ZombieAIController
     {
         if (dead) return;
         Initialize();
+        if (health != null && health.IsTrainingDummy) return;
         dead = true;
         contactResolved = true;
         stepStarted = false;
