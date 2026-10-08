@@ -103,8 +103,8 @@ MonoBehaviour:
   preparationSound: {fileID: 8300000, guid: 2586c539512374c429f28084c8fe7a88, type: 3}
   detectionRadius: 50
   loseInterestRadius: 100
-  chaseSpeed: 6
-  acceleration: 20
+  chaseSpeed: 7
+  acceleration: 25
   turnSpeed: 360
   pathUpdateInterval: 0.1
   preparationRange: 5
@@ -113,7 +113,7 @@ MonoBehaviour:
   minimumPreparationTime: 0.45
   maximumPreparationTime: 1.4
   commitmentHalfAngle: 30
-  attackDamage: 75
+  attackDamage: 25
   strikeDistance: 1.5
   hitReach: 1.6
   hitHalfAngle: 50

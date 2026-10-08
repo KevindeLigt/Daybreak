@@ -106,14 +106,14 @@ MonoBehaviour:
   wanderRadius: 8
   wanderPauseMin: 1.5
   wanderPauseMax: 3.5
-  walkSpeed: 2
-  focusSpeed: 2.5
-  focusDistance: 3.5
+  walkSpeed: 2.5
+  focusSpeed: 3
+  focusDistance: 4
   speedMultiplierRange: {x: 0.88, y: 1.12}
   pathUpdateInterval: 0.15
   moveAnimationDampTime: 0.1
   attackRange: 4
-  attackDamage: 25
+  attackDamage: 15
   attackCooldown: 1.2
   normalAttackPrepareDuration: 0.6
   normalAttackPrepareSpeed: 3.5

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class GameFlowManager : MonoBehaviour
 {
@@ -10,11 +11,32 @@ public class GameFlowManager : MonoBehaviour
     public GameObject[] enemyPrefabs;
     public int startingEnemiesPerWave = 5;
 
+    [Tooltip("Extra enemies added to each run-wide wave. Region transitions keep this progression.")]
+    [Min(0)] public int enemiesAddedPerWave = 2;
+
     [Tooltip("Used only when the active region has no Curse Objective assigned.")]
     public int maxWaves = 5;
 
     public float timeBetweenWaves = 3f;
+    [Tooltip("Fixed interval used when Use Paced Spawning is disabled.")]
     public float spawnDelay = 0.3f;
+
+    [Header("Wave Pacing")]
+    [SerializeField] private bool usePacedSpawning = true;
+    [Tooltip("Spawning window in seconds, excluding the warning. A full room pauses this clock; clearing survivors can take longer.")]
+    [SerializeField, Min(1f)] private float waveSpawnDuration = 35f;
+    [Tooltip("X: progress through the spawning window (0 to 1). Y: relative spawning pressure. Higher sections receive more of the wave's fixed enemy total.")]
+    [SerializeField] private AnimationCurve spawnPressureCurve = WaveSpawnSchedule.CreateDefaultCurve();
+    [Tooltip("Maximum living wave enemies in the room. At the limit, paced spawning and its clock wait for a kill. Zero disables the limit.")]
+    [SerializeField, Min(0)] private int maxConcurrentEnemies = 8;
+    [Tooltip("Warning time before each wave. Optional events below can play sound or VFX. Zero starts immediately.")]
+    [SerializeField, Min(0f)] private float waveWarningDuration = 2.5f;
+
+    [Header("Wave Feedback (optional)")]
+    public UnityEvent onWaveWarning = new UnityEvent();
+    public UnityEvent onWaveStarted = new UnityEvent();
+    [Tooltip("All spawn attempts are finished, but surviving enemies may still need to be killed.")]
+    public UnityEvent onWaveSpawningFinished = new UnityEvent();
 
     [Header("Curse Objective Flow")]
     [SerializeField] private bool useCurseObjectiveFlow = true;
@@ -49,6 +71,8 @@ public class GameFlowManager : MonoBehaviour
 
     private int aliveEnemies;
     private int enemiesThisWave;
+    [SerializeField] private int pendingSpawns;
+    [SerializeField] private float waveSpawnElapsed;
     private bool gameActive;
     private bool isSpawningWave;
     private bool isWaitingForNextWave;
@@ -59,6 +83,7 @@ public class GameFlowManager : MonoBehaviour
     private CurseObjectiveController currentObjective;
     private RegionManager subscribedRegionManager;
     private Coroutine progressionCoroutine;
+    private Coroutine spawnCoroutine;
     private readonly List<ZombieAIController> waveControllers = new List<ZombieAIController>();
     private Transform heartGatheringPoint;
     private RootHeartEncounterGuide heartGuide;
@@ -68,6 +93,10 @@ public class GameFlowManager : MonoBehaviour
     public int CurrentWave => currentWave;
     public int CurrentRegionWave => currentRegionWave;
     public int AliveEnemies => aliveEnemies;
+    // AliveEnemies retains the existing "enemies left in this wave" contract,
+    // including arrivals still pending. The limit uses only living arrivals.
+    public int LivingEnemies => Mathf.Max(0, aliveEnemies - pendingSpawns);
+    public int PendingSpawns => pendingSpawns;
     public bool GameActive => gameActive;
     public bool IsWaitingForHeartDeposit => isWaitingForHeartDeposit;
 
@@ -99,6 +128,8 @@ public class GameFlowManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        StopSpawningWave();
+        StopProgressionCoroutine();
         ClearWaveOrders();
         UnsubscribeFromRegionManager();
         UnbindCurrentObjective();
@@ -110,6 +141,8 @@ public class GameFlowManager : MonoBehaviour
         currentRegionWave = 0;
         aliveEnemies = 0;
         enemiesThisWave = 0;
+        pendingSpawns = 0;
+        waveSpawnElapsed = 0f;
         gameActive = true;
         isSpawningWave = false;
         isWaitingForNextWave = false;
@@ -164,6 +197,7 @@ public class GameFlowManager : MonoBehaviour
     private void BeginRegionEncounter(MapRegion region, float delay)
     {
         encounterVersion++;
+        StopSpawningWave();
         ClearWaveOrders();
         heartGuide?.ClearGuide();
         StopProgressionCoroutine();
@@ -173,6 +207,8 @@ public class GameFlowManager : MonoBehaviour
         currentRegionWave = 0;
         aliveEnemies = 0;
         enemiesThisWave = 0;
+        pendingSpawns = 0;
+        waveSpawnElapsed = 0f;
         isSpawningWave = false;
         isWaitingForNextWave = false;
         isWaitingForHeartDeposit = false;
@@ -241,56 +277,115 @@ public class GameFlowManager : MonoBehaviour
 
         // Enemy pressure scales across the whole run instead of restarting
         // when the player enters a new region.
-        enemiesThisWave = startingEnemiesPerWave + (currentWave - 1) * 2;
+        enemiesThisWave = Mathf.Max(1, startingEnemiesPerWave +
+            (currentWave - 1) * Mathf.Max(0, enemiesAddedPerWave));
         aliveEnemies = enemiesThisWave;
+        pendingSpawns = enemiesThisWave;
+        waveSpawnElapsed = 0f;
         isSpawningWave = true;
         isWaitingForNextWave = false;
 
         uiManager?.UpdateWave(currentWave);
         uiManager?.UpdateEnemyCount(aliveEnemies, enemiesThisWave);
 
-        StartCoroutine(SpawnWaveRoutine(encounterVersion));
+        int version = encounterVersion;
+        Coroutine routine = StartCoroutine(SpawnWaveRoutine(version));
+        // An Inspector feedback event can synchronously end or replace the
+        // encounter. Do not overwrite a newer wave's coroutine in that case.
+        if (IsCurrentWave(version) && isSpawningWave) spawnCoroutine = routine;
     }
 
     private IEnumerator SpawnWaveRoutine(int version)
     {
         int failedSpawns = 0;
         int plannedSpawns = enemiesThisWave;
+        bool paced = usePacedSpawning;
+        float[] spawnTimes = paced
+            ? WaveSpawnSchedule.Build(plannedSpawns, Mathf.Max(1f, waveSpawnDuration), spawnPressureCurve)
+            : WaveSpawnSchedule.BuildFixed(plannedSpawns, Mathf.Max(0.02f, spawnDelay));
 
-        for (int i = 0; i < plannedSpawns; i++)
+        onWaveWarning?.Invoke();
+        if (!IsCurrentWave(version)) yield break;
+        if (waveWarningDuration > 0f)
+            yield return new WaitForSeconds(waveWarningDuration);
+        if (!IsCurrentWave(version)) yield break;
+        onWaveStarted?.Invoke();
+        if (!IsCurrentWave(version)) yield break;
+
+        int attemptedSpawns = 0;
+        float nextSpawnAllowedAt = Time.time;
+
+        while (attemptedSpawns < plannedSpawns)
         {
-            if (!gameActive || version != encounterVersion)
-                yield break;
+            if (!IsCurrentWave(version)) yield break;
 
-            if (!SpawnEnemy())
-                failedSpawns++;
+            bool roomFull = paced && maxConcurrentEnemies > 0 &&
+                LivingEnemies >= maxConcurrentEnemies;
+            if (!roomFull && waveSpawnElapsed >= spawnTimes[attemptedSpawns] &&
+                Time.time >= nextSpawnAllowedAt)
+            {
+                // Reserve this living arrival before Instantiate: an OnEnable
+                // callback can report a death synchronously during creation.
+                pendingSpawns--;
+                attemptedSpawns++;
+                if (!SpawnEnemy())
+                {
+                    failedSpawns++;
+                    aliveEnemies = Mathf.Max(0, aliveEnemies - 1);
+                    uiManager?.UpdateEnemyCount(aliveEnemies, enemiesThisWave);
+                }
+                if (!IsCurrentWave(version)) yield break;
 
-            yield return new WaitForSeconds(spawnDelay);
+                // One arrival per frame and a short minimum interval prevent
+                // catch-up bursts after a slow frame. Normal timings come from
+                // the curve; this is only a lower bound.
+                nextSpawnAllowedAt = Time.time + (paced ? 0.15f : 0.02f);
+                if (attemptedSpawns >= plannedSpawns) break;
+            }
+
+            roomFull = paced && maxConcurrentEnemies > 0 &&
+                LivingEnemies >= maxConcurrentEnemies;
+            yield return null;
+            if (!IsCurrentWave(version)) yield break;
+            if (!roomFull) waveSpawnElapsed += Time.deltaTime;
         }
 
-        if (!gameActive || version != encounterVersion)
-            yield break;
+        if (!IsCurrentWave(version)) yield break;
 
         if (failedSpawns > 0)
         {
-            aliveEnemies = Mathf.Max(0, aliveEnemies - failedSpawns);
-            uiManager?.UpdateEnemyCount(aliveEnemies, enemiesThisWave);
             Debug.LogWarning($"{failedSpawns} enemies could not be spawned during Wave {currentWave}.");
         }
 
+        spawnCoroutine = null;
         isSpawningWave = false;
-        CheckFinalEnemies();
-
-        if (aliveEnemies <= 0)
+        if (failedSpawns >= plannedSpawns)
         {
-            if (failedSpawns >= enemiesThisWave)
-            {
-                Debug.LogError("The entire wave failed to spawn. Progression has been paused instead of falsely completing the wave.");
-                yield break;
-            }
-
-            HandleWaveCleared();
+            Debug.LogError("The entire wave failed to spawn. Progression has been paused instead of falsely completing the wave.");
+            yield break;
         }
+
+        onWaveSpawningFinished?.Invoke();
+        if (!IsCurrentWave(version)) yield break;
+        CheckFinalEnemies();
+        if (aliveEnemies <= 0) HandleWaveCleared();
+    }
+
+    private bool IsCurrentWave(int version) => gameActive && version == encounterVersion;
+
+    private void StopSpawningWave()
+    {
+        if (spawnCoroutine != null) StopCoroutine(spawnCoroutine);
+        spawnCoroutine = null;
+        aliveEnemies = Mathf.Max(0, aliveEnemies - pendingSpawns);
+        pendingSpawns = 0;
+        isSpawningWave = false;
+    }
+
+    [ContextMenu("Restore Default Spawn Pressure Curve")]
+    private void RestoreDefaultSpawnPressureCurve()
+    {
+        spawnPressureCurve = WaveSpawnSchedule.CreateDefaultCurve();
     }
 
     private bool SpawnEnemy()
@@ -365,7 +460,9 @@ public class GameFlowManager : MonoBehaviour
 
     public void EnemyDied()
     {
-        if (!gameActive)
+        // Pending arrivals cannot die. Ignore notifications when no living
+        // arrival is registered instead of subtracting from future spawns.
+        if (!gameActive || LivingEnemies <= 0)
             return;
 
         aliveEnemies = Mathf.Max(0, aliveEnemies - 1);
@@ -460,11 +557,13 @@ public class GameFlowManager : MonoBehaviour
     private void CompleteCurrentRegionalEncounter()
     {
         encounterVersion++;
+        StopSpawningWave();
         ClearWaveOrders();
         heartGuide?.ClearGuide();
         StopProgressionCoroutine();
         aliveEnemies = 0;
         enemiesThisWave = 0;
+        pendingSpawns = 0;
         isSpawningWave = false;
         isWaitingForHeartDeposit = false;
         isWaitingForNextWave = false;
@@ -549,6 +648,8 @@ public class GameFlowManager : MonoBehaviour
             return;
 
         gameActive = false;
+        StopSpawningWave();
+        StopProgressionCoroutine();
         heartGuide?.ClearGuide();
         Time.timeScale = 0f;
         uiManager?.ShowGameOver(true);
@@ -560,8 +661,81 @@ public class GameFlowManager : MonoBehaviour
             return;
 
         gameActive = false;
+        StopSpawningWave();
+        StopProgressionCoroutine();
         heartGuide?.ClearGuide();
         Time.timeScale = 0f;
         uiManager?.ShowGameOver(false);
+    }
+}
+
+/// <summary>
+/// Converts relative spawn pressure into a finite set of arrival times.
+/// Kept in this file so replacing GameFlowManager.cs is the only install step.
+/// The total enemy count is fixed; the curve distributes that count over time.
+/// </summary>
+internal static class WaveSpawnSchedule
+{
+    public static AnimationCurve CreateDefaultCurve() => new AnimationCurve(
+        new Keyframe(0f, 0.2f),
+        new Keyframe(0.2f, 0.4f),
+        new Keyframe(0.55f, 1f),
+        new Keyframe(0.75f, 0.8f),
+        new Keyframe(1f, 0.2f));
+
+    public static float[] BuildFixed(int count, float interval)
+    {
+        float[] times = new float[Mathf.Max(0, count)];
+        for (int i = 0; i < times.Length; i++) times[i] = i * interval;
+        return times;
+    }
+
+    public static float[] Build(int count, float duration, AnimationCurve curve)
+    {
+        if (count <= 0) return new float[0];
+        if (count == 1) return new float[1];
+
+        const int samples = 256;
+        float[] cumulative = new float[samples + 1];
+        float previous = Weight(curve, 0f);
+        for (int i = 1; i <= samples; i++)
+        {
+            float weight = Weight(curve, (float)i / samples);
+            cumulative[i] = cumulative[i - 1] + (previous + weight) * 0.5f;
+            previous = weight;
+        }
+
+        float total = cumulative[samples];
+        float[] times = new float[count];
+        duration = Mathf.Max(0f, duration);
+        int sample = 1;
+        for (int i = 0; i < count; i++)
+        {
+            // Midpoints of equal portions of area avoid a mandatory late
+            // straggler exactly at the end of the spawning window.
+            float fraction = (i + 0.5f) / count;
+            if (total <= 0.0001f)
+            {
+                // Empty/all-zero curves fall back to uniform arrivals.
+                times[i] = fraction * duration;
+                continue;
+            }
+
+            float targetArea = fraction * total;
+            while (sample < samples && cumulative[sample] < targetArea) sample++;
+            float sectionArea = cumulative[sample] - cumulative[sample - 1];
+            float sectionFraction = sectionArea > 0f
+                ? (targetArea - cumulative[sample - 1]) / sectionArea : 0f;
+            times[i] = ((sample - 1 + sectionFraction) / samples) * duration;
+        }
+        return times;
+    }
+
+    private static float Weight(AnimationCurve curve, float time)
+    {
+        if (curve == null || curve.length == 0) return 1f;
+        float value = curve.Evaluate(time);
+        if (float.IsNaN(value) || float.IsInfinity(value)) return 0f;
+        return Mathf.Max(0f, value);
     }
 }
