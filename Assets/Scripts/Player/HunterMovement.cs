@@ -44,6 +44,7 @@ public class HunterMovement : MonoBehaviour
     public float controllerSensitivity = 120f;
 
     private CharacterController controller;
+    private ShoulderRam shoulderRam;
 
     private Vector2 moveInput;
     private Vector2 lookInput;
@@ -61,6 +62,7 @@ public class HunterMovement : MonoBehaviour
     void Awake()
     {
         controller = GetComponent<CharacterController>();
+        shoulderRam = GetComponent<ShoulderRam>();
     }
 
     void OnEnable()
@@ -99,6 +101,17 @@ public class HunterMovement : MonoBehaviour
 
     void HandleMovement()
     {
+        // ShoulderRam owns CharacterController.Move during its burst. Normal
+        // walking must not add extra distance or carry a buffered jump into it.
+        if (shoulderRam != null && shoulderRam.isActiveAndEnabled && shoulderRam.OwnsMovementThisFrame)
+        {
+            horizontalVelocity = Vector3.zero;
+            verticalVelocity = groundedStickForce;
+            lastJumpPressedTime = -999f;
+            lastGroundedTime = -999f;
+            return;
+        }
+
         bool isGrounded = controller.isGrounded;
 
         if (isGrounded)

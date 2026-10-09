@@ -175,7 +175,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 1
   m_Height: 1
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -191,7 +191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e0150ad3d65a7243aa72cf92e76a08e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HunterMovement
-  walkSpeed: 4
+  walkSpeed: 4.3
   groundAcceleration: 28
   groundDeceleration: 34
   airAcceleration: 8
@@ -432,8 +432,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9770218e473835f41ba4b79f61144215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
-  maxHealth: 1000
-  currentHealth: 1000
+  maxHealth: 100
+  currentHealth: 100
   healToFullOnMaxIncrease: 1
   screenFlash: {fileID: 3242892524222320894}
   playerHitSFX: {fileID: 8300000, guid: f11a33cebfe30d2469f75e8905160c6b, type: 3}
@@ -482,12 +482,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae0fd07080fd95f418c6bdeebc31f068, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShoulderRam
-  ramSpeed: 10
+  ramDistance: 3.5
   ramDuration: 0.4
   ramCooldown: 6
-  ramDamage: 30
-  ramKnockbackForce: 16
-  enemyStunTime: 0.3
   groundedStickForce: -8
   recoveryTime: 0.12
   minMoveInputForRam: 0.15
@@ -524,15 +521,20 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  hitRadius: 2
-  hitForwardOffset: 0.9
+  hitRadius: 1.2
+  hitForwardOffset: 0.15
   enemyMask:
     serializedVersion: 2
     m_Bits: 192
+  enemyPushDistance: 2
+  enemyPushDuration: 0.3
+  enemyStunTime: 0.35
+  sidewaysPushBias: 0.75
+  ramDamage: 0
+  ramKnockbackForce: 16
   wallMask:
     serializedVersion: 2
     m_Bits: 128
-  wallCheckDistance: 1
   playerCamera: {fileID: 2426618626291283026}
   fovKick: 5
   fovKickInTime: 0.04
@@ -995,7 +997,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1889284230721202610, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_ShapeWidth
-      value: 0.2779493
+      value: 0.37
+      objectReference: {fileID: 0}
+    - target: {fileID: 1889284230721202610, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_FadeDistance
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 1889284230721202610, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_LightlayersMask
@@ -1127,23 +1133,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7299920430574045180, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_Intensity
-      value: 47.3214
+      value: 7.0350513
       objectReference: {fileID: 0}
     - target: {fileID: 7299920430574045180, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_AreaSize.x
-      value: 0.2779493
+      value: 0.37
       objectReference: {fileID: 0}
     - target: {fileID: 7299920430574045180, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_ColorTemperature
-      value: 6304
+      value: 6093
       objectReference: {fileID: 0}
     - target: {fileID: 7299920430574045180, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_RenderingLayerMask
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7299920430574045180, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
+      propertyPath: m_UseColorTemperature
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7299920430574045180, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_BoundingSphereOverride.w
-      value: 2.2566235
+      value: 2.265488
       objectReference: {fileID: 0}
     - target: {fileID: 7825546998353887288, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_RenderingLayerMask
@@ -1155,7 +1165,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7927128503812674014, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.671
+      value: 0.37
       objectReference: {fileID: 0}
     - target: {fileID: 7927128503812674014, guid: 5fc862f86afa7f2419a3d19ad73443e2, type: 3}
       propertyPath: m_LocalPosition.z

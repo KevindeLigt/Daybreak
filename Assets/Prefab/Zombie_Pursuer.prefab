@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 6839049045574744321}
   - component: {fileID: 3371541968239391456}
   - component: {fileID: 410577082451195112}
+  - component: {fileID: 2298648742933943336}
   m_Layer: 6
   m_Name: Zombie_Pursuer
   m_TagString: Enemy
@@ -222,28 +223,28 @@ MonoBehaviour:
   originalBodyRenderers:
   - {fileID: 690214317320605922}
   gibSpawns:
-  - gibPrefab: {fileID: 7581268083563548207, guid: 15296f9c5fbf5f5418ec36a8eff3fb88, type: 3}
+  - gibPrefab: {fileID: 2254305962618601616, guid: 9f345cccd46bb16418ba2943c8cda91d, type: 3}
     spawnAnchor: {fileID: 2977398170742217903}
     alwaysSpawn: 1
     spawnChance: 0
     forceMultiplier: 1
     torqueMultiplier: 1
     attachBloodTrail: 0
-  - gibPrefab: {fileID: 7581268083563548207, guid: 15296f9c5fbf5f5418ec36a8eff3fb88, type: 3}
+  - gibPrefab: {fileID: 3174181622122226447, guid: faa2fd29a78d9e4408c4c27eb55977a0, type: 3}
     spawnAnchor: {fileID: 2977398170742217903}
     alwaysSpawn: 1
     spawnChance: 0
     forceMultiplier: 1
     torqueMultiplier: 1
     attachBloodTrail: 0
-  - gibPrefab: {fileID: 7581268083563548207, guid: 15296f9c5fbf5f5418ec36a8eff3fb88, type: 3}
+  - gibPrefab: {fileID: 2079043444651047674, guid: 4030512393821004db4b948ad90a1aac, type: 3}
     spawnAnchor: {fileID: 2977398170742217903}
     alwaysSpawn: 1
     spawnChance: 0
     forceMultiplier: 1
     torqueMultiplier: 1
     attachBloodTrail: 0
-  - gibPrefab: {fileID: 7581268083563548207, guid: 15296f9c5fbf5f5418ec36a8eff3fb88, type: 3}
+  - gibPrefab: {fileID: 1595600378173142241, guid: 6fce6fb0a766cc24582f1885cc0165fc, type: 3}
     spawnAnchor: {fileID: 2977398170742217903}
     alwaysSpawn: 1
     spawnChance: 0
@@ -374,6 +375,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &2298648742933943336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1131232361969350571}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe4c1250ca1436d4b928bec86dfbc581, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyRamPush
 --- !u!1 &3515542479959553119
 GameObject:
   m_ObjectHideFlags: 0

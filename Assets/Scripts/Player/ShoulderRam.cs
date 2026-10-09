@@ -1,192 +1,142 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(PlayerInput))]
+[DefaultExecutionOrder(-100)]
 public class ShoulderRam : MonoBehaviour
 {
-    [Header("Directional Ram Settings")]
-    [Tooltip("Short burst speed. This is a grounded shove/dodge, not a long dash.")]
-    public float ramSpeed = 10f;
-
-    [Tooltip("Short duration keeps it snappy and grounded.")]
-    public float ramDuration = 0.20f;
-
-    [Tooltip("Cooldown should make this a commitment, not a spam dodge.")]
-    public float ramCooldown = 6f;
-
-    [Tooltip("Small damage only. Shotgun should remain the main killer.")]
-    public float ramDamage = 8f;
-
-    [Tooltip("Main purpose of the ram: create space.")]
-    public float ramKnockbackForce = 16f;
-
-    [Tooltip("How long enemies are interrupted/stunned.")]
-    public float enemyStunTime = 0.30f;
-
-    [Tooltip("Small downward force to keep the ram grounded.")]
+    [Header("Directional Ram")]
+    [Tooltip("Maximum horizontal travel in open space, independent of frame rate and the feel curve.")]
+    [Min(0f)] public float ramDistance = 3.5f;
+    [Min(0.05f)] public float ramDuration = 0.4f;
+    [Min(0f)] public float ramCooldown = 6f;
     public float groundedStickForce = -8f;
-
-    [Tooltip("Recovery after the ram finishes. Keeps it from feeling like a perfect escape.")]
-    public float recoveryTime = 0.12f;
-
-    [Tooltip("Minimum movement input required to ram. Prevents accidental forward ram.")]
-    public float minMoveInputForRam = 0.15f;
+    [Tooltip("Extra reuse lock after movement. Normal walking resumes immediately.")]
+    [Min(0f)] public float recoveryTime = 0.12f;
+    [Min(0f)] public float minMoveInputForRam = 0.15f;
 
     [Header("Ram Feel Curve")]
-    [Tooltip("High at the start, low at the end. Creates a BAM -> stop feeling.")]
+    [Tooltip("Relative speed through the ram. Normalized so changing its shape preserves Ram Distance.")]
     public AnimationCurve ramSpeedCurve = new AnimationCurve(
-        new Keyframe(0f, 1f),
-        new Keyframe(0.65f, 0.55f),
-        new Keyframe(1f, 0f)
-    );
+        new Keyframe(0f, 1f), new Keyframe(0.65f, 0.55f), new Keyframe(1f, 0f));
 
-    [Header("Hit Detection")]
-    [Tooltip("Radius of the impact zone.")]
-    public float hitRadius = 0.85f;
-
-    [Tooltip("How far in the ram direction the hit sphere appears.")]
-    public float hitForwardOffset = 0.9f;
-
-    [Tooltip("Assign your Enemy layer here.")]
+    [Header("Moving Push Bubble")]
+    [Tooltip("360 degree bubble radius. Automatically kept at least 0.25 m wider than the player's capsule.")]
+    [Min(0.1f)] public float hitRadius = 1.2f;
+    [Tooltip("Small bias toward the movement direction; the bubble still surrounds the player.")]
+    [Min(0f)] public float hitForwardOffset = 0.15f;
+    [Tooltip("Layers containing the enemies' colliders, including their hitboxes.")]
     public LayerMask enemyMask;
+    [Tooltip("Maximum path length each enemy can be displaced by one ram. Multiple colliders do not multiply it.")]
+    [Min(0f)] public float enemyPushDistance = 2f;
+    [Min(0.05f)] public float enemyPushDuration = 0.3f;
+    [Tooltip("Additional interruption after ram movement and enemy displacement finish. Existing AI attack cooldowns also apply.")]
+    [Min(0f)] public float enemyStunTime = 0.35f;
+    [Tooltip("Ahead of the player, pushes favour the sides of the path. Behind the player, pushes are radial.")]
+    [Range(0f, 1f)] public float sidewaysPushBias = 0.75f;
 
-    [Header("Wall Detection")]
-    [Tooltip("Assign Default / Environment / Level Geometry layers here.")]
+    [Header("Optional Impact Damage")]
+    [Tooltip("Applied once per enemy per ram. Use 0 for a space-making skill.")]
+    [Min(0f)] public float ramDamage = 0f;
+    [Tooltip("Strength sent to existing hit reactions and, if damage kills, the death ragdoll. Live displacement uses Enemy Push Distance.")]
+    [Min(0f)] public float ramKnockbackForce = 16f;
+
+    [Header("World Collision")]
+    [Tooltip("Solid level geometry. If empty, checks all layers except Ignore Raycast; enemies and the player are filtered out.")]
     public LayerMask wallMask;
-
-    public float wallCheckDistance = 0.65f;
 
     [Header("Feedback")]
     public Camera playerCamera;
-
-    [Tooltip("Small FOV punch. Too much makes it feel floaty.")]
     public float fovKick = 4f;
-
     public float fovKickInTime = 0.04f;
     public float fovReturnTime = 0.12f;
-
     public float cameraShakeStrength = 0.07f;
     public float cameraShakeDuration = 0.07f;
 
     private CharacterController controller;
     private PlayerInput playerInput;
-
     private Vector2 moveInput;
     private Vector3 ramDirection;
-
     private float lastRamTime = -999f;
-    private float ramCooldownTimer = 0f;
-
-    private bool isRamming = false;
-    private bool isRecovering = false;
-
+    private float ramCooldownTimer;
+    private bool ramRequested;
+    private bool isRamming;
+    private bool isRecovering;
+    private int activation;
+    private int movementFrame = -1;
+    private bool warnedMask;
+    private bool impactFeedbackPlayed;
     private float defaultFov;
-
-    private readonly HashSet<EnemyHealth> enemiesHitThisRam = new HashSet<EnemyHealth>();
-
+    private bool ownsFov;
+    private bool ownsShake;
+    private Vector3 shakeOrigin;
     private Coroutine fovRoutine;
     private Coroutine shakeRoutine;
+    private Collider[] overlapBuffer = new Collider[64];
+    private readonly HashSet<EnemyHealth> enemiesHitThisRam = new HashSet<EnemyHealth>();
+    private readonly HashSet<EnemyHealth> enemiesInStep = new HashSet<EnemyHealth>();
+    private readonly float[] cumulativeSpeed = new float[65];
+    private const float MaxStepDistance = 0.15f;
 
     public bool IsRamming => isRamming;
     public bool IsRecovering => isRecovering;
+    public bool OwnsMovementThisFrame => isRamming || movementFrame == Time.frameCount;
+    private LayerMask WorldMask => wallMask.value == 0 ? Physics.DefaultRaycastLayers : wallMask;
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
-
-        if (playerCamera == null)
-            playerCamera = Camera.main;
-
-        if (playerCamera != null)
-            defaultFov = playerCamera.fieldOfView;
+        if (playerCamera == null) playerCamera = Camera.main;
     }
 
     private void Update()
     {
-        UpdateCooldownUI();
+        if (ramCooldownTimer > 0f)
+        {
+            ramCooldownTimer = Mathf.Max(0f, ramCooldownTimer - Time.deltaTime);
+            UIManager.Instance?.UpdateRamCooldown(ramCooldown > 0f
+                ? Mathf.Clamp01(ramCooldownTimer / ramCooldown) : 0f);
+        }
+        if (!ramRequested) return;
+        ramRequested = false;
+        if (CanRam()) StartCoroutine(RamRoutine());
     }
 
-    private void UpdateCooldownUI()
-    {
-        if (ramCooldownTimer <= 0f)
-            return;
+    public void OnMove(InputAction.CallbackContext ctx) => moveInput = ctx.ReadValue<Vector2>();
 
-        ramCooldownTimer = Mathf.Max(0f, ramCooldownTimer - Time.deltaTime);
-
-        float normalized = Mathf.Clamp01(ramCooldownTimer / ramCooldown);
-        UIManager.Instance?.UpdateRamCooldown(normalized);
-    }
-
-    // Optional Input System callback.
-    // This helps if PlayerInput uses Send Messages / Broadcast Messages.
-    public void OnMove(InputAction.CallbackContext ctx)
-    {
-        moveInput = ctx.ReadValue<Vector2>();
-    }
-
-    // Input System callback.
     public void OnRam(InputAction.CallbackContext ctx)
     {
-        if (!ctx.started)
-            return;
-
-        if (!CanRam())
-            return;
-
-        StartCoroutine(RamRoutine());
+        // Process in Update, after every enemy has run Start. No movement in an
+        // Input System callback and no first-frame Shambler initialization race.
+        if (ctx.started && isActiveAndEnabled) ramRequested = true;
     }
 
     private bool CanRam()
     {
-        if (isRamming) return false;
-        if (isRecovering) return false;
-
-        if (Time.time < lastRamTime + ramCooldown)
-            return false;
-
-        if (!controller.isGrounded)
-            return false;
-
-        if (!TryGetRamDirection(out ramDirection))
-            return false;
-
-        return true;
+        if (isRamming || isRecovering || Time.time < lastRamTime + Mathf.Max(0f, ramCooldown)) return false;
+        if (controller == null || !controller.enabled || !controller.isGrounded) return false;
+        return TryGetRamDirection(out ramDirection);
     }
 
     private bool TryGetRamDirection(out Vector3 direction)
     {
         direction = Vector3.zero;
-
-        Vector2 currentMoveInput = moveInput;
-
-        // More reliable if the PlayerInput has an action called "Move".
+        Vector2 input = moveInput;
         if (playerInput != null && playerInput.actions != null)
         {
-            InputAction moveAction = playerInput.actions["Move"];
-            if (moveAction != null)
-            {
-                currentMoveInput = moveAction.ReadValue<Vector2>();
-            }
+            InputAction action = playerInput.actions.FindAction("Move", false);
+            if (action != null) input = action.ReadValue<Vector2>();
         }
-
-        if (currentMoveInput.magnitude < minMoveInputForRam)
-            return false;
-
-        currentMoveInput = Vector2.ClampMagnitude(currentMoveInput, 1f);
-
-        direction =
-            transform.right * currentMoveInput.x +
-            transform.forward * currentMoveInput.y;
-
+        if (input.magnitude < Mathf.Max(0f, minMoveInputForRam)) return false;
+        input = Vector2.ClampMagnitude(input, 1f);
+        direction = transform.right * input.x + transform.forward * input.y;
         direction.y = 0f;
-
-        if (direction.sqrMagnitude < 0.001f)
-            return false;
-
+        if (direction.sqrMagnitude < 0.0001f) return false;
         direction.Normalize();
         return true;
     }
@@ -195,48 +145,62 @@ public class ShoulderRam : MonoBehaviour
     {
         isRamming = true;
         isRecovering = false;
-
         lastRamTime = Time.time;
-        ramCooldownTimer = ramCooldown;
-
-        UIManager.Instance?.UpdateRamCooldown(1f);
-
+        ramCooldownTimer = Mathf.Max(0f, ramCooldown);
+        unchecked { activation++; }
         enemiesHitThisRam.Clear();
-
+        impactFeedbackPlayed = false;
+        BuildDistanceCurve();
         StartFovKick();
-
-        float timer = 0f;
-
-        while (timer < ramDuration)
+        UIManager.Instance?.UpdateRamCooldown(ramCooldownTimer > 0f ? 1f : 0f);
+        if (enemyMask.value == 0 && !warnedMask)
         {
-            timer += Time.deltaTime;
+            Debug.LogWarning("ShoulderRam: Enemy Mask is empty. Assign the enemies' collider layers to enable the shove.", this);
+            warnedMask = true;
+        }
 
-            float normalizedTime = Mathf.Clamp01(timer / ramDuration);
-            float curveMultiplier = ramSpeedCurve.Evaluate(normalizedTime);
+        float elapsed = 0f;
+        float requested = 0f;
+        float duration = Mathf.Max(0.05f, ramDuration);
+        bool blocked = false;
+        while (elapsed < duration && controller.enabled && !blocked)
+        {
+            float seconds = Mathf.Min(Time.deltaTime, duration - elapsed);
+            if (seconds <= 0f) { yield return null; continue; }
+            movementFrame = Time.frameCount;
+            elapsed += seconds;
+            float nextRequested = Mathf.Max(0f, ramDistance) * DistanceProgress(elapsed / duration);
+            float frameDistance = Mathf.Max(0f, nextRequested - requested);
+            requested = nextRequested;
+            int steps = Mathf.Max(1, Mathf.CeilToInt(frameDistance / MaxStepDistance));
+            float stepDistance = frameDistance / steps;
+            float stepSeconds = seconds / steps;
 
-            Vector3 frameMove =
-                ramDirection * ramSpeed * curveMultiplier * Time.deltaTime;
+            for (int step = 0; step < steps; step++)
+            {
+                GetPlayerCapsule(out Vector3 bottom, out Vector3 top, out float radius);
+                float allowed = RamCollision.LimitWorldMove(bottom, top, Mathf.Max(0.05f, radius - RamCollision.Skin),
+                    ramDirection, stepDistance, WorldMask, transform, transform);
 
-            // Keeps the CharacterController stuck to the floor.
-            frameMove.y = groundedStickForce * Time.deltaTime;
+                // Test the current bubble and the next small step. Displace bodies
+                // before moving the player; do not turn off their colliders.
+                enemiesInStep.Clear();
+                PushBubble(Vector3.zero, stepSeconds, duration - elapsed);
+                PushBubble(ramDirection * allowed, stepSeconds, duration - elapsed);
+                Physics.SyncTransforms();
 
-            CollisionFlags flags = controller.Move(frameMove);
-
-            DetectHits();
-
-            bool hitWallWithController = (flags & CollisionFlags.Sides) != 0;
-            bool hitWallWithRaycast = HitWallAhead();
-
-            if (hitWallWithController || hitWallWithRaycast)
-                break;
-
-            yield return null;
+                Vector3 motion = ramDirection * allowed;
+                motion.y = groundedStickForce * stepSeconds;
+                controller.Move(motion);
+                Physics.SyncTransforms();
+                blocked = allowed < stepDistance - 0.0001f || !controller.isGrounded;
+                if (blocked) break;
+            }
+            if (elapsed < duration && !blocked) yield return null;
         }
 
         isRamming = false;
-
         ReturnFov();
-
         if (recoveryTime > 0f)
         {
             isRecovering = true;
@@ -245,149 +209,214 @@ public class ShoulderRam : MonoBehaviour
         }
     }
 
-    private void DetectHits()
+    private void PushBubble(Vector3 nextStep, float seconds, float remainingRamTime)
     {
-        Vector3 hitCenter = transform.position + ramDirection * hitForwardOffset;
-
-        Collider[] hits = Physics.OverlapSphere(
-            hitCenter,
-            hitRadius,
-            enemyMask,
-            QueryTriggerInteraction.Ignore
-        );
-
-        foreach (Collider hit in hits)
+        if (enemyMask.value == 0) return;
+        GetPlayerCapsule(out Vector3 bottom, out Vector3 top, out float playerRadius);
+        float radius = Mathf.Max(playerRadius + 0.25f, hitRadius);
+        // Keep the offset smaller than the bubble's extra width, so the current
+        // player capsule remains enclosed even when using old prefab values.
+        Vector3 offset = ramDirection * Mathf.Clamp(hitForwardOffset, 0f,
+            Mathf.Max(0f, radius - playerRadius - 0.25f)) + nextStep;
+        int count;
+        while (true)
         {
+            count = Physics.OverlapCapsuleNonAlloc(bottom + offset, top + offset,
+                radius, overlapBuffer, enemyMask, QueryTriggerInteraction.Collide);
+            if (count < overlapBuffer.Length) break;
+            System.Array.Resize(ref overlapBuffer, overlapBuffer.Length * 2);
+        }
+
+        Vector3 from = (bottom + top) * 0.5f;
+        for (int i = 0; i < count; i++)
+        {
+            Collider hit = overlapBuffer[i];
+            if (hit == null) continue;
             EnemyHealth health = hit.GetComponentInParent<EnemyHealth>();
-            if (health == null)
-                continue;
+            if (health == null || health.IsDead || health.IsTrainingDummy || !enemiesInStep.Add(health)) continue;
+            ZombieAIController ai = health.GetComponent<ZombieAIController>();
+            NavMeshAgent agent = health.GetComponent<NavMeshAgent>();
+            if (ai == null || !ai.isActiveAndEnabled || !ai.CanReceiveHitReaction ||
+                agent == null || !agent.enabled || !agent.isOnNavMesh || agent.isOnOffMeshLink || !agent.updatePosition) continue;
 
-            if (enemiesHitThisRam.Contains(health))
-                continue;
+            Vector3 to = health.transform.position + Vector3.up * (agent.height * 0.5f);
+            if (RamCollision.HasWorldBetween(from, to, WorldMask, transform, health.transform)) continue;
 
-            enemiesHitThisRam.Add(health);
+            EnemyRamPush push = health.GetComponent<EnemyRamPush>();
+            if (push == null) push = health.gameObject.AddComponent<EnemyRamPush>();
+            Vector3 direction = PushDirection(health.transform.position, from, health.GetInstanceID());
+            float interrupt = Mathf.Max(0f, remainingRamTime) +
+                Mathf.Max(0.05f, enemyPushDuration) + Mathf.Max(0f, enemyStunTime);
+            if (!push.ApplyPressure(this, activation, direction, enemyPushDistance,
+                enemyPushDuration, interrupt, WorldMask, seconds)) continue;
 
-            Vector3 force = ramDirection * ramKnockbackForce;
-
-            health.TakeDamage(ramDamage, force);
-
-            ZombieAIController ai = hit.GetComponentInParent<ZombieAIController>();
-            if (ai != null)
+            if (!enemiesHitThisRam.Add(health)) continue;
+            if (ramDamage > 0f) health.TakeDamage(ramDamage, direction * Mathf.Max(0f, ramKnockbackForce));
+            if (!health.IsDead)
             {
-                ai.HitStun(enemyStunTime);
+                EnemyHitReaction reaction = health.GetComponent<EnemyHitReaction>();
+                if (reaction != null) reaction.OnHit(direction, Mathf.Max(0f, ramKnockbackForce));
             }
-
-            Rigidbody rb = hit.attachedRigidbody;
-            if (rb != null)
+            if (!impactFeedbackPlayed)
             {
-                rb.AddForce(force, ForceMode.Impulse);
+                impactFeedbackPlayed = true;
+                PlayImpactFeedback();
             }
-
-            PlayImpactFeedback();
         }
     }
 
-    private bool HitWallAhead()
+    private Vector3 PushDirection(Vector3 enemyPosition, Vector3 bubbleCenter, int identity)
     {
-        if (wallMask.value == 0)
-            return false;
+        Vector3 radial = enemyPosition - bubbleCenter;
+        radial.y = 0f;
+        Vector3 right = Vector3.Cross(Vector3.up, ramDirection).normalized;
+        float side = Vector3.Dot(radial, right);
+        float sign = Mathf.Abs(side) > 0.05f ? Mathf.Sign(side) : ((identity & 1) == 0 ? 1f : -1f);
+        Vector3 lateral = right * sign;
+        if (radial.sqrMagnitude < 0.0001f) return lateral;
+        // A body directly ahead goes to a side of the corridor, rather than
+        // staying directly in front of the player for the entire ram.
+        if (Vector3.Dot(radial, ramDirection) >= 0f)
+            return Vector3.Lerp(radial.normalized, lateral, Mathf.Clamp01(sidewaysPushBias)).normalized;
+        return radial.normalized;
+    }
 
-        Vector3 origin = transform.position + Vector3.up * 0.6f;
+    private void GetPlayerCapsule(out Vector3 bottom, out Vector3 top, out float radius)
+    {
+        Vector3 scale = transform.lossyScale;
+        radius = Mathf.Max(0.05f, controller.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.z)));
+        float halfSegment = Mathf.Max(0f, controller.height * Mathf.Abs(scale.y) * 0.5f - radius);
+        Vector3 center = transform.TransformPoint(controller.center);
+        bottom = center - Vector3.up * halfSegment;
+        top = center + Vector3.up * halfSegment;
+    }
 
-        return Physics.Raycast(
-            origin,
-            ramDirection,
-            wallCheckDistance,
-            wallMask,
-            QueryTriggerInteraction.Ignore
-        );
+    private void BuildDistanceCurve()
+    {
+        cumulativeSpeed[0] = 0f;
+        int segments = cumulativeSpeed.Length - 1;
+        for (int i = 1; i <= segments; i++)
+        {
+            float value = ramSpeedCurve != null && ramSpeedCurve.length > 0
+                ? Mathf.Max(0f, ramSpeedCurve.Evaluate((i - 0.5f) / segments)) : 1f;
+            cumulativeSpeed[i] = cumulativeSpeed[i - 1] + value;
+        }
+        float total = cumulativeSpeed[segments];
+        for (int i = 1; i <= segments; i++)
+            cumulativeSpeed[i] = total > 0.0001f ? cumulativeSpeed[i] / total : (float)i / segments;
+    }
+
+    private float DistanceProgress(float normalizedTime)
+    {
+        float sample = Mathf.Clamp01(normalizedTime) * (cumulativeSpeed.Length - 1);
+        int index = Mathf.Min(cumulativeSpeed.Length - 2, Mathf.FloorToInt(sample));
+        return Mathf.Lerp(cumulativeSpeed[index], cumulativeSpeed[index + 1], sample - index);
+    }
+
+    [ContextMenu("Apply Path-Clearing Prototype Settings")]
+    private void ApplyPrototypeSettings()
+    {
+        // Unity keeps old serialized field values after replacing a script.
+        // This explicit preset updates tuning only; it keeps all references/masks.
+        ramDistance = 3.5f;
+        ramDuration = 0.4f;
+        ramCooldown = 6f;
+        hitRadius = 1.2f;
+        hitForwardOffset = 0.15f;
+        enemyPushDistance = 2f;
+        enemyPushDuration = 0.3f;
+        enemyStunTime = 0.35f;
+        sidewaysPushBias = 0.75f;
+        ramDamage = 0f;
+        ramKnockbackForce = 16f;
+        ramSpeedCurve = new AnimationCurve(new Keyframe(0f, 1f),
+            new Keyframe(0.65f, 0.55f), new Keyframe(1f, 0f));
     }
 
     private void StartFovKick()
     {
-        if (playerCamera == null)
-            return;
-
-        if (fovRoutine != null)
-            StopCoroutine(fovRoutine);
-
+        if (playerCamera == null) return;
+        if (!ownsFov) defaultFov = playerCamera.fieldOfView;
+        ownsFov = true;
+        if (fovRoutine != null) StopCoroutine(fovRoutine);
         fovRoutine = StartCoroutine(FovRoutine(defaultFov + fovKick, fovKickInTime));
     }
 
     private void ReturnFov()
     {
-        if (playerCamera == null)
-            return;
-
-        if (fovRoutine != null)
-            StopCoroutine(fovRoutine);
-
-        fovRoutine = StartCoroutine(FovRoutine(defaultFov, fovReturnTime));
+        if (playerCamera == null || !ownsFov) return;
+        if (fovRoutine != null) StopCoroutine(fovRoutine);
+        fovRoutine = StartCoroutine(FovRoutine(defaultFov, fovReturnTime, true));
     }
 
-    private IEnumerator FovRoutine(float targetFov, float duration)
+    private IEnumerator FovRoutine(float target, float duration, bool returning = false)
     {
-        float startFov = playerCamera.fieldOfView;
-        float timer = 0f;
-
-        while (timer < duration)
+        float start = playerCamera.fieldOfView;
+        float elapsed = 0f;
+        while (elapsed < duration)
         {
-            timer += Time.deltaTime;
-            float t = Mathf.Clamp01(timer / duration);
-
-            playerCamera.fieldOfView = Mathf.Lerp(startFov, targetFov, t);
-
+            elapsed += Time.deltaTime;
+            playerCamera.fieldOfView = Mathf.Lerp(start, target, elapsed / Mathf.Max(0.001f, duration));
             yield return null;
         }
-
-        playerCamera.fieldOfView = targetFov;
+        playerCamera.fieldOfView = target;
+        if (returning) ownsFov = false;
     }
 
     private void PlayImpactFeedback()
     {
-        if (shakeRoutine != null)
-            StopCoroutine(shakeRoutine);
-
-        shakeRoutine = StartCoroutine(CameraShake(cameraShakeDuration));
+        if (playerCamera == null) return;
+        if (shakeRoutine != null) StopCoroutine(shakeRoutine);
+        RestoreShake();
+        shakeOrigin = playerCamera.transform.localPosition;
+        ownsShake = true;
+        shakeRoutine = StartCoroutine(CameraShake());
     }
 
-    private IEnumerator CameraShake(float duration)
+    private IEnumerator CameraShake()
     {
-        if (playerCamera == null)
-            yield break;
-
-        float timer = 0f;
-        Vector3 originalLocalPos = playerCamera.transform.localPosition;
-
-        while (timer < duration)
+        float elapsed = 0f;
+        while (elapsed < cameraShakeDuration && playerCamera != null)
         {
-            timer += Time.deltaTime;
-
-            playerCamera.transform.localPosition =
-                originalLocalPos + Random.insideUnitSphere * cameraShakeStrength;
-
+            elapsed += Time.deltaTime;
+            playerCamera.transform.localPosition = shakeOrigin + Random.insideUnitSphere * cameraShakeStrength;
             yield return null;
         }
+        RestoreShake();
+    }
 
-        playerCamera.transform.localPosition = originalLocalPos;
+    private void RestoreShake()
+    {
+        if (ownsShake && playerCamera != null) playerCamera.transform.localPosition = shakeOrigin;
+        ownsShake = false;
+    }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+        isRamming = isRecovering = ramRequested = false;
+        movementFrame = -1;
+        if (ownsFov && playerCamera != null) playerCamera.fieldOfView = defaultFov;
+        ownsFov = false;
+        RestoreShake();
+        fovRoutine = shakeRoutine = null;
     }
 
     private void OnDrawGizmosSelected()
     {
-        Vector3 debugDirection = ramDirection.sqrMagnitude > 0.001f
-            ? ramDirection
-            : transform.forward;
-
-        debugDirection.y = 0f;
-        debugDirection.Normalize();
-
+        CharacterController capsule = controller != null ? controller : GetComponent<CharacterController>();
+        if (capsule == null) return;
+        controller = capsule;
+        GetPlayerCapsule(out Vector3 bottom, out Vector3 top, out float playerRadius);
+        Vector3 direction = isRamming ? ramDirection : transform.forward;
+        float radius = Mathf.Max(playerRadius + 0.25f, hitRadius);
+        Vector3 offset = direction * Mathf.Clamp(hitForwardOffset, 0f, radius - playerRadius - 0.25f);
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position + debugDirection * hitForwardOffset, hitRadius);
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(
-            transform.position + Vector3.up * 0.6f,
-            transform.position + Vector3.up * 0.6f + debugDirection * wallCheckDistance
-        );
+        Gizmos.DrawWireSphere(bottom + offset, radius);
+        Gizmos.DrawWireSphere(top + offset, radius);
+        Gizmos.DrawLine(bottom + offset + transform.right * radius, top + offset + transform.right * radius);
+        Gizmos.DrawLine(bottom + offset - transform.right * radius, top + offset - transform.right * radius);
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(transform.position, transform.position + direction * Mathf.Max(0f, ramDistance));
     }
 }
