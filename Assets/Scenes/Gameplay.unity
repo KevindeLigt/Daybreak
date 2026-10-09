@@ -78148,6 +78148,10 @@ PrefabInstance:
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 3099844058878048771, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
+      propertyPath: fovKick
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3099844058878048771, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
       propertyPath: hitRadius
       value: 2
       objectReference: {fileID: 0}
@@ -78178,6 +78182,10 @@ PrefabInstance:
     - target: {fileID: 3099844058878048771, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
       propertyPath: ramKnockbackForce
       value: 28
+      objectReference: {fileID: 0}
+    - target: {fileID: 3099844058878048771, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
+      propertyPath: cameraShakeStrength
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 3099844058878048771, guid: 10d10ebf5c74ebb4387642e5685e946e, type: 3}
       propertyPath: ramSpeedCurve.m_Curve.Array.data[1].inSlope
