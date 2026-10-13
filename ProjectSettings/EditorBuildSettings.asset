@@ -12,8 +12,11 @@ EditorBuildSettings:
     path: Assets/Scenes/LoadingScreen.unity
     guid: 2ef8c7cc0eae06640847b01788ca67a9
   - enabled: 1
-    path: Assets/Scenes/Gameplay.unity
+    path: Assets/Scenes/Gameplay_01_Church.unity
     guid: 8124e5870f4fd4c779e7a5f994e84ad1
+  - enabled: 1
+    path: Assets/Scenes/Gameplay_02_Town.unity
+    guid: f89e920c8d8812645b1a37c6c5cb4b50
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 016850dd63924b44e8791ce99769969a, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 32e07d39faec43847a22d3e4a553ab0b, type: 3}
