@@ -2,10 +2,15 @@ using UnityEngine;
 
 public class UnlockableGate : MonoBehaviour, IInteractable
 {
+    public enum DestinationMode { InSceneRegion, LevelExit }
+    [Tooltip("Level Exit opens the barrier only. Put a separate LevelExit trigger behind it.")]
+    [SerializeField] private DestinationMode destinationMode = DestinationMode.InSceneRegion;
+    public bool OpensForLevelExit => destinationMode == DestinationMode.LevelExit;
+
     [Header("Region Progression")]
     [SerializeField] private MapRegion connectedRegion;
 
-    [Tooltip("Keep enabled for the current prototype. Later the Curse Objective can call UnlockGate after cleansing a region.")]
+    [Tooltip("For an objective-locked exit, turn this off. MapRegion unlocks the gate after cleansing.")]
     [SerializeField] private bool startsUnlocked = true;
 
     [Header("Opening Behaviour")]
@@ -38,7 +43,7 @@ public class UnlockableGate : MonoBehaviour, IInteractable
             if (!isUnlocked)
                 return lockedPrompt;
 
-            if (connectedRegion == null)
+            if (!OpensForLevelExit && connectedRegion == null)
                 return "Gate has no connected region";
 
             return unlockedPrompt;
@@ -48,7 +53,8 @@ public class UnlockableGate : MonoBehaviour, IInteractable
     public bool CanInteract =>
         !isOpen &&
         isUnlocked &&
-        connectedRegion != null;
+        !SceneLoader.IsInputBlocked &&
+        (OpensForLevelExit || connectedRegion != null);
 
     private void Awake()
     {
@@ -68,13 +74,13 @@ public class UnlockableGate : MonoBehaviour, IInteractable
             return false;
         }
 
-        if (RegionManager.Instance == null)
+        if (!OpensForLevelExit && RegionManager.Instance == null)
         {
             Debug.LogError($"{name} cannot open because no RegionManager exists in the scene.");
             return false;
         }
 
-        if (!RegionManager.Instance.TransitionToRegion(connectedRegion))
+        if (!OpensForLevelExit && !RegionManager.Instance.TransitionToRegion(connectedRegion))
             return false;
 
         OpenGate();

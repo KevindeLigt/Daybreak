@@ -29,6 +29,8 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(float dmg)
     {
+        if (currentHealth <= 0f || dmg <= 0f || float.IsNaN(dmg) || float.IsInfinity(dmg)) return;
+        float actualDamage = Mathf.Min(currentHealth, dmg);
         currentHealth -= dmg;
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
 
@@ -39,7 +41,8 @@ public class PlayerHealth : MonoBehaviour
         screenFlash?.Flash(Color.red, 0.4f, 0.25f);
         Debug.Log("Pain Flash triggered!");
 
-        PlayerStatsManager.Instance.AddDamageTaken(dmg);
+        PlayerStatsManager.GetOrCreate().AddDamageTaken(actualDamage);
+        KillComboSystem.GetOrCreate().OnPlayerDamaged();
 
         // Hit SFX with pitch variation
         if (playerHitSFX != null)
@@ -50,6 +53,7 @@ public class PlayerHealth : MonoBehaviour
 
         if (currentHealth <= 0f)
         {
+            PlayerStatsManager.GetOrCreate().FinishRun(ScoredRunResult.Died);
             GameFlowManager.Instance?.PlayerDied();
         }
     }

@@ -3,65 +3,80 @@ using UnityEngine;
 public class KillComboSystem : MonoBehaviour
 {
     public static KillComboSystem Instance;
-
-    [Header("Combo Settings")]
+    [Header("Optional streak timeout")]
+    [Tooltip("Off by default: only taking damage breaks the streak. Objective travel can take as long as needed.")]
+    public bool useComboTimeout = false;
     public float comboTimeout = 2.5f;
-    public int combo = 0;
+    [Tooltip("Runtime projection of kills since damage. Score/music milestones live on PlayerStatsManager.")]
+    public int combo;
 
-    private float comboTimer;
+    private PlayerStatsManager boundStats;
 
-    // Thresholds match how many layers you want active
-    public int[] layerThresholds = { 1, 3, 6, 10 };
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatic() => Instance = null;
 
-    void Awake()
+    private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
+        if (Instance != null && Instance != this) { Destroy(this); return; }
         Instance = this;
     }
-
-    void Update()
+    public static KillComboSystem GetOrCreate()
     {
-        if (combo > 0)
+        if (Instance == null)
         {
-            comboTimer -= Time.deltaTime;
-            if (comboTimer <= 0f)
-            {
-                combo = 0;
-                MusicLayersController.Instance.ResetToBase();
-            }
+            KillComboSystem existing = FindObjectOfType<KillComboSystem>();
+            if (existing != null) existing.Awake();
+            else new GameObject("KillComboSystem").AddComponent<KillComboSystem>();
         }
+        return Instance;
     }
-
-    public void OnEnemyKilled()
+    private void OnEnable() => Bind();
+    private void Start() { Bind(); Refresh(); }
+    private void Update()
     {
-        combo++;
-        comboTimer = comboTimeout;
-
-        int activeLayers = CalculateLayerCount(combo);
-        MusicLayersController.Instance.SetActiveLayers(activeLayers);
+        if (boundStats != PlayerStatsManager.Instance) Bind();
+        if (boundStats != null && useComboTimeout && boundStats.Run.active && boundStats.Run.streak > 0 &&
+            Time.time - boundStats.Run.lastKillTime > Mathf.Max(.01f, comboTimeout))
+            boundStats.BreakStreak();
+    }
+    private void Bind()
+    {
+        if (boundStats != null) boundStats.Changed -= Refresh;
+        boundStats = PlayerStatsManager.GetOrCreate();
+        boundStats.Changed += Refresh;
+        Refresh();
+    }
+    private void Refresh()
+    {
+        if (boundStats == null) return;
+        combo = boundStats.Run.streak;
+        MusicLayersController.Instance?.SetActiveLayers(boundStats.MusicLayerCount);
     }
 
+    public void OnEnemyKilled(EnemyKillInfo kill)
+    {
+        if (boundStats != PlayerStatsManager.Instance || boundStats == null) Bind();
+        // A free test room can score real enemies with GameFlowManager disabled.
+        if (!boundStats.Run.initialized && !SceneLoader.IsInputBlocked) boundStats.BeginRun();
+        boundStats.RecordKill(kill);
+    }
+
+    // Legacy event entry point; normal project kills come through the typed EnemyHealth event.
+    public void OnEnemyKilled() => OnEnemyKilled(new EnemyKillInfo { enemyType = "Unknown", basePoints = 100 });
     public void OnPlayerDamaged()
     {
-        combo = 0;
-        MusicLayersController.Instance.ResetToBase();
+        if (boundStats != PlayerStatsManager.Instance || boundStats == null) Bind();
+        boundStats.BreakStreak();
+        Refresh();
     }
-
-    int CalculateLayerCount(int currentCombo)
+    private void OnDisable()
     {
-        int count = 0;
-
-        foreach (int threshold in layerThresholds)
-        {
-            if (currentCombo >= threshold)
-                count++;
-        }
-
-        return count;
+        if (boundStats != null) boundStats.Changed -= Refresh;
+        boundStats = null;
+    }
+    private void OnDestroy()
+    {
+        OnDisable();
+        if (Instance == this) Instance = null;
     }
 }

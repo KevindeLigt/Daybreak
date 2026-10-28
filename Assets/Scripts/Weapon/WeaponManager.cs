@@ -6,8 +6,20 @@ public class WeaponManager : MonoBehaviour
     [Header("Weapons")]
     public WeaponBase[] weaponSlots;      // assign in inspector
     private int currentIndex = 0;
+    public int CurrentSlot => currentIndex;
 
-    private WeaponBase Current => weaponSlots[currentIndex];
+    public bool IsValidSlot(int index) => weaponSlots != null && index >= 0 &&
+        index < weaponSlots.Length && weaponSlots[index] != null;
+
+    public void RestoreSlot(int index)
+    {
+        if (!IsValidSlot(index)) return;
+        if (IsValidSlot(currentIndex)) weaponSlots[currentIndex].OnUnequip();
+        currentIndex = index;
+        weaponSlots[currentIndex].OnEquip();
+    }
+
+    private WeaponBase Current => IsValidSlot(currentIndex) ? weaponSlots[currentIndex] : null;
 
     void Start()
     {
@@ -28,18 +40,21 @@ public class WeaponManager : MonoBehaviour
     // Called by Input System
     public void OnFire(InputAction.CallbackContext ctx)
     {
+        if (SceneLoader.IsInputBlocked) return;
         if (ctx.performed)
             Current?.OnFire();
     }
 
     public void OnReload(InputAction.CallbackContext ctx)
     {
+        if (SceneLoader.IsInputBlocked) return;
         if (ctx.performed)
             Current?.OnReload();
     }
 
     public void OnScrollWheel(InputAction.CallbackContext ctx)
     {
+        if (SceneLoader.IsInputBlocked || weaponSlots == null || weaponSlots.Length == 0) return;
         float scroll = ctx.ReadValue<Vector2>().y;
         if (scroll > 0) NextWeapon();
         else if (scroll < 0) PreviousWeapon();
@@ -60,6 +75,7 @@ public class WeaponManager : MonoBehaviour
 
     private void EquipSlot(int index)
     {
+        if (SceneLoader.IsInputBlocked) return;
         if (index < 0 || index >= weaponSlots.Length)
             return;
         if (weaponSlots[index] == null)

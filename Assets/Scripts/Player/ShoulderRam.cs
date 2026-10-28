@@ -85,6 +85,17 @@ public class ShoulderRam : MonoBehaviour
     public bool IsRamming => isRamming;
     public bool IsRecovering => isRecovering;
     public bool OwnsMovementThisFrame => isRamming || movementFrame == Time.frameCount;
+    public float RemainingCooldown => Mathf.Max(0f, lastRamTime + Mathf.Max(0f, ramCooldown) - Time.time);
+
+    public void RestoreCooldown(float remaining)
+    {
+        StopAllCoroutines();
+        isRamming = isRecovering = ramRequested = false;
+        movementFrame = -1;
+        ramCooldownTimer = Mathf.Clamp(remaining, 0f, Mathf.Max(0f, ramCooldown));
+        lastRamTime = Time.time - Mathf.Max(0f, ramCooldown) + ramCooldownTimer;
+        UIManager.Instance?.UpdateRamCooldown(ramCooldown > 0f ? ramCooldownTimer / ramCooldown : 0f);
+    }
     private LayerMask WorldMask => wallMask.value == 0 ? Physics.DefaultRaycastLayers : wallMask;
 
     private void Awake()
@@ -96,6 +107,7 @@ public class ShoulderRam : MonoBehaviour
 
     private void Update()
     {
+        if (SceneLoader.IsInputBlocked) { ramRequested = false; return; }
         if (ramCooldownTimer > 0f)
         {
             ramCooldownTimer = Mathf.Max(0f, ramCooldownTimer - Time.deltaTime);
@@ -113,11 +125,12 @@ public class ShoulderRam : MonoBehaviour
     {
         // Process in Update, after every enemy has run Start. No movement in an
         // Input System callback and no first-frame Shambler initialization race.
-        if (ctx.started && isActiveAndEnabled) ramRequested = true;
+        if (ctx.started && isActiveAndEnabled && !SceneLoader.IsInputBlocked) ramRequested = true;
     }
 
     private bool CanRam()
     {
+        if (SceneLoader.IsInputBlocked) return false;
         if (isRamming || isRecovering || Time.time < lastRamTime + Mathf.Max(0f, ramCooldown)) return false;
         if (controller == null || !controller.enabled || !controller.isGrounded) return false;
         return TryGetRamDirection(out ramDirection);
@@ -251,7 +264,8 @@ public class ShoulderRam : MonoBehaviour
                 enemyPushDuration, interrupt, WorldMask, seconds)) continue;
 
             if (!enemiesHitThisRam.Add(health)) continue;
-            if (ramDamage > 0f) health.TakeDamage(ramDamage, direction * Mathf.Max(0f, ramKnockbackForce));
+            if (ramDamage > 0f) health.TakeDamage(ramDamage, direction * Mathf.Max(0f, ramKnockbackForce),
+                PlayerDamageContext.FromPlayer(transform.position, KillScoreWeapon.ShoulderRam));
             if (!health.IsDead)
             {
                 EnemyHitReaction reaction = health.GetComponent<EnemyHitReaction>();

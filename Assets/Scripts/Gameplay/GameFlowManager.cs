@@ -109,7 +109,7 @@ public class GameFlowManager : MonoBehaviour
         }
 
         Instance = this;
-        Time.timeScale = 1f;
+        if (!SceneLoader.IsLoading) Time.timeScale = 1f;
     }
 
     private void Start()
@@ -123,7 +123,12 @@ public class GameFlowManager : MonoBehaviour
         FindObjectOfType<ShrineSpawnerManager>()?.SpawnShrinesForRun();
 
         UIManager.Instance?.ClearAllStatusEffects();
-        PlayerWeaponStats.Instance?.ResetRunStats();
+        // LevelSceneSetup restores/initializes run bonuses after all Start methods.
+        if (LevelSceneSetup.Instance == null && (RunState.Instance == null || !RunState.Instance.AwaitingArrival))
+        {
+            PlayerWeaponStats.Instance?.ResetRunStats();
+            PlayerStatsManager.GetOrCreate().BeginRun();
+        }
     }
 
     private void OnDestroy()
@@ -133,6 +138,7 @@ public class GameFlowManager : MonoBehaviour
         ClearWaveOrders();
         UnsubscribeFromRegionManager();
         UnbindCurrentObjective();
+        if (Instance == this) Instance = null;
     }
 
     private void ResetGameState()
@@ -152,6 +158,25 @@ public class GameFlowManager : MonoBehaviour
 
     private IEnumerator StartGameRoutine()
     {
+        yield return null;
+        LevelSceneSetup setup = LevelSceneSetup.Instance;
+        if (setup == null && RunState.Instance != null && RunState.Instance.AwaitingArrival)
+        {
+            Debug.LogError("Add LevelSceneSetup to this gameplay scene. Its encounter is paused until the run can be restored.");
+            yield break;
+        }
+        if (setup != null)
+        {
+            while (!setup.IsReady)
+            {
+                if (!string.IsNullOrEmpty(setup.InitializationError)) yield break;
+                yield return null;
+            }
+            currentWave = RunState.Instance.GlobalWave;
+            uiManager?.UpdateWave(currentWave);
+        }
+        // Do not spawn arrivals under the transition overlay.
+        while (SceneLoader.IsLoading) yield return null;
         // Allows RegionManager, regional runtime objects, UI, and objectives to initialize.
         yield return new WaitForSeconds(0.2f);
 
@@ -648,6 +673,7 @@ public class GameFlowManager : MonoBehaviour
             return;
 
         gameActive = false;
+        PlayerStatsManager.GetOrCreate().FinishRun(ScoredRunResult.Completed);
         StopSpawningWave();
         StopProgressionCoroutine();
         heartGuide?.ClearGuide();
@@ -661,6 +687,7 @@ public class GameFlowManager : MonoBehaviour
             return;
 
         gameActive = false;
+        PlayerStatsManager.GetOrCreate().FinishRun(ScoredRunResult.Died);
         StopSpawningWave();
         StopProgressionCoroutine();
         heartGuide?.ClearGuide();

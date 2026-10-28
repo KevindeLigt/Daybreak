@@ -36,7 +36,6 @@ public class SkeletonArrow : MonoBehaviour
         if (other.TryGetComponent(out PlayerHealth player))
         {
             player.TakeDamage(damage);
-            PlayerStatsManager.Instance.AddDamageDealt(damage);
         }
 
         if (hitVFX)

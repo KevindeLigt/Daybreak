@@ -16,6 +16,9 @@ public class CrossbowBolt : MonoBehaviour
     public CrossbowController shooter;
 
     private bool hasHit = false;
+    private Vector3 shotOrigin;
+    private void Awake() => shotOrigin = transform.position;
+    public void SetShotOrigin(Vector3 origin) => shotOrigin = origin;
 
     void Start()
     {
@@ -32,8 +35,6 @@ public class CrossbowBolt : MonoBehaviour
 
         // Enemy hit?
         EnemyHealth enemy = collision.collider.GetComponentInParent<EnemyHealth>();
-        PlayerStatsManager.Instance.AddCrossbowHit();
-        PlayerStatsManager.Instance.AddDamageDealt(damage);
         if (enemy != null)
         {
             OnHitEnemy(enemy, collision, hitPoint, hitNormal);
@@ -54,7 +55,10 @@ public class CrossbowBolt : MonoBehaviour
         // Directional force
         Vector3 hitDir = collision.relativeVelocity.normalized;
 
-        enemy.TakeDamage(finalDamage, hitDir * force);
+        if (shooter != null && !enemy.IsDead && !enemy.IsTrainingDummy)
+            PlayerStatsManager.GetOrCreate().AddCrossbowHit();
+        var context = shooter != null ? PlayerDamageContext.FromPlayer(shotOrigin, KillScoreWeapon.Crossbow) : default;
+        enemy.TakeDamage(finalDamage, hitDir * force, context);
 
         // Hit VFX
         if (hitVFX)

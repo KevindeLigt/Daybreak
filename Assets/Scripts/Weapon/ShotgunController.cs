@@ -58,6 +58,17 @@ public class DoubleBarrelShotgunController : WeaponBase
     private bool isReloading = false;
     private bool isFiring = false;
     private bool fireLeftNext = true;
+    public int LoadedShells => shellsLoaded;
+    public bool LeftBarrelNext => fireLeftNext;
+
+    public void RestoreLoadedState(int count, bool leftNext)
+    {
+        StopAllCoroutines();
+        shellsLoaded = Mathf.Clamp(count, 0, 2);
+        fireLeftNext = leftNext;
+        isReloading = isFiring = false;
+        UIManager.Instance?.UpdateShotgunAmmo(shellsLoaded);
+    }
 
     private RecoilSystem recoil;
     private CameraShake cameraShake;
@@ -86,11 +97,13 @@ public class DoubleBarrelShotgunController : WeaponBase
 
     public override void OnFire()
     {
+        if (SceneLoader.IsInputBlocked) return;
         TryFire();
     }
 
     public override void OnReload()
     {
+        if (SceneLoader.IsInputBlocked) return;
         if (!isReloading)
             StartCoroutine(ReloadRoutine());
     }
@@ -131,7 +144,7 @@ public class DoubleBarrelShotgunController : WeaponBase
         fireLeftNext = !fireLeftNext;
 
         if (anim) anim.SetTrigger(fireTrigger);
-        PlayerStatsManager.Instance.AddShot("Shotgun");
+        PlayerStatsManager.GetOrCreate().AddShot("Shotgun");
 
         if (muzzleFlashPrefab)
             Instantiate(muzzleFlashPrefab, muzzle.position, muzzle.rotation);
@@ -224,7 +237,7 @@ public class DoubleBarrelShotgunController : WeaponBase
             Vector3 forceDir = (health.transform.position - origin).normalized;
             Vector3 force = forceDir * eviscerateForce;
 
-            health.Eviscerate(force);
+            health.Eviscerate(force, PlayerDamageContext.FromPlayer(transform.root.position, KillScoreWeapon.Shotgun));
             killed++;
         }
     }
@@ -254,8 +267,8 @@ public class DoubleBarrelShotgunController : WeaponBase
                         }
                         continue;
                     }
-                    health.TakeDamage(finalDamage, force);
-                    PlayerStatsManager.Instance.AddDamageDealt(finalDamage);
+                    health.TakeDamage(finalDamage, force,
+                        PlayerDamageContext.FromPlayer(transform.root.position, KillScoreWeapon.Shotgun));
 
                     EnemyHitReaction reaction = health.GetComponent<EnemyHitReaction>();
                     if (reaction != null)

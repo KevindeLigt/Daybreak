@@ -95,8 +95,29 @@ public class HunterMovement : MonoBehaviour
 
     void Update()
     {
+        if (SceneLoader.IsInputBlocked)
+        {
+            lookInput = Vector2.zero;
+            lastJumpPressedTime = -999f;
+            return;
+        }
         HandleMovement();
         HandleLook();
+    }
+
+    public void PlaceAtLevelEntrance(Vector3 position, Quaternion rotation)
+    {
+        if (controller == null) controller = GetComponent<CharacterController>();
+        bool wasEnabled = controller != null && controller.enabled;
+        if (wasEnabled) controller.enabled = false;
+        transform.SetPositionAndRotation(position, Quaternion.Euler(0f, rotation.eulerAngles.y, 0f));
+        horizontalVelocity = Vector3.zero;
+        verticalVelocity = groundedStickForce;
+        lookInput = Vector2.zero;
+        cameraPitch = 0f;
+        lastGroundedTime = lastJumpPressedTime = -999f;
+        if (cameraRoot != null) cameraRoot.localRotation = Quaternion.identity;
+        if (wasEnabled) controller.enabled = true;
     }
 
     void HandleMovement()

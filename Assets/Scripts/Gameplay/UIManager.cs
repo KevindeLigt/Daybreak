@@ -36,7 +36,7 @@ public class UIManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) Destroy(gameObject);
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
     }
 
@@ -48,13 +48,13 @@ public class UIManager : MonoBehaviour
         if (restartButton != null)
             restartButton.onClick.AddListener(() =>
             {
-                SceneLoader.LoadScene("Gameplay");
+                SceneLoader.RestartRun();
             });
 
         if (quitButton != null)
             quitButton.onClick.AddListener(() =>
             {
-                SceneLoader.LoadScene("MainMenu");
+                SceneLoader.ReturnToMenu();
             });
     }
 
@@ -88,8 +88,8 @@ public class UIManager : MonoBehaviour
 
     public void UpdateShotgunAmmo(int count)
     {
-        leftShell.sprite = count >= 1 ? loadedSprite : emptySprite;
-        rightShell.sprite = count == 2 ? loadedSprite : emptySprite;
+        if (leftShell != null) leftShell.sprite = count >= 1 ? loadedSprite : emptySprite;
+        if (rightShell != null) rightShell.sprite = count == 2 ? loadedSprite : emptySprite;
     }
 
     public void UpdateRamCooldown(float normalized)
@@ -172,4 +172,6 @@ public class UIManager : MonoBehaviour
 
         activeStatusEffects.Clear();
     }
+
+    private void OnDestroy() { if (Instance == this) Instance = null; }
 }

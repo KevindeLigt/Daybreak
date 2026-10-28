@@ -8,6 +8,10 @@ public class EnemyHealth : MonoBehaviour
     public string enemyType = "Unknown";
     public float maxHealth = 100f;
 
+    [Header("Kill Score")]
+    [Tooltip("Base points before range/evisceration/rapid-kill bonuses and the current multiplier.")]
+    [Min(0)] public int baseKillScore = 100;
+
     [Header("Training Dummy (test scene only)")]
     [Tooltip("Set before Play. Stays standing, simulates defeat, then resets. Disable for normal enemies.")]
     [SerializeField] private bool trainingDummy = false;
@@ -125,7 +129,11 @@ public class EnemyHealth : MonoBehaviour
     }
 
     public void TakeDamage(float damage, Vector3 force)
+        => TakeDamage(damage, force, default);
+
+    public void TakeDamage(float damage, Vector3 force, PlayerDamageContext context)
     {
+        if (damage <= 0f || float.IsNaN(damage) || float.IsInfinity(damage)) return;
         if (trainingDummy)
         {
             if (!TrainingDefeated && damage > 0f)
@@ -140,11 +148,14 @@ public class EnemyHealth : MonoBehaviour
         if (isDead || damage <= 0f)
             return;
 
+        float appliedDamage = Mathf.Min(currentHealth, damage);
         currentHealth = Mathf.Max(0f, currentHealth - damage);
+        if (context.IsPlayerDamage)
+            PlayerStatsManager.GetOrCreate().AddDamageDealt(appliedDamage);
 
         if (currentHealth <= 0f)
         {
-            Kill(force, false);
+            Kill(force, false, context);
             return;
         }
 
@@ -158,13 +169,18 @@ public class EnemyHealth : MonoBehaviour
     /// Evisceration bypasses StumbleFall and immediately replaces the body with gibs.
     /// </summary>
     public void Eviscerate(Vector3 force)
+        => Eviscerate(force, default);
+
+    public void Eviscerate(Vector3 force, PlayerDamageContext context)
     {
         if (trainingDummy) return;
         if (isDead)
             return;
 
+        if (context.IsPlayerDamage)
+            PlayerStatsManager.GetOrCreate().AddDamageDealt(currentHealth);
         currentHealth = 0f;
-        Kill(force, true);
+        Kill(force, true, context);
     }
 
     /// <summary>
@@ -205,7 +221,7 @@ public class EnemyHealth : MonoBehaviour
         Destroy(gameObject, destroyDelay);
     }
 
-    private void Kill(Vector3 force, bool wasEviscerated)
+    private void Kill(Vector3 force, bool wasEviscerated, PlayerDamageContext context)
     {
         if (isDead)
             return;
@@ -216,10 +232,19 @@ public class EnemyHealth : MonoBehaviour
 
         StopHitFlash();
 
-        // Shared kill bookkeeping: exactly once for both death presentations.
+        // Credit before notifying the wave manager: this may be the final kill of the entire run.
+        // Ragdolls, training dummies and uncredited/environment deaths never award a player kill.
+        if (context.IsPlayerDamage)
+        {
+            string type = zombieAI != null ? "Zombie" : GetComponent<SkeletonArcherAI>() != null ? "Skeleton" : enemyType;
+            if (string.IsNullOrWhiteSpace(type)) type = "Unknown";
+            KillComboSystem.GetOrCreate().OnEnemyKilled(new EnemyKillInfo
+            {
+                enemyType = type, basePoints = baseKillScore, eviscerated = wasEviscerated,
+                hasDistance = true, distance = Vector3.Distance(context.Origin, transform.position), weapon = context.Weapon
+            });
+        }
         GameFlowManager.Instance?.EnemyDied();
-        KillComboSystem.Instance?.OnEnemyKilled();
-        PlayerStatsManager.Instance?.AddKill(enemyType);
         TryDropHealthOrb();
 
         // Stop navigation, attacks, and idle audio. Normal death keeps the

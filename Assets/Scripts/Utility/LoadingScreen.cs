@@ -7,14 +7,26 @@ public class LoadingScreen : MonoBehaviour
 {
     public Slider progressBar;
 
-    void Start()
+    private void Start()
     {
         StartCoroutine(LoadAsync());
     }
 
-    IEnumerator LoadAsync()
+    private IEnumerator LoadAsync()
     {
-        AsyncOperation op = SceneManager.LoadSceneAsync(SceneLoader.NextScene);
+        if (!SceneLoader.IsLoading || string.IsNullOrWhiteSpace(SceneLoader.NextScene))
+        {
+            Debug.LogError("Start from a level or MainMenu; LoadingScreen needs a destination queued by SceneLoader.", this);
+            yield break;
+        }
+        AsyncOperation op = null;
+        try { op = SceneManager.LoadSceneAsync(SceneLoader.NextScene, LoadSceneMode.Single); }
+        catch (System.Exception ex) { SceneLoader.ReportLoadFailure(ex.Message); }
+        if (op == null)
+        {
+            SceneLoader.ReportLoadFailure("Could not start destination loading.");
+            yield break;
+        }
         op.allowSceneActivation = false;
 
         while (!op.isDone)
@@ -25,7 +37,10 @@ public class LoadingScreen : MonoBehaviour
                 progressBar.value = progress;
 
             if (progress >= 1f)
-                op.allowSceneActivation = true;
+            {
+                SceneLoader.RequestDestinationActivation();
+                op.allowSceneActivation = SceneLoader.CanActivateDestination;
+            }
 
             yield return null;
         }
