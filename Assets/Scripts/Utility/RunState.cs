@@ -1,9 +1,8 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>Run values only. Scene objects, enemies, UI and navigation stay in their own scenes.</summary>
+/// <summary>Run values only. Carries one shotgun; scene actors stay in their own scenes.</summary>
 public sealed class RunState : MonoBehaviour
 {
     public static RunState Instance { get; private set; }
@@ -15,20 +14,12 @@ public sealed class RunState : MonoBehaviour
 
     private string pendingScene;
     private Snapshot incoming;
-    private float initialMaxHealth;
     private readonly List<string> completedLevels = new List<string>();
 
     private sealed class Snapshot
     {
         public float health, maxHealth, baseDamage, bonusDamage, ramCooldown;
-        public int wave, selectedSlot;
-        public readonly List<WeaponSnapshot> weapons = new List<WeaponSnapshot>();
-    }
-
-    private sealed class WeaponSnapshot
-    {
-        public int slot, ammo;
-        public string type;
+        public int wave, shells;
         public bool leftBarrelNext;
     }
 
@@ -55,7 +46,6 @@ public sealed class RunState : MonoBehaviour
         PlayerStatsManager.GetOrCreate().BeginRun();
         FirstLevelScene = firstLevel;
         GlobalWave = 0;
-        initialMaxHealth = 0f;
         completedLevels.Clear();
         incoming = null;
         pendingScene = firstLevel;
@@ -67,7 +57,6 @@ public sealed class RunState : MonoBehaviour
         pendingScene = null;
         incoming = null;
         GlobalWave = 0;
-        initialMaxHealth = 0f;
         completedLevels.Clear();
     }
 
@@ -75,57 +64,43 @@ public sealed class RunState : MonoBehaviour
         WeaponManager manager, int wave, string completedLevel, out string error)
     {
         error = null;
-        if (player == null || player.currentHealth <= 0f || manager == null ||
-            PlayerWeaponStats.Instance == null)
+        DoubleBarrelShotgunController shotgun = manager != null ? manager.Shotgun : null;
+        if (player == null || player.currentHealth <= 0f || shotgun == null)
         {
-            error = "Level exit needs a living PlayerHealth, WeaponManager and PlayerWeaponStats.";
-            return false;
-        }
-        if (!manager.IsValidSlot(manager.CurrentSlot))
-        {
-            error = "The player has no valid equipped weapon to carry into the next level.";
+            error = "Level exit needs a living PlayerHealth and a WeaponManager pointing to its shotgun.";
             return false;
         }
 
-        var state = new Snapshot
+        // Optional compatibility with existing Inspector damage tuning.
+        // A player without this component uses the shotgun's raw pellet damage.
+        PlayerWeaponStats tuning = PlayerWeaponStats.Instance;
+        ShoulderRam ram = player.GetComponent<ShoulderRam>();
+        incoming = new Snapshot
         {
             health = player.currentHealth,
             maxHealth = player.maxHealth,
-            baseDamage = PlayerWeaponStats.Instance.baseDamageMultiplier,
-            bonusDamage = PlayerWeaponStats.Instance.bonusDamageFlat,
+            baseDamage = tuning != null ? tuning.baseDamageMultiplier : 1f,
+            bonusDamage = tuning != null ? tuning.bonusDamageFlat : 0f,
+            ramCooldown = ram != null ? ram.RemainingCooldown : 0f,
             wave = Mathf.Max(0, wave),
-            selectedSlot = manager.CurrentSlot
+            shells = shotgun.LoadedShells,
+            leftBarrelNext = shotgun.LeftBarrelNext
         };
-        ShoulderRam ram = player.GetComponent<ShoulderRam>();
-        state.ramCooldown = ram != null ? ram.RemainingCooldown : 0f;
-        for (int i = 0; i < manager.weaponSlots.Length; i++)
-        {
-            WeaponBase weapon = manager.weaponSlots[i];
-            if (weapon == null) continue;
-            var saved = new WeaponSnapshot { slot = i, type = weapon.GetType().FullName, ammo = -1 };
-            if (weapon is DoubleBarrelShotgunController shotgun)
-            {
-                saved.ammo = shotgun.LoadedShells;
-                saved.leftBarrelNext = shotgun.LeftBarrelNext;
-            }
-            else if (weapon is CrossbowController crossbow) saved.ammo = crossbow.boltLoaded ? 1 : 0;
-            state.weapons.Add(saved);
-        }
-        incoming = state;
         pendingScene = destination;
         if (!string.IsNullOrEmpty(completedLevel) && !completedLevels.Contains(completedLevel))
             completedLevels.Add(completedLevel);
         return true;
     }
 
-    /// <summary>Called after destination Start methods; validates the full loadout before applying any values.</summary>
+    /// <summary>Called after destination Start methods; validates before changing player values.</summary>
     public bool RestoreLevel(Scene scene, string firstLevel, PlayerHealth player,
         WeaponManager manager, out string error)
     {
         error = null;
-        if (player == null || manager == null || PlayerWeaponStats.Instance == null)
+        DoubleBarrelShotgunController shotgun = manager != null ? manager.Shotgun : null;
+        if (player == null || shotgun == null)
         {
-            error = "Assign PlayerHealth and WeaponManager; include PlayerWeaponStats in this level.";
+            error = "Assign PlayerHealth and a WeaponManager pointing to this player's shotgun.";
             return false;
         }
         if (AwaitingArrival && !SceneLoader.MatchesScene(pendingScene, scene))
@@ -133,58 +108,43 @@ public sealed class RunState : MonoBehaviour
             error = "Loaded level does not match the queued run destination: " + pendingScene;
             return false;
         }
+
+        PlayerWeaponStats tuning = PlayerWeaponStats.Instance;
         if (incoming != null)
         {
-            if (!manager.IsValidSlot(incoming.selectedSlot))
+            // Never silently discard real damage modifiers during migration.
+            if (tuning == null && (incoming.baseDamage != 1f || incoming.bonusDamage != 0f))
             {
-                error = "Destination is missing the equipped weapon slot. Use the same player/loadout prefab in both levels.";
+                error = "This run carries non-default damage tuning. Keep PlayerWeaponStats on the destination player, or start a fresh run with consistent shotgun tuning.";
                 return false;
-            }
-            foreach (WeaponSnapshot saved in incoming.weapons)
-            {
-                if (!manager.IsValidSlot(saved.slot) ||
-                    manager.weaponSlots[saved.slot].GetType().FullName != saved.type)
-                {
-                    error = "Weapon slots differ between levels. Missing/mismatched slot: " + saved.slot;
-                    return false;
-                }
             }
 
             player.maxHealth = Mathf.Max(1f, incoming.maxHealth);
             player.currentHealth = Mathf.Clamp(incoming.health, 0f, player.maxHealth);
-            PlayerWeaponStats.Instance.baseDamageMultiplier = incoming.baseDamage;
-            PlayerWeaponStats.Instance.bonusDamageFlat = incoming.bonusDamage;
-            GlobalWave = incoming.wave;
-            foreach (WeaponSnapshot saved in incoming.weapons)
+            if (tuning != null)
             {
-                WeaponBase weapon = manager.weaponSlots[saved.slot];
-                if (weapon is DoubleBarrelShotgunController shotgun)
-                    shotgun.RestoreLoadedState(saved.ammo, saved.leftBarrelNext);
-                else if (weapon is CrossbowController crossbow) crossbow.boltLoaded = saved.ammo > 0;
+                tuning.baseDamageMultiplier = incoming.baseDamage;
+                tuning.bonusDamageFlat = incoming.bonusDamage;
             }
-            manager.RestoreSlot(incoming.selectedSlot);
+            GlobalWave = incoming.wave;
+            shotgun.RestoreLoadedState(incoming.shells, incoming.leftBarrelNext);
             ShoulderRam ram = player.GetComponent<ShoulderRam>();
             if (ram != null) ram.RestoreCooldown(incoming.ramCooldown);
         }
         else
         {
-            // Direct Editor Play is a new run; a queued fresh run already chose its first scene.
+            // Direct Editor Play is fresh; a menu-started run already chose its first scene.
             if (!AwaitingArrival)
                 PrepareNewRun(string.IsNullOrWhiteSpace(firstLevel) ? scene.path : firstLevel.Trim());
-            PlayerWeaponStats.Instance.ResetRunStats();
+            if (tuning != null) tuning.ResetRunStats();
             GlobalWave = 0;
-            initialMaxHealth = player.maxHealth;
         }
 
+        shotgun.OnEquip();
         PlayerStatsManager.Instance?.ResetRapidKillWindow();
         UIManager.Instance?.UpdateHealth(player.currentHealth, player.maxHealth);
         UIManager.Instance?.UpdateWave(GlobalWave);
-        if (PlayerWeaponStats.Instance.bonusDamageFlat != 0f)
-            UIManager.Instance?.SetStatusEffect("DamageBonus", $"Damage +{PlayerWeaponStats.Instance.bonusDamageFlat}");
-        if (initialMaxHealth > 0f && player.maxHealth > initialMaxHealth)
-            UIManager.Instance?.SetStatusEffect("MaxHealth", $"Max Health +{player.maxHealth - initialMaxHealth}");
-        foreach (WeaponBase weapon in manager.weaponSlots)
-            if (weapon is DoubleBarrelShotgunController shotgun) UIManager.Instance?.UpdateShotgunAmmo(shotgun.LoadedShells);
+        UIManager.Instance?.UpdateShotgunAmmo(shotgun.LoadedShells);
         incoming = null;
         pendingScene = null;
         return true;

@@ -120,7 +120,6 @@ public class GameFlowManager : MonoBehaviour
         ResetGameState();
         SubscribeToRegionManager();
         StartCoroutine(StartGameRoutine());
-        FindObjectOfType<ShrineSpawnerManager>()?.SpawnShrinesForRun();
 
         UIManager.Instance?.ClearAllStatusEffects();
         // LevelSceneSetup restores/initializes run bonuses after all Start methods.

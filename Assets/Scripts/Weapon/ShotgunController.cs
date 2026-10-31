@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class DoubleBarrelShotgunController : WeaponBase
+public class DoubleBarrelShotgunController : MonoBehaviour
 {
     [Header("Shotgun Settings")]
     public int pelletsPerShot = 12;
@@ -56,7 +56,6 @@ public class DoubleBarrelShotgunController : WeaponBase
 
     private int shellsLoaded = 2;
     private bool isReloading = false;
-    private bool isFiring = false;
     private bool fireLeftNext = true;
     public int LoadedShells => shellsLoaded;
     public bool LeftBarrelNext => fireLeftNext;
@@ -66,7 +65,7 @@ public class DoubleBarrelShotgunController : WeaponBase
         StopAllCoroutines();
         shellsLoaded = Mathf.Clamp(count, 0, 2);
         fireLeftNext = leftNext;
-        isReloading = isFiring = false;
+        isReloading = false;
         UIManager.Instance?.UpdateShotgunAmmo(shellsLoaded);
     }
 
@@ -85,61 +84,69 @@ public class DoubleBarrelShotgunController : WeaponBase
 
     void Start()
     {
-        recoil = fpsCamera.GetComponent<RecoilSystem>();
-        cameraShake = fpsCamera.GetComponent<CameraShake>();
+        recoil = fpsCamera != null ? fpsCamera.GetComponent<RecoilSystem>() : null;
+        cameraShake = fpsCamera != null ? fpsCamera.GetComponent<CameraShake>() : null;
         weaponSway = GetComponentInChildren<WeaponSway>();
         anim = GetComponentInChildren<Animator>();
     }
 
     // ----------------------------------------------------------------------
-    // WEAPONBASE OVERRIDES
+    // SHOTGUN INPUT / ACTIVATION
     // ----------------------------------------------------------------------
 
-    public override void OnFire()
+    public void OnFire()
     {
         if (SceneLoader.IsInputBlocked) return;
         TryFire();
     }
 
-    public override void OnReload()
+    public void OnReload()
     {
         if (SceneLoader.IsInputBlocked) return;
         if (!isReloading)
             StartCoroutine(ReloadRoutine());
     }
 
-    public override void OnEquip()
+    public void OnEquip()
     {
         gameObject.SetActive(true);
+        UIManager.Instance?.UpdateShotgunAmmo(shellsLoaded);
     }
 
-    public override void OnUnequip()
+    public void OnUnequip()
     {
+        CancelActions();
         gameObject.SetActive(false);
+    }
+
+    private void OnDisable() => CancelActions();
+
+    private void CancelActions()
+    {
+        StopAllCoroutines();
+        // Inserted shells stay loaded; an interrupted reload can start again.
+        isReloading = false;
     }
 
     // ----------------------------------------------------------------------
 
     private void TryFire()
     {
-        if (isReloading) return;
+        if (isReloading || fpsCamera == null || leftBarrel == null || rightBarrel == null) return;
 
         if (shellsLoaded <= 0)
         {
             if (dryFireSFX)
                 AudioSource.PlayClipAtPoint(dryFireSFX, transform.position, dryFireVolume);
 
-            Debug.Log("CLICK! Empty!");
             return;
         }
 
-        StartCoroutine(FireRoutine());
+        FireShot();
     }
 
-    private IEnumerator FireRoutine()
+    private void FireShot()
     {
-        isFiring = true;
-
         Transform muzzle = fireLeftNext ? leftBarrel : rightBarrel;
         fireLeftNext = !fireLeftNext;
 
@@ -162,10 +169,7 @@ public class DoubleBarrelShotgunController : WeaponBase
             AudioSource.PlayClipAtPoint(shotgunFireSFX, muzzle.position, fireVolume);
 
         shellsLoaded--;
-        UIManager.Instance.UpdateShotgunAmmo(shellsLoaded);
-
-        yield return new WaitForSeconds(0.1f);
-        isFiring = false;
+        UIManager.Instance?.UpdateShotgunAmmo(shellsLoaded);
     }
 
     private void TryEviscerateCloseEnemies()
@@ -213,7 +217,6 @@ public class DoubleBarrelShotgunController : WeaponBase
                 continue;
 
             candidates.Add(health);
-            Debug.Log("Eviscerate!");
         }
 
         if (candidates.Count == 0)
@@ -256,7 +259,9 @@ public class DoubleBarrelShotgunController : WeaponBase
                 EnemyHealth health = hit.collider.GetComponentInParent<EnemyHealth>();
                 if (health != null)
                 {
-                    float finalDamage = PlayerWeaponStats.Instance.CalculatePelletDamage(damagePerPellet);
+                    float finalDamage = PlayerWeaponStats.Instance != null
+                        ? PlayerWeaponStats.Instance.CalculatePelletDamage(damagePerPellet)
+                        : damagePerPellet;
                     Vector3 force = direction.normalized * forcePerPellet;
                     if (health.IsTrainingDummy)
                     {
@@ -334,7 +339,7 @@ public class DoubleBarrelShotgunController : WeaponBase
         {
             if (anim) anim.SetTrigger(insertShellTrigger);
             shellsLoaded++;
-            UIManager.Instance.UpdateShotgunAmmo(shellsLoaded);
+            UIManager.Instance?.UpdateShotgunAmmo(shellsLoaded);
             yield return new WaitForSeconds(loadShellTime);
         }
 

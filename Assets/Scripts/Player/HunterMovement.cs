@@ -51,6 +51,7 @@ public class HunterMovement : MonoBehaviour
 
     private Vector3 horizontalVelocity;
     private float verticalVelocity;
+    private int ramContinuationFrame = -1;
 
     private float cameraPitch = 0f;
 
@@ -113,6 +114,7 @@ public class HunterMovement : MonoBehaviour
         transform.SetPositionAndRotation(position, Quaternion.Euler(0f, rotation.eulerAngles.y, 0f));
         horizontalVelocity = Vector3.zero;
         verticalVelocity = groundedStickForce;
+        ramContinuationFrame = -1;
         lookInput = Vector2.zero;
         cameraPitch = 0f;
         lastGroundedTime = lastJumpPressedTime = -999f;
@@ -122,6 +124,11 @@ public class HunterMovement : MonoBehaviour
 
     void HandleMovement()
     {
+        // A ram can finish inside ShoulderRam.Update or after our Update. Its
+        // handoff already accounts for this frame's remaining movement time.
+        if (ramContinuationFrame == Time.frameCount)
+            return;
+
         // ShoulderRam owns CharacterController.Move during its burst. Normal
         // walking must not add extra distance or carry a buffered jump into it.
         if (shoulderRam != null && shoulderRam.isActiveAndEnabled && shoulderRam.OwnsMovementThisFrame)
@@ -133,6 +140,30 @@ public class HunterMovement : MonoBehaviour
             return;
         }
 
+        MoveNormally(Time.deltaTime);
+    }
+
+    public void ResumeAfterRam(Vector3 exitVelocity, float remainingFrameSeconds)
+    {
+        ramContinuationFrame = Time.frameCount;
+        horizontalVelocity = Vector3.zero;
+        verticalVelocity = groundedStickForce;
+        lastJumpPressedTime = lastGroundedTime = -999f;
+
+        if (!isActiveAndEnabled || controller == null || !controller.enabled || SceneLoader.IsInputBlocked)
+            return;
+
+        // Keep the ram's horizontal momentum. Normal acceleration, steering and
+        // braking take over from here; releasing input still slows the player.
+        exitVelocity.y = 0f;
+        horizontalVelocity = exitVelocity;
+        float seconds = Mathf.Clamp(remainingFrameSeconds, 0f, Time.deltaTime);
+        if (seconds > 0f)
+            MoveNormally(seconds);
+    }
+
+    private void MoveNormally(float seconds)
+    {
         bool isGrounded = controller.isGrounded;
 
         if (isGrounded)
@@ -163,7 +194,7 @@ public class HunterMovement : MonoBehaviour
         horizontalVelocity = Vector3.MoveTowards(
             horizontalVelocity,
             targetHorizontalVelocity,
-            acceleration * Time.deltaTime
+            acceleration * seconds
         );
 
         bool jumpBuffered = Time.time - lastJumpPressedTime <= jumpBufferTime;
@@ -178,16 +209,16 @@ public class HunterMovement : MonoBehaviour
         }
 
         if (verticalVelocity < 0f)
-            verticalVelocity += gravity * fallMultiplier * Time.deltaTime;
+            verticalVelocity += gravity * fallMultiplier * seconds;
         else
-            verticalVelocity += gravity * Time.deltaTime;
+            verticalVelocity += gravity * seconds;
 
         verticalVelocity = Mathf.Max(verticalVelocity, maxFallSpeed);
 
         Vector3 finalVelocity = horizontalVelocity;
         finalVelocity.y = verticalVelocity;
 
-        controller.Move(finalVelocity * Time.deltaTime);
+        controller.Move(finalVelocity * seconds);
     }
 
     void HandleLook()

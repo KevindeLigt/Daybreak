@@ -1,100 +1,54 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
+/// <summary>Shotgun input bridge. The name is retained for existing PlayerInput/scene references.</summary>
+[DisallowMultipleComponent]
 public class WeaponManager : MonoBehaviour
 {
-    [Header("Weapons")]
-    public WeaponBase[] weaponSlots;      // assign in inspector
-    private int currentIndex = 0;
-    public int CurrentSlot => currentIndex;
+    [Tooltip("The player's shotgun. Empty uses the previous slot assignment or searches this hierarchy.")]
+    public DoubleBarrelShotgunController shotgun;
 
-    public bool IsValidSlot(int index) => weaponSlots != null && index >= 0 &&
-        index < weaponSlots.Length && weaponSlots[index] != null;
+    // Unity stores component references in the old slot array. Keep a hidden
+    // migration path without retaining WeaponBase or any switching behavior.
+    [SerializeField, HideInInspector, FormerlySerializedAs("weaponSlots")]
+    private MonoBehaviour[] legacyWeaponSlots;
 
-    public void RestoreSlot(int index)
+    public DoubleBarrelShotgunController Shotgun
     {
-        if (!IsValidSlot(index)) return;
-        if (IsValidSlot(currentIndex)) weaponSlots[currentIndex].OnUnequip();
-        currentIndex = index;
-        weaponSlots[currentIndex].OnEquip();
-    }
-
-    private WeaponBase Current => IsValidSlot(currentIndex) ? weaponSlots[currentIndex] : null;
-
-    void Start()
-    {
-        // Disable all, then equip first
-        for (int i = 0; i < weaponSlots.Length; i++)
+        get
         {
-            if (weaponSlots[i] != null)
-                weaponSlots[i].OnUnequip();
-        }
-
-        if (weaponSlots.Length > 0 && weaponSlots[0] != null)
-        {
-            currentIndex = 0;
-            weaponSlots[currentIndex].OnEquip();
+            if (shotgun != null) return shotgun;
+            if (legacyWeaponSlots != null)
+            {
+                foreach (MonoBehaviour previous in legacyWeaponSlots)
+                    if (previous is DoubleBarrelShotgunController found)
+                    { shotgun = found; break; }
+            }
+            if (shotgun == null) shotgun = GetComponentInChildren<DoubleBarrelShotgunController>(true);
+            return shotgun;
         }
     }
 
-    // Called by Input System
-    public void OnFire(InputAction.CallbackContext ctx)
+    private void Start()
     {
-        if (SceneLoader.IsInputBlocked) return;
-        if (ctx.performed)
-            Current?.OnFire();
+        if (Shotgun != null) Shotgun.OnEquip();
+        else Debug.LogError("WeaponManager: Assign the player's Shotgun. This scene uses the single-shotgun setup.", this);
     }
 
-    public void OnReload(InputAction.CallbackContext ctx)
+    public void OnFire(InputAction.CallbackContext context)
     {
-        if (SceneLoader.IsInputBlocked) return;
-        if (ctx.performed)
-            Current?.OnReload();
+        if (context.performed && !SceneLoader.IsInputBlocked) Shotgun?.OnFire();
     }
 
-    public void OnScrollWheel(InputAction.CallbackContext ctx)
+    public void OnReload(InputAction.CallbackContext context)
     {
-        if (SceneLoader.IsInputBlocked || weaponSlots == null || weaponSlots.Length == 0) return;
-        float scroll = ctx.ReadValue<Vector2>().y;
-        if (scroll > 0) NextWeapon();
-        else if (scroll < 0) PreviousWeapon();
+        if (context.performed && !SceneLoader.IsInputBlocked) Shotgun?.OnReload();
     }
 
-    public void OnWeapon1(InputAction.CallbackContext ctx)
-    {
-        if (ctx.performed) EquipSlot(0);
-    }
-    public void OnWeapon2(InputAction.CallbackContext ctx)
-    {
-        if (ctx.performed) EquipSlot(1);
-    }
-    public void OnWeapon3(InputAction.CallbackContext ctx)
-    {
-        if (ctx.performed) EquipSlot(2);
-    }
-
-    private void EquipSlot(int index)
-    {
-        if (SceneLoader.IsInputBlocked) return;
-        if (index < 0 || index >= weaponSlots.Length)
-            return;
-        if (weaponSlots[index] == null)
-            return;
-
-        Current?.OnUnequip();
-        currentIndex = index;
-        Current?.OnEquip();
-    }
-
-    private void NextWeapon()
-    {
-        int newIndex = (currentIndex + 1) % weaponSlots.Length;
-        EquipSlot(newIndex);
-    }
-
-    private void PreviousWeapon()
-    {
-        int newIndex = (currentIndex - 1 + weaponSlots.Length) % weaponSlots.Length;
-        EquipSlot(newIndex);
-    }
+    // Harmless until obsolete PlayerInput listeners are removed in the Editor.
+    public void OnScrollWheel(InputAction.CallbackContext context) { }
+    public void OnWeapon1(InputAction.CallbackContext context) { }
+    public void OnWeapon2(InputAction.CallbackContext context) { }
+    public void OnWeapon3(InputAction.CallbackContext context) { }
 }

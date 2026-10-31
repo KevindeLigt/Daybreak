@@ -8,19 +8,23 @@ public class HealthOrbPickup : MonoBehaviour
     public float floatSpeed = 2f;
 
     private Vector3 startPos;
+    private int playerMask;
+    private bool collected;
 
     void Start()
     {
         startPos = transform.position;
+        playerMask = LayerMask.GetMask("Player");
     }
 
     void Update()
     {
+        if (collected || SceneLoader.IsInputBlocked) return;
         // simple float animation
         transform.position = startPos + Vector3.up * (Mathf.Sin(Time.time * floatSpeed) * floatHeight);
 
         // auto-collect if player walks near
-        if (Physics.CheckSphere(transform.position, pickupRadius, LayerMask.GetMask("Player")))
+        if (Physics.CheckSphere(transform.position, pickupRadius, playerMask))
         {
             TryHeal();
         }
@@ -28,16 +32,12 @@ public class HealthOrbPickup : MonoBehaviour
 
     void TryHeal()
     {
-        // detect player health
+        if (collected) return;
         var player = GameObject.FindGameObjectWithTag("Player");
-        if (player && player.TryGetComponent(out PlayerHealth hp))
-        {
-            hp.currentHealth = Mathf.Min(hp.maxHealth, hp.currentHealth + healAmount);
-            UIManager.Instance.UpdateHealth(hp.currentHealth, hp.maxHealth);
-            hp.screenFlash?.Flash(new Color(0f, 1f, 0.2f), 0.3f, 0.25f);
+        if (player == null || !player.TryGetComponent(out PlayerHealth hp) || !hp.TryHeal(healAmount))
+            return;
 
-        }
-
+        collected = true;
         Destroy(gameObject);
     }
 }

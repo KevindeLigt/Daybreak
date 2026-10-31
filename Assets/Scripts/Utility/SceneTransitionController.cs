@@ -81,7 +81,7 @@ public sealed class SceneTransitionController : MonoBehaviour
                 waited += Time.unscaledDeltaTime;
                 if (waited > 5f)
                 {
-                    Abort("Destination needs an active LevelSceneSetup with PlayerHealth, WeaponManager and PlayerWeaponStats. Encounter remains paused.", false);
+                    Abort("Destination needs an active LevelSceneSetup with PlayerHealth and a WeaponManager pointing to its shotgun. Encounter remains paused.", false);
                     yield break;
                 }
                 yield return null;

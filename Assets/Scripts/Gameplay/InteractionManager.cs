@@ -12,7 +12,7 @@ public class InteractionManager : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
+            Destroy(this);
             return;
         }
 
@@ -52,6 +52,7 @@ public class InteractionManager : MonoBehaviour
 
     public void TryInteract()
     {
+        if (SceneLoader.IsInputBlocked) return;
         if (!HasValidInteractable())
         {
             ClearCurrentInteractable();
@@ -96,5 +97,10 @@ public class InteractionManager : MonoBehaviour
         currentBehaviour = null;
         currentInteractable = null;
         UIManager.Instance?.HideInteractPrompt();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
     }
 }

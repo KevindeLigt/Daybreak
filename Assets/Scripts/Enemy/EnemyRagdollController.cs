@@ -7,6 +7,7 @@ public class EnemyRagdollController : MonoBehaviour
     private NavMeshAgent agent;
     private Animator animator;
     private ZombieAIController zombieAI;
+    private ZombieAI legacyZombieAI;
 
     private Collider mainCollider;
     private Rigidbody rootRigidbody;
@@ -25,6 +26,7 @@ public class EnemyRagdollController : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponentInChildren<Animator>(true);
         zombieAI = GetComponent<ZombieAIController>();
+        legacyZombieAI = GetComponent<ZombieAI>();
 
         mainCollider = GetComponent<Collider>();
         rootRigidbody = GetComponent<Rigidbody>();
@@ -127,6 +129,11 @@ public class EnemyRagdollController : MonoBehaviour
         if (zombieAI != null)
             zombieAI.enabled = !isTrainingDummy;
 
+        if (isTrainingDummy)
+        {
+            if (legacyZombieAI != null) legacyZombieAI.enabled = false;
+        }
+
         if (isTrainingDummy && animator != null)
         {
             animator.applyRootMotion = false;
@@ -215,6 +222,11 @@ public class EnemyRagdollController : MonoBehaviour
     {
         if (zombieAI != null)
             zombieAI.enabled = false;
+        if (legacyZombieAI != null)
+        {
+            legacyZombieAI.enabled = false;
+            if (legacyZombieAI.idleAudioSource != null) legacyZombieAI.idleAudioSource.Stop();
+        }
 
         if (agent != null)
         {

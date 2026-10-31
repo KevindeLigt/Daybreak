@@ -189,4 +189,12 @@ public class EnemyHitReaction : MonoBehaviour
         return false;
     }
 
+    private void OnDisable()
+    {
+        if (bufferedReactionRoutine != null) StopCoroutine(bufferedReactionRoutine);
+        bufferedReactionRoutine = null;
+        accumulatedHitStrength = 0f;
+        accumulatedHitDirection = Vector3.zero;
+    }
+
 }

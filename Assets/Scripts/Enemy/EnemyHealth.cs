@@ -96,6 +96,7 @@ public class EnemyHealth : MonoBehaviour
 
     private float currentHealth;
     private Color originalColor;
+    private Material flashMaterial;
 
     private EnemyRagdollController ragdoll;
     private EnemyEviscerationController eviscerationController;
@@ -124,8 +125,12 @@ public class EnemyHealth : MonoBehaviour
         if (enemyRenderer == null)
             enemyRenderer = GetComponentInChildren<Renderer>();
 
-        if (enemyRenderer != null)
-            originalColor = enemyRenderer.material.color;
+        if (enemyRenderer != null && enemyRenderer.sharedMaterial != null)
+        {
+            // Renderer.material creates a private instance. Cache and release it.
+            flashMaterial = enemyRenderer.material;
+            originalColor = flashMaterial.color;
+        }
     }
 
     public void TakeDamage(float damage, Vector3 force)
@@ -236,7 +241,7 @@ public class EnemyHealth : MonoBehaviour
         // Ragdolls, training dummies and uncredited/environment deaths never award a player kill.
         if (context.IsPlayerDamage)
         {
-            string type = zombieAI != null ? "Zombie" : GetComponent<SkeletonArcherAI>() != null ? "Skeleton" : enemyType;
+            string type = zombieAI != null ? "Zombie" : enemyType;
             if (string.IsNullOrWhiteSpace(type)) type = "Unknown";
             KillComboSystem.GetOrCreate().OnEnemyKilled(new EnemyKillInfo
             {
@@ -351,7 +356,7 @@ public class EnemyHealth : MonoBehaviour
 
     private void StartHitFlash()
     {
-        if (enemyRenderer == null)
+        if (enemyRenderer == null || flashMaterial == null)
             return;
 
         if (flashRoutine != null)
@@ -368,18 +373,18 @@ public class EnemyHealth : MonoBehaviour
             flashRoutine = null;
         }
 
-        if (enemyRenderer != null)
-            enemyRenderer.material.color = originalColor;
+        if (flashMaterial != null)
+            flashMaterial.color = originalColor;
     }
 
     private IEnumerator Flash()
     {
-        enemyRenderer.material.color = hitColor;
+        flashMaterial.color = hitColor;
 
         yield return new WaitForSeconds(flashDuration);
 
-        if (!isDead && enemyRenderer != null)
-            enemyRenderer.material.color = originalColor;
+        if (!isDead && flashMaterial != null)
+            flashMaterial.color = originalColor;
 
         flashRoutine = null;
     }
@@ -425,5 +430,13 @@ public class EnemyHealth : MonoBehaviour
             transform.position + Vector3.up * 0.5f,
             Quaternion.identity
         );
+    }
+
+    private void OnDisable() => StopHitFlash();
+
+    private void OnDestroy()
+    {
+        if (flashMaterial != null) Destroy(flashMaterial);
+        flashMaterial = null;
     }
 }

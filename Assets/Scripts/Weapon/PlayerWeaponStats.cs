@@ -8,15 +8,24 @@ public class PlayerWeaponStats : MonoBehaviour
     public float baseDamageMultiplier = 1f;     // always 1
     public float bonusDamageFlat = 0f;          // shrines add to this
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatic() => Instance = null;
+
     void Awake()
     {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
+            // This component can live on the player root. Never delete the player.
+            Destroy(this);
             return;
         }
 
         Instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
     }
 
     // ===== Increase Damage from Shrines =====

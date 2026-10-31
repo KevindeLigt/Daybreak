@@ -35,26 +35,49 @@ public class ScreenFlashEffect : MonoBehaviour
     /// </summary>
     public void Flash(Color color, float maxAlpha, float duration)
     {
+        if (!isActiveAndEnabled || flashImage == null) return;
         if (flashRoutine != null)
             StopCoroutine(flashRoutine);
 
-        flashRoutine = StartCoroutine(FlashRoutine(color, maxAlpha, duration));
+        flashRoutine = null;
+        if (duration <= 0f || float.IsNaN(duration) || float.IsInfinity(duration))
+        {
+            ClearFlash();
+            return;
+        }
+        flashRoutine = StartCoroutine(FlashRoutine(color, Mathf.Clamp01(maxAlpha), duration));
     }
 
     private IEnumerator FlashRoutine(Color color, float maxAlpha, float duration)
     {
         float timer = 0f;
 
-        while (timer < duration)
+        while (timer < duration && flashImage != null)
         {
-            timer += Time.deltaTime;
+            // Game-over pauses gameplay time; the screen must still clear.
+            timer += Time.unscaledDeltaTime;
             float alpha = Mathf.Lerp(maxAlpha, 0f, timer / duration);
 
             flashImage.color = new Color(color.r, color.g, color.b, alpha);
             yield return null;
         }
 
-        flashImage.color = new Color(color.r, color.g, color.b, 0f);
+        ClearFlash();
         flashRoutine = null;
+    }
+
+    private void ClearFlash()
+    {
+        if (flashImage == null) return;
+        Color color = flashImage.color;
+        color.a = 0f;
+        flashImage.color = color;
+    }
+
+    private void OnDisable()
+    {
+        if (flashRoutine != null) StopCoroutine(flashRoutine);
+        flashRoutine = null;
+        ClearFlash();
     }
 }

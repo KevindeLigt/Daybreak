@@ -7,7 +7,7 @@ public static class SceneLoader
     public const string LoadingScene = "LoadingScreen";
     public static string NextScene;
     public static bool IsLoading => SceneTransitionController.Instance != null && SceneTransitionController.Instance.IsBusy;
-    public static bool IsInputBlocked => IsLoading ||
+    public static bool IsInputBlocked => Time.timeScale <= 0f || IsLoading ||
         (LevelSceneSetup.Instance != null && !LevelSceneSetup.Instance.IsReady);
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]

@@ -29,7 +29,7 @@ public sealed class LevelSceneSetup : MonoBehaviour
 
     private IEnumerator Start()
     {
-        // WeaponManager.Start equips its default slot; UI/GameFlow Start clear old HUD entries.
+        // WeaponManager.Start activates the shotgun; UI/GameFlow Start clear old HUD entries.
         // Restore only after all those initializers have run.
         yield return null;
         if (player == null) player = FindObjectOfType<PlayerHealth>();

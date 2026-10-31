@@ -39,7 +39,6 @@ public class PlayerHealth : MonoBehaviour
 
         // Visual flash
         screenFlash?.Flash(Color.red, 0.4f, 0.25f);
-        Debug.Log("Pain Flash triggered!");
 
         PlayerStatsManager.GetOrCreate().AddDamageTaken(actualDamage);
         KillComboSystem.GetOrCreate().OnPlayerDamaged();
@@ -58,7 +57,18 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    // ===== NEW: Increase Max Health =====
+    /// <summary>Accepts a health pickup for a living player, retaining full-health pickup behaviour.</summary>
+    public bool TryHeal(float amount)
+    {
+        if (currentHealth <= 0f || amount <= 0f || float.IsNaN(amount) || float.IsInfinity(amount))
+            return false;
+
+        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
+        UIManager.Instance?.UpdateHealth(currentHealth, maxHealth);
+        PlayHealFeedback();
+        return true;
+    }
+
     public void IncreaseMaxHealth(float amount)
     {
         maxHealth += amount;
@@ -83,7 +93,6 @@ public class PlayerHealth : MonoBehaviour
         {
             var healColor = new Color(0f, 1f, 0.2f);
             screenFlash.Flash(healColor, 0.3f, 0.25f);
-            Debug.Log("Heal Flash triggered!");
         }
     }
 

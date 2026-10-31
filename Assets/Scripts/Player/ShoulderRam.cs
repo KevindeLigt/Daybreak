@@ -20,7 +20,7 @@ public class ShoulderRam : MonoBehaviour
     [Min(0f)] public float minMoveInputForRam = 0.15f;
 
     [Header("Ram Feel Curve")]
-    [Tooltip("Relative speed through the ram. Normalized so changing its shape preserves Ram Distance.")]
+    [Tooltip("Shapes the burst above normal walking speed. Normalized to preserve Ram Distance; a zero ending eases into walking instead of stopping.")]
     public AnimationCurve ramSpeedCurve = new AnimationCurve(
         new Keyframe(0f, 1f), new Keyframe(0.65f, 0.55f), new Keyframe(1f, 0f));
 
@@ -59,8 +59,10 @@ public class ShoulderRam : MonoBehaviour
 
     private CharacterController controller;
     private PlayerInput playerInput;
+    private HunterMovement movement;
     private Vector2 moveInput;
     private Vector3 ramDirection;
+    private float ramInputMagnitude;
     private float lastRamTime = -999f;
     private float ramCooldownTimer;
     private bool ramRequested;
@@ -102,6 +104,7 @@ public class ShoulderRam : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
+        movement = GetComponent<HunterMovement>();
         if (playerCamera == null) playerCamera = Camera.main;
     }
 
@@ -147,6 +150,7 @@ public class ShoulderRam : MonoBehaviour
         }
         if (input.magnitude < Mathf.Max(0f, minMoveInputForRam)) return false;
         input = Vector2.ClampMagnitude(input, 1f);
+        ramInputMagnitude = input.magnitude;
         direction = transform.right * input.x + transform.forward * input.y;
         direction.y = 0f;
         if (direction.sqrMagnitude < 0.0001f) return false;
@@ -163,7 +167,7 @@ public class ShoulderRam : MonoBehaviour
         unchecked { activation++; }
         enemiesHitThisRam.Clear();
         impactFeedbackPlayed = false;
-        BuildDistanceCurve();
+        float endSpeedScale = BuildDistanceCurve();
         StartFovKick();
         UIManager.Instance?.UpdateRamCooldown(ramCooldownTimer > 0f ? 1f : 0f);
         if (enemyMask.value == 0 && !warnedMask)
@@ -175,14 +179,25 @@ public class ShoulderRam : MonoBehaviour
         float elapsed = 0f;
         float requested = 0f;
         float duration = Mathf.Max(0.05f, ramDuration);
+        float distance = Mathf.Max(0f, ramDistance);
+        float walkSpeed = movement != null && movement.isActiveAndEnabled
+            ? Mathf.Max(0f, movement.walkSpeed) * ramInputMagnitude : 0f;
+        float cruisingSpeed = Mathf.Min(walkSpeed, distance / duration);
+        float burstDistance = Mathf.Max(0f, distance - cruisingSpeed * duration);
+        float exitSpeed = cruisingSpeed + burstDistance / duration * endSpeedScale;
+        float usedFrameSeconds = 0f;
+        bool hitSide = false;
         bool blocked = false;
         while (elapsed < duration && controller.enabled && !blocked)
         {
             float seconds = Mathf.Min(Time.deltaTime, duration - elapsed);
             if (seconds <= 0f) { yield return null; continue; }
+            usedFrameSeconds = 0f;
             movementFrame = Time.frameCount;
             elapsed += seconds;
-            float nextRequested = Mathf.Max(0f, ramDistance) * DistanceProgress(elapsed / duration);
+            // Integrate walking speed plus a shaped burst. The sum still covers
+            // exactly Ram Distance in Ram Duration, but no longer fades to zero.
+            float nextRequested = cruisingSpeed * elapsed + burstDistance * DistanceProgress(elapsed / duration);
             float frameDistance = Mathf.Max(0f, nextRequested - requested);
             requested = nextRequested;
             int steps = Mathf.Max(1, Mathf.CeilToInt(frameDistance / MaxStepDistance));
@@ -204,7 +219,8 @@ public class ShoulderRam : MonoBehaviour
 
                 Vector3 motion = ramDirection * allowed;
                 motion.y = groundedStickForce * stepSeconds;
-                controller.Move(motion);
+                hitSide = (controller.Move(motion) & CollisionFlags.Sides) != 0;
+                usedFrameSeconds += stepSeconds;
                 Physics.SyncTransforms();
                 blocked = allowed < stepDistance - 0.0001f || !controller.isGrounded;
                 if (blocked) break;
@@ -213,6 +229,14 @@ public class ShoulderRam : MonoBehaviour
         }
 
         isRamming = false;
+        bool completed = !blocked && !hitSide && controller.enabled && elapsed >= duration;
+        if (movement != null)
+        {
+            // Spend only time left after the final ram step, even if a long
+            // frame completes the entire ram before HunterMovement.Update.
+            movement.ResumeAfterRam(completed ? ramDirection * exitSpeed : Vector3.zero,
+                completed ? Mathf.Max(0f, Time.deltaTime - usedFrameSeconds) : 0f);
+        }
         ReturnFov();
         if (recoveryTime > 0f)
         {
@@ -305,19 +329,27 @@ public class ShoulderRam : MonoBehaviour
         top = center + Vector3.up * halfSegment;
     }
 
-    private void BuildDistanceCurve()
+    private float BuildDistanceCurve()
     {
         cumulativeSpeed[0] = 0f;
         int segments = cumulativeSpeed.Length - 1;
         for (int i = 1; i <= segments; i++)
         {
-            float value = ramSpeedCurve != null && ramSpeedCurve.length > 0
-                ? Mathf.Max(0f, ramSpeedCurve.Evaluate((i - 0.5f) / segments)) : 1f;
+            float value = SpeedWeight((i - 0.5f) / segments);
             cumulativeSpeed[i] = cumulativeSpeed[i - 1] + value;
         }
         float total = cumulativeSpeed[segments];
+        bool usable = total > 0.0001f && !float.IsInfinity(total);
         for (int i = 1; i <= segments; i++)
-            cumulativeSpeed[i] = total > 0.0001f ? cumulativeSpeed[i] / total : (float)i / segments;
+            cumulativeSpeed[i] = usable ? cumulativeSpeed[i] / total : (float)i / segments;
+        return usable ? SpeedWeight(1f) * segments / total : 1f;
+    }
+
+    private float SpeedWeight(float normalizedTime)
+    {
+        float value = ramSpeedCurve != null && ramSpeedCurve.length > 0
+            ? ramSpeedCurve.Evaluate(normalizedTime) : 1f;
+        return float.IsNaN(value) || float.IsInfinity(value) ? 0f : Mathf.Max(0f, value);
     }
 
     private float DistanceProgress(float normalizedTime)
