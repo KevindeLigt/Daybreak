@@ -184,6 +184,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
   enemyType: Zombie
   maxHealth: 100
+  baseKillScore: 100
   trainingDummy: 0
   trainingResetDelay: 1.5
   deathForceMultiplier: 10
@@ -227,6 +228,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyEviscerationController
   originalBodyRenderers:
   - {fileID: 690214317320605922}
+  - {fileID: 5860678357713323570}
   gibSpawns:
   - gibPrefab: {fileID: 1595600378173142241, guid: 6fce6fb0a766cc24582f1885cc0165fc, type: 3}
     spawnAnchor: {fileID: 2977398170742217903}
@@ -400,6 +402,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7091909866335770990}
     m_Modifications:
+    - target: {fileID: 590825679968212226, guid: 711cc903c0c53794ba16cc6b8bd6db1d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: e77e0eb06649c5448b5759f9bd0cc74c, type: 2}
     - target: {fileID: 5708881054326222858, guid: 711cc903c0c53794ba16cc6b8bd6db1d, type: 3}
       propertyPath: zombieAI
       value: 
@@ -515,6 +521,11 @@ Rigidbody:
 --- !u!136 &5368507269878340212 stripped
 CapsuleCollider:
   m_CorrespondingSourceObject: {fileID: 1433978469461444932, guid: 711cc903c0c53794ba16cc6b8bd6db1d, type: 3}
+  m_PrefabInstance: {fileID: 6441914627625161520}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &5860678357713323570 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 590825679968212226, guid: 711cc903c0c53794ba16cc6b8bd6db1d, type: 3}
   m_PrefabInstance: {fileID: 6441914627625161520}
   m_PrefabAsset: {fileID: 0}
 --- !u!54 &5869898915550169753 stripped
